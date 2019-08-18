@@ -1,0 +1,9 @@
+Running Orsen Chat:
+
+new package imported: flask-cors
+> python -m pip install flask-cors
+
+1. activate virtual environment
+2. run ngrok http 5000
+3. copy the ngrok link and paste to the website 
+4. start chatting

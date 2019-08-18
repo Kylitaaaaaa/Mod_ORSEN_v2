@@ -1,0 +1,58 @@
+3 cmd
+
+1. 
+first cmd run:
+>  ngrok http [port]
+orsen port is 5000
+
+expected output:
+
+ngrok by @inconshreveable                                                                               (Ctrl+C to quit)
+
+Session Status                online
+Session Expires               7 hours, 56 minutes
+Version                       2.2.8
+Region                        United States (us)
+Web Interface                 http://127.0.0.1:4040
+Forwarding                    http://434c1329.ngrok.io -> localhost:5000
+Forwarding                    https://434c1329.ngrok.io -> localhost:5000
+
+Connections                   ttl     opn     rt1     rt5     p50     p90
+                              2       0       0.00    0.00    1.36    2.40
+
+
+2. (only run when ngrok url is changed)
+navigate to orsen_processing
+open orsen_actions.json
+copy a part of forwarding link from ngrok
+paste to 2 "url" keys under "conversations"
+
+second cmd run:
+
+gactions update --action_package D:\orsen\orsen_processor\orsen_actions.json --project eliza-e81d0
+
+expected output:
+
+Your app for the Assistant for project eliza-e81d0 was successfully updated with your actions. Visit the Actions on Google console to finish registering your app and submit it for review at https://console.actions.google.com/project/eliza-e81d0/overview
+ 
+
+3. 
+navigate to orsen_processing
+third cmd run:
+D:\orsen\orsen_processor\venv\Scripts\python.exe D:/orsen/orsen_processor/orsen.py
+
+expected output:
+
+* Serving Flask app "orsen" (lazy loading)
+ * Environment: production
+   WARNING: Do not use the development server in a production environment.
+   Use a production WSGI server instead.
+ * Debug mode: on
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 108-896-949
+ * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+
+4. go to simulator (do this for every change in python code)
+change version to update 
+Start calling Orsen

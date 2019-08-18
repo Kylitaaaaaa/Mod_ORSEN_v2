@@ -1,0 +1,17 @@
+diff a/src/run.py b/src/run.py	(rejected hunks)
+@@ -47,6 +47,15 @@
+         print("oops")
+     else:
+         bef +=1
++=======
++    # if curr > 0:
++    #     infoextraction.coref_resolution(sent, sentences[curr], sentences[bef], world, False)
++    # else:
++    #     infoextraction.coref_resolution(sent, sentences[curr], sentences[curr], world, True)
++    # print(curr)
++    # curr += 1
++    # bef += 1
++>>>>>>> 698751e1d61d4bdbe688bc8f9ab6adff578e65fc
+ 
+ 
+ print(world.characters)
