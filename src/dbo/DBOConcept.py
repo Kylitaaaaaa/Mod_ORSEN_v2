@@ -1,6 +1,7 @@
-from pypika import Query, Table, Field
+from src.db import SQLConnector, SQLExecuter
+from src.constants import  *
 
-from src.db import SQLConnector
+from pypika import Query, Table, Criterion, Field
 import abc
 from abc import ABC, abstractmethod
 import sys
@@ -28,21 +29,61 @@ class DBOConcept(ABC):
         query = q.get_sql()
         query = query.replace("\"","")
 
-        conn = SQLConnector.get_instance().get_connection()
-        cursor = conn.cursor()
+        result = SQLExecuter.execute_query(query, FETCH_ALL)
 
-        resulting = []
-        try:
-            cursor.execute(query)
-            result = cursor.fetchall()
+        concepts = []
+        for r in result:
+            concepts.append(self.concept_type(*r))
+        return concepts
 
-            for row in result:
+    def get_concept_by_id(self, id):
+        q = Query.from_(self.table_reference)\
+            .select("*")\
+            .where(
+                self.table_reference.idconcepts == id
+            )
 
-                resulting.append(self.concept_type(*row))
+        query = q.get_sql()
+        query = query.replace("\"","")
 
-        except Exception as e:
+        result = SQLExecuter.execute_query(query, FETCH_ONE)
+        concept = self.concept_type(*result)
 
-            print(e, file=sys.stderr)
+        return concept
 
-        conn.close()
-        return resulting
+
+    def get_concept_by_word(self, word):
+        q = Query.from_(self.table_reference)\
+            .select("*")\
+            .where(
+                (self.table_reference.first == word) | (self.table_reference.second == word)
+            )
+
+        query = q.get_sql()
+        query = query.replace("\"","")
+        print(query)
+
+        result = SQLExecuter.execute_query(query, FETCH_ALL)
+
+        concepts = []
+        for r in result:
+            concepts.append(self.concept_type(*r))
+        return concepts
+
+    def get_concept_by_relation(self, word, relation):
+        q = Query.from_(self.table_reference)\
+            .select("*")\
+            .where(
+                ((self.table_reference.first == word) | (self.table_reference.second == word)) & (self.table_reference.relation == relation)
+            )
+
+        query = q.get_sql()
+        query = query.replace("\"","")
+        print(query)
+
+        result = SQLExecuter.execute_query(query, FETCH_ALL)
+
+        concepts = []
+        for r in result:
+            concepts.append(self.concept_type(*r))
+        return concepts

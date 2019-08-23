@@ -2,6 +2,9 @@ from src.constants import *
 import pymysql
 import sys
 
+"""
+    Singleton impelementation of DB connector
+"""
 class SQLConnector:
 
     __instance = None
