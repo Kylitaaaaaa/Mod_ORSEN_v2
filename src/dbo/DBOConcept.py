@@ -29,7 +29,7 @@ class DBOConcept(ABC):
         query = q.get_sql()
         query = query.replace("\"","")
 
-        result = SQLExecuter.execute_query(query, FETCH_ALL)
+        result = SQLExecuter.execute_read_query(query, FETCH_ALL)
 
         concepts = []
         for r in result:
@@ -46,7 +46,7 @@ class DBOConcept(ABC):
         query = q.get_sql()
         query = query.replace("\"","")
 
-        result = SQLExecuter.execute_query(query, FETCH_ONE)
+        result = SQLExecuter.execute_read_query(query, FETCH_ONE)
         concept = self.concept_type(*result)
 
         return concept
@@ -63,7 +63,7 @@ class DBOConcept(ABC):
         query = query.replace("\"","")
         print(query)
 
-        result = SQLExecuter.execute_query(query, FETCH_ALL)
+        result = SQLExecuter.execute_read_query(query, FETCH_ALL)
 
         concepts = []
         for r in result:
@@ -81,9 +81,28 @@ class DBOConcept(ABC):
         query = query.replace("\"","")
         print(query)
 
-        result = SQLExecuter.execute_query(query, FETCH_ALL)
+        result = SQLExecuter.execute_read_query(query, FETCH_ALL)
 
         concepts = []
         for r in result:
             concepts.append(self.concept_type(*r))
         return concepts
+
+    def get_specific_concept(self, first, relation, second):
+        q = Query.from_(self.table_reference)\
+            .select("*")\
+            .where(
+                (self.table_reference.first == first) & (self.table_reference.relation == relation) &  (self.table_reference.second == second)
+            )
+
+        query = q.get_sql()
+        query = query.replace("\"","")
+        print(query)
+
+        result = SQLExecuter.execute_read_query(query, FETCH_ONE)
+        concept = self.concept_type(*result)
+
+        return concept
+
+    def add_concept(self, concept):
+        # TODO implement this
