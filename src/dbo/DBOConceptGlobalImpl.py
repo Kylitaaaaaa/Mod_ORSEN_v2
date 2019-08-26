@@ -1,5 +1,9 @@
 from . import DBOConcept
+from src.constants import *
+from src.db import SQLExecuter
 from src.objects.concept import GlobalConcept
+
+from pypika import Query, Table, Criterion, Field
 
 """
     Global implementation of DBO Concept which uses the GlobalConcept object type.
@@ -8,4 +12,23 @@ from src.objects.concept import GlobalConcept
 class DBOConceptGlobalImpl(DBOConcept):
     def __init__(self):
         DBOConcept.__init__(self, "concepts", GlobalConcept)
-        print("Done")
+
+    def add_concept(self, concept):
+        q = Query\
+            .into(self.table_reference)\
+            .columns(
+                self.table_reference.first,
+                self.table_reference.relation,
+                self.table_reference.second)\
+            .insert(
+                concept.first,
+                concept.relation,
+                concept.second )
+
+        query = q.get_sql()
+        query = query.replace("\"", "")
+        print(query)
+
+        sql_response = SQLExecuter.execute_insert_query(query, concept)
+
+        return sql_response

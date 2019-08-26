@@ -37,8 +37,8 @@ class SQLExecuter:
             cursor = conn.cursor()
 
             # Execute above sql statement using query and details passed from other functions'
-            # TODO verify if this method works
-            cursor.execute(query, *details)
+            cursor.execute(query)
+            # cursor.execute(query, *details)
             conn.commit()
 
             executed = True
