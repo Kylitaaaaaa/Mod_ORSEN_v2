@@ -1,4 +1,4 @@
-from . import DBOConcept
+from src.dbo import DBOConcept
 from src.constants import *
 from src.db import SQLExecuter
 from src.objects.concept import LocalConcept
