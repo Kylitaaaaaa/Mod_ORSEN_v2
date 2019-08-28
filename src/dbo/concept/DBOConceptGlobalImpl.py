@@ -1,7 +1,7 @@
-from src.dbo import DBOConcept
+from . import DBOConcept
 from src.constants import *
 from src.db import SQLExecuter
-from src.objects.concept import GlobalConcept
+from src.models.concept import GlobalConcept
 
 from pypika import Query, Table, Criterion, Field
 

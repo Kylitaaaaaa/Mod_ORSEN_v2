@@ -56,6 +56,32 @@ class DBOConcept(ABC):
         return concepts
 
     """
+        General code to get a concept based on the word-relation-word pairing in a given concept. 
+
+        Input:  first word, relation, second word
+        Output: Concept object based on concept type
+    """
+    def get_specific_concept(self, first, relation, second):
+        q = Query \
+            .from_(self.table_reference) \
+            .select("*") \
+            .where(
+            (self.table_reference.first == first) & (self.table_reference.relation == relation) & (
+                        self.table_reference.second == second)
+        )
+
+        query = q.get_sql()
+        query = query.replace("\"", "")
+        print(query)
+
+        result = SQLExecuter.execute_read_query(query, FETCH_ONE)
+        if result is None: return None
+
+        concept = self.concept_type(*result)
+
+        return concept
+
+    """
         General code to get a concept using its concept id "id". Converts database rows into objects by using 
         the object type defined in concept_type
                         
@@ -132,31 +158,6 @@ class DBOConcept(ABC):
         for r in result:
             concepts.append(self.concept_type(*r))
         return concepts
-
-    """
-        General code to get a concept based on the word-relation-word pairing in a given concept. 
-        
-        Input:  first word, relation, second word
-        Output: Concept object based on concept type
-    """
-    def get_specific_concept(self, first, relation, second):
-        q = Query\
-            .from_(self.table_reference)\
-            .select("*")\
-            .where(
-                (self.table_reference.first == first) & (self.table_reference.relation == relation)  &  (self.table_reference.second == second)
-            )
-
-        query = q.get_sql()
-        query = query.replace("\"","")
-        print(query)
-
-        result = SQLExecuter.execute_read_query(query, FETCH_ONE)
-        if result is None: return None
-
-        concept = self.concept_type(*result)
-
-        return concept
 
     """
         Similar to get_specific_concept, except it searches for relations with specified words as substrings instead 
