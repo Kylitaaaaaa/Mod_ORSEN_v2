@@ -1,3 +1,13 @@
 
 \(do_not_touch\)ORSEN2/
 *.pyc
+
+.idea/inspectionProfiles/profiles_settings.xml
+
+.idea/misc.xml
+
+.idea/Mod_ORSEN_v2.iml
+
+.idea/modules.xml
+
+.idea/vcs.xml

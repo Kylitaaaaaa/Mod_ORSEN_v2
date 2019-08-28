@@ -27,7 +27,7 @@ class SQLExecuter:
         return result
 
     @staticmethod
-    def execute_insert_query(query, details):
+    def execute_write_query(query):
         result = []
         executed = False
 

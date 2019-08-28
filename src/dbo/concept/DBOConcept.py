@@ -186,3 +186,7 @@ class DBOConcept(ABC):
         for r in result:
             concepts.append(self.concept_type(*r))
         return concepts
+
+    @abstractmethod
+    def add_concept(self, concept):
+        pass

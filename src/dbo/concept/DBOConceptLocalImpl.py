@@ -44,6 +44,35 @@ class DBOConceptLocalImpl(DBOConcept):
         query = query.replace("\"", "")
         print(query)
 
-        sql_response = SQLExecuter.execute_insert_query(query, concept)
+        sql_response = SQLExecuter.execute_write_query(query)
 
         return sql_response
+
+    def update_score(self, id, score):
+        q = Query\
+            .update(self.table_reference)\
+            .set(self.table_reference.score, score)\
+            .where(self.table_reference.id == id)
+
+        query = q.get_sql()
+        query = query.replace("\"", "")
+        print(query)
+
+        sql_response = SQLExecuter.execute_write_query(query)
+
+        return sql_response
+
+    def update_valid(self, id, valid):
+        q = Query\
+            .update(self.table_reference)\
+            .set(self.table_reference.valid, valid)\
+            .where(self.table_reference.id == id)
+
+        query = q.get_sql()
+        query = query.replace("\"", "")
+        print(query)
+
+        sql_response = SQLExecuter.execute_write_query(query)
+
+        return sql_response
+

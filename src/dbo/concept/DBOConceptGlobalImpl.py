@@ -29,6 +29,6 @@ class DBOConceptGlobalImpl(DBOConcept):
         query = query.replace("\"", "")
         print(query)
 
-        sql_response = SQLExecuter.execute_insert_query(query, concept)
+        sql_response = SQLExecuter.execute_write_query(query)
 
         return sql_response
