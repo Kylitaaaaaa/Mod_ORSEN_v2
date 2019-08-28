@@ -1,1 +1,1 @@
-from src.user import DBOUser
+from .User import User
