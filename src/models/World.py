@@ -1,4 +1,4 @@
-class Object:
+class World:
     objects = [] #Object object
     characters = [] #Character object
     settings = [] #Setting object

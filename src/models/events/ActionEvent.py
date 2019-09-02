@@ -1,4 +1,5 @@
 from . import Event
+from .constants import EVENT_ACTION
 
 class ActionEvent(Event):
 
@@ -8,8 +9,8 @@ class ActionEvent(Event):
     preposition = ""
     object_of_preposition = ""
 
-    def __init__(self, sequence_number, type, subject, attributes):
-        super().__init__(sequence_number, type, subject)
+    def __init__(self, sequence_number, subject, attributes):
+        super().__init__(sequence_number, EVENT_ACTION, subject)
 
         self.attributes = attributes
 
