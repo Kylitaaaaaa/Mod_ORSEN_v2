@@ -2,15 +2,19 @@ from src.db import SQLConnector
 from src.dbo.concept import DBOConcept, DBOConceptGlobalImpl, DBOConceptLocalImpl
 from src.dbo.dialogue import DBODialogueTemplate
 from src.dbo.user import DBOUser
-from src.models.concept import Concept, GlobalConcept, LocalConcept
 from src.models.user import User
 
-connection = SQLConnector.get_instance().get_connection()
+# from src.models.dialogue import DialogueTemplate, UnknownDialogueTemplate
+from src.models.dialogue import  UnknownDialogueTemplate
+from src import DialogueTemplateBuilder
 
-concept_manager = DBOConceptGlobalImpl()
-local_concept_manager = DBOConceptLocalImpl()
-user_manager = DBOUser("users", User)
-dialogue_manager = DBODialogueTemplate("templates", DBODialogueTemplate)
+# connection = SQLConnector.get_instance().get_connection()
+#
+# concept_manager = DBOConceptGlobalImpl()
+# local_concept_manager = DBOConceptLocalImpl()
+# user_manager = DBOUser("users", User)
+dialogue_manager = DBODialogueTemplate("templates")
+
 # concept = concept_manager.get_concept_by_id(4000)
 # concept = local_concept_manager.get_concept_by_id(1)
 # print(concept)
@@ -52,5 +56,13 @@ dialogue_manager = DBODialogueTemplate("templates", DBODialogueTemplate)
 # is_added = user_manager.add_user(user)
 # print("IS CONCEPT ADDED:",is_added)
 
-template = dialogue_manager.get_specific_template(1)
-print(template)
+# template = dialogue_manager.get_specific_template(1)
+# print(template)
+
+templates = dialogue_manager.get_templates_of_type('feedback')
+print(templates)
+
+# DialogueTemplate.build(-1, 'a', 'a', 'a', 'a', 'a')
+# a = UnknownDialogueTemplate(-1, 'a', 'a', 'a', 'a', 'a')
+# a = DialogueTemplateBuilder.build(-1, 'a', 'a', 'a', 'a', 'a')
+# print(a)
