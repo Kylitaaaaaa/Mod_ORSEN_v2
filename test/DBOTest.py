@@ -12,7 +12,6 @@ from src import DialogueTemplateBuilder
 #
 # concept_manager = DBOConceptGlobalImpl()
 # local_concept_manager = DBOConceptLocalImpl()
-# user_manager = DBOUser("users", User)
 dialogue_manager = DBODialogueTemplate("templates")
 
 # concept = concept_manager.get_concept_by_id(4000)
@@ -52,15 +51,16 @@ dialogue_manager = DBODialogueTemplate("templates")
 # for concept in concepts:
 #     print(concept)
 
-# user = User(-1, "wisner", "xd")
-# is_added = user_manager.add_user(user)
-# print("IS CONCEPT ADDED:",is_added)
+user_manager = DBOUser("users", User)
+user = User(-1, "wisner", "xd")
+new_user = user_manager.add_user(user)
+print(new_user)
 
 # template = dialogue_manager.get_specific_template(1)
 # print(template)
 
-templates = dialogue_manager.get_templates_of_type('feedback')
-print(templates)
+# templates = dialogue_manager.get_templates_of_type('feedback')
+# print(templates)
 
 # DialogueTemplate.build(-1, 'a', 'a', 'a', 'a', 'a')
 # a = UnknownDialogueTemplate(-1, 'a', 'a', 'a', 'a', 'a')

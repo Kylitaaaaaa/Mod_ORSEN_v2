@@ -9,4 +9,6 @@ class UnknownDialogueTemplate(DialogueTemplate):
         super().__init__(id, DIALOGUE_TYPE_UNKNOWN, template, relation, blanks, nodes, dependent_nodes);
 
     def fill_blank(self, fill):
+        # TODO fix fill_blank implementation
+
         pass

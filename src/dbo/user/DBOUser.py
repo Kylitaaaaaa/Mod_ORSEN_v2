@@ -28,9 +28,9 @@ class DBOUser(ABC):
         result = SQLExecuter.execute_read_query(query, FETCH_ONE)
         if result is None: return None
 
-        concept = self.user_type(*result)
+        user = self.user_type(*result)
 
-        return concept
+        return user
 
 
     def get_user_by_id(self, id):
@@ -68,4 +68,7 @@ class DBOUser(ABC):
 
         sql_response = SQLExecuter.execute_write_query(query)
 
-        return sql_response
+        if sql_response is not None:
+            user.id = sql_response
+
+        return user

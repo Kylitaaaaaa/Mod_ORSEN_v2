@@ -29,7 +29,7 @@ class SQLExecuter:
     @staticmethod
     def execute_write_query(query):
         result = []
-        executed = False
+        executed = None
 
         try:
             # Open connection to MySQL
@@ -41,7 +41,7 @@ class SQLExecuter:
             # cursor.execute(query, *details)
             conn.commit()
 
-            executed = True
+            executed = cursor.lastrowid
         except Exception as e:
             print(e, file=sys.stderr)
         finally:

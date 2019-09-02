@@ -1,6 +1,7 @@
 import abc
 from abc import ABC
 
+
 class DialogueTemplate(ABC):
    __metaclass__ = abc.ABCMeta
 
