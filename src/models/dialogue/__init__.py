@@ -1,0 +1,6 @@
+from .DialogueTemplate import DialogueTemplate
+from .PromptDialogueTemplate import  PromptDialogueTemplate
+from .PumpingGeneralDialogueTemplate import PumpingGeneralDialogueTemplate
+
+from .InputMisheardDialogueTemplate import InputMisheardDialogueTemplate
+from .UnknownDialogueTemplate import  UnknownDialogueTemplate

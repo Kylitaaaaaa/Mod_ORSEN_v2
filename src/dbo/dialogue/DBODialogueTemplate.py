@@ -1,19 +1,13 @@
 from src.db import SQLExecuter
 from src.constants import *
-from src.dialogue import DialogueTemplate
+from src.models.dialogue import DialogueTemplate
 
-from pypika import Query, Table, Criterion, Field
-import abc
-from abc import ABC, abstractmethod
-import sys
+from pypika import Query, Table
 
-class DBODialogueTemplate(ABC):
-    __metaclass__ = abc.ABCMeta
+class DBODialogueTemplate():
 
-    def __init__(self, table_reference, dialogue_template_type):
-        super().__init__()
+    def __init__(self, table_reference):
         self.table_reference = Table(table_reference)
-        self.dialogue_template_type = dialogue_template_type
 
     def get_specific_template(self, id):
         q = Query \
@@ -33,3 +27,25 @@ class DBODialogueTemplate(ABC):
         dialogue_template = DialogueTemplate.build(*result)
 
         return dialogue_template
+
+    def get_templates_of_type(self, dialogue_type):
+        q = Query \
+            .from_(self.table_reference) \
+            .select("*") \
+            .where(
+            self.table_reference.response_type == dialogue_type
+        )
+
+        query = q.get_sql()
+        query = query.replace("\"", "")
+        print(query)
+
+        result = SQLExecuter.execute_read_query(query, FETCH_ALL)
+        if result is None: return None
+
+        dialogue_templates = []
+        for r in result:
+            dialogue_templates.append(DialogueTemplate.build(*r))
+
+        return dialogue_templates
+
