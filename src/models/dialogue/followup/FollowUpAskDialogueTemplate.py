@@ -9,5 +9,5 @@ class FollowUpAskDialogueTemplate(FollowUpDialogueTemplate):
 
     def fill_blank(self, fill):
         # TODO fix fill_blank implementation
-        
+
         pass
