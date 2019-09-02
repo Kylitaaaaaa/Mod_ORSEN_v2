@@ -1,11 +1,17 @@
+""" PACKAGE VERSIONING CONTROL """
+SPACY_VERSION = '2.1.0'
+NEURALCOREF_VERSION = '4.0.0'
+LAST_CHECK_DATE = "July 26, 2019"
+
+""" DATABASE CREDENTIALS """
 LOCATION = "localhost"
 USERNAME = "root"
 PASSWORD = "password"
 SCHEMA = "orsen_kb"
 
+""" SQL COMMANDS """
 FETCH_ONE = 1
 FETCH_ALL = 2
-
 
 ####################################################
 # RELATIONS ########################################

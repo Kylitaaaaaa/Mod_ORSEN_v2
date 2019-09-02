@@ -7,8 +7,6 @@ Created on Sun Aug  4 12:27:58 2019
 import abc
 from abc import ABC, abstractmethod
 
-from filewriter import TxtWriter
-
 
 class Coreference(ABC):
     __metaclass__ = abc.ABCMeta

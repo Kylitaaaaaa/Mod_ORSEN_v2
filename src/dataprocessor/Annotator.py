@@ -4,7 +4,7 @@ Created on Tue Jul  9 05:52:05 2019
 
 @author: Wisner
 """
-from constants import *
+from src.constants import *
 
 import spacy
 import neuralcoref
