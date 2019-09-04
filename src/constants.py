@@ -1,3 +1,8 @@
+""" FOR LOGS """
+CONVERSATION_LOG = "conversation"
+INFORMATION_EXTRACTION_LOG = "information_extraction"
+DIALOGUE_MODEL_LOG = "dialogue_model"
+
 """ PACKAGE VERSIONING CONTROL """
 SPACY_VERSION = '2.1.0'
 NEURALCOREF_VERSION = '4.0.0'
