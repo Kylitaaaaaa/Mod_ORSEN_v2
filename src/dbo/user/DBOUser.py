@@ -32,6 +32,26 @@ class DBOUser(ABC):
 
         return user
 
+    def get_user_by_name(self, name):
+        q = Query\
+            .from_(self.table_reference)\
+            .select("*")\
+            .where(
+                (self.table_reference.name == name)
+            )
+
+        query = q.get_sql()
+        query = query.replace("\"","")
+        print(query)
+
+        result = SQLExecuter.execute_read_query(query, FETCH_ONE)
+        if result is None: return None
+
+        users = []
+        for r in result:
+            users.append(self.user_type(*r))
+
+        return users
 
     def get_user_by_id(self, id):
         q = Query \
