@@ -43,7 +43,7 @@ class ORSEN:
                     pass
                 else:
                     pass
-            elif self.endstorygen
+            elif self.endstorygen:
                 if response.lower() in IS_AFFIRM:
                     pass
                 else:
