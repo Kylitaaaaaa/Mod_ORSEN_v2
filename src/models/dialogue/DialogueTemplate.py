@@ -1,5 +1,5 @@
 import abc
-from abc import ABC
+from abc import ABC, abstractmethod
 
 
 class DialogueTemplate(ABC):
@@ -26,3 +26,8 @@ class DialogueTemplate(ABC):
 
    def get_type(self):
       return self.dialogue_type
+
+   @staticmethod
+   @abstractmethod
+   def is_usable(self, to_check=[]):
+      pass
