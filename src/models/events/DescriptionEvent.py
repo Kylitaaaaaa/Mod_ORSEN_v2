@@ -12,3 +12,18 @@ class DescriptionEvent(Event):
 
     def get_attributes(self):
         return self.attributes
+
+    def __str__(self):
+        subject_string = "\tSubject = [ "
+        for object in self.subject:
+            subject_string += object + ","
+        subject_string += " ]\n"
+
+        string = "EVENT #" + str(self.sequence_no) + " - "
+
+        string += "DESCRIPTIVE\n"
+        string += subject_string
+        string += "\tattributes = [ "
+        for attr in self.attributes:
+            string += attr + ","
+        string += " ]\n"
