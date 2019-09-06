@@ -1,8 +1,7 @@
 from src.dbo.user import DBOUser
 from src.models.user import User
+from src import Logger
 from src.ORSEN import ORSEN
-
-
 
 # Database access
 dbo_user = DBOUser('users', User)
@@ -83,14 +82,20 @@ def set_global_curr_user(user):
 
 
 #start here
-login_signup()
-
-print("done")
-
+# Initialize loggers
+Logger.setup_loggers()
 
 #User objects
 curr_user = None
-# login_signup()
-# ORSEN.start_conversation()
-#
-# ORSEN.make_kwento()
+login_signup()
+print("done")
+
+orsen = ORSEN()
+
+is_engaged = True
+while is_engaged:
+    response = get_input()
+    ORSEN.get_response(response)
+    is_engaged = ORSEN.talk()
+
+

@@ -18,6 +18,11 @@ SCHEMA = "orsen_kb"
 FETCH_ONE = 1
 FETCH_ALL = 2
 
+""" GENERIC RESPONSES """
+IS_AFFIRM = ['yes', 'yes.', 'yeah', 'yeah.', 'sure', 'sure.', 'yup', 'yup.']
+IS_DENY = ['no', 'no.', 'nope', 'nope.']
+IS_END = ['bye', 'bye.', 'the end', 'the end.']
+
 ####################################################
 # RELATIONS ########################################
 ####################################################
