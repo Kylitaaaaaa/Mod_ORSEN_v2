@@ -92,10 +92,21 @@ print("done")
 
 orsen = ORSEN()
 
+# is_engaged = True
+# while is_engaged:
+#     response = get_input()
+#     ORSEN.get_response(response)
+#     is_engaged = ORSEN.talk()
+
 is_engaged = True
 while is_engaged:
     response = get_input()
-    ORSEN.get_response(response)
-    is_engaged = ORSEN.talk()
+    if not ORSEN.is_end_story(response):
+        # story world stuff here
+        print("Story time")
+        ORSEN.get_response(response)
+        is_engaged = ORSEN.talk()
+    else:
+        print("End of story")
 
 
