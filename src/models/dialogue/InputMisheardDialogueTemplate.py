@@ -1,5 +1,5 @@
 from . import DialogueTemplate
-from .constants import DIALOGUE_TYPE_INPUT_MISHEARD
+from src.constants import DIALOGUE_TYPE_INPUT_MISHEARD
 
 
 class InputMisheardDialogueTemplate(DialogueTemplate):
@@ -8,5 +8,8 @@ class InputMisheardDialogueTemplate(DialogueTemplate):
 
     def fill_blanks(self, details=[]):
         # TODO fix fill_blank implementation
+        pass
 
+    def is_usable(self, to_check=[]):
+        # TODO fix fill_blank implementation
         pass

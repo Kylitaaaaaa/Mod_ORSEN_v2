@@ -1,5 +1,5 @@
 from . import DialogueTemplate
-from .constants import DIALOGUE_TYPE_PUMPING_GENERAL
+from src.constants import DIALOGUE_TYPE_PUMPING_GENERAL
 
 
 class PumpingGeneralDialogueTemplate(DialogueTemplate):
@@ -9,5 +9,8 @@ class PumpingGeneralDialogueTemplate(DialogueTemplate):
 
     def fill_blanks(self, details=[]):
         # TODO fix fill_blank implementation
+        pass
 
+    def is_usable(self, to_check=[]):
+        # TODO fix fill_blank implementation
         pass

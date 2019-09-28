@@ -1,5 +1,5 @@
 from . import DialogueTemplate
-from .constants import DIALOGUE_TYPE_FEEDBACK
+from src.constants import DIALOGUE_TYPE_FEEDBACK
 
 
 class FeedbackDialogueTemplate(DialogueTemplate):
@@ -9,5 +9,8 @@ class FeedbackDialogueTemplate(DialogueTemplate):
 
     def fill_blank(self, fill):
         # TODO fix fill_blank implementation
+        pass
 
+    def is_usable(self, to_check=[]):
+        # TODO fix fill_blank implementation
         pass

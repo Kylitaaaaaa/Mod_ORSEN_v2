@@ -1,5 +1,5 @@
-from src.models.dialogue.constants import *
 from src.models.dialogue import PromptDialogueTemplate, PumpingGeneralDialogueTemplate, InputMisheardDialogueTemplate, UnknownDialogueTemplate
+from src.constants import *
 
 class DialogueTemplateBuilder():
 

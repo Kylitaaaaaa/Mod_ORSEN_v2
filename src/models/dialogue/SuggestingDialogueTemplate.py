@@ -1,5 +1,5 @@
 from . import DialogueTemplate
-from .constants import DIALOGUE_TYPE_SUGGESTING
+from src.constants import DIALOGUE_TYPE_SUGGESTING
 
 
 class SuggestingDialogueTemplate(DialogueTemplate):
@@ -15,3 +15,7 @@ class SuggestingDialogueTemplate(DialogueTemplate):
                 if self.template[i] == self.node[j]:
                     self.template[i] = fill
                     break
+
+    def is_usable(self, to_check=[]):
+        # TODO fix fill_blank implementation
+        pass

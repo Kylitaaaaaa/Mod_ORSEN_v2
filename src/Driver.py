@@ -43,13 +43,13 @@ def login():
             print("Hi! Welcome back ", name)
             is_done = True
 
-def signup(self):
+def signup():
     print("What's your username?")
     name = input()
     print("What's is the secret code?")
     code = input()
 
-    self.set_global_curr_user(self.dbo_user.add_user(User(-1, name, code)))
+    set_global_curr_user(dbo_user.add_user(User(-1, name, code)))
 
 def login_signup_automatic():
     print("What's your name?")
