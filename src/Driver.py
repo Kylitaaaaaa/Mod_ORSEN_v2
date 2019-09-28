@@ -85,11 +85,14 @@ def set_global_curr_user(user):
 # Initialize loggers
 Logger.setup_loggers()
 
-#User objects
+#Retrieve User Details --- User objects
+print("---------Retrieving User Details---------")
 curr_user = None
-login_signup()
-print("done")
+# login_signup()
+# print("done")
 
+
+print("---------Launching ORSEN---------")
 orsen = ORSEN()
 
 # is_engaged = True
@@ -101,12 +104,15 @@ orsen = ORSEN()
 is_engaged = True
 while is_engaged:
     response = get_input()
-    if not ORSEN.is_end_story(response):
+    if ORSEN.is_end_story(ORSEN, response):
+        ###end of story
+        print("End of story")
+    else:
         # story world stuff here
         print("Story time")
-        ORSEN.get_response(response)
+        ORSEN.get_response(ORSEN, response)
         is_engaged = ORSEN.talk()
-    else:
-        print("End of story")
+
+print("---------Closing ORSEN---------")
 
 

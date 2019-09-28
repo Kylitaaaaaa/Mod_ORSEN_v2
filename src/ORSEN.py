@@ -36,6 +36,11 @@ class ORSEN:
         else:
             result = None
 
+    def is_end_story(self, response):
+        if response == 'the end':
+            return True
+        return False
+
     def get_response(self, response):
         if self.endstory:
             if (not self.endstorygen):
