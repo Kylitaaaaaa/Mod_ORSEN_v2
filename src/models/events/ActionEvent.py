@@ -9,10 +9,13 @@ class ActionEvent(Event):
     preposition = ""
     object_of_preposition = ""
 
-    def __init__(self, sequence_number, subject, attributes):
+    def __init__(self, sequence_number, subject, verb, direct_object, adverb, preposition, object_of_preposition):
         super().__init__(sequence_number, EVENT_ACTION, subject)
-
-        self.attributes = attributes
+        self.verb = verb
+        self.direct_object = direct_object
+        self.adverb = adverb
+        self.preposition = preposition
+        self.object_of_preposition = object_of_preposition
 
     def get_verb(self):
         return self.verb

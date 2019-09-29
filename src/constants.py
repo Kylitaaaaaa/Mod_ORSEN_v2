@@ -23,6 +23,14 @@ IS_AFFIRM = ['yes', 'yes.', 'yeah', 'yeah.', 'sure', 'sure.', 'yup', 'yup.']
 IS_DENY = ['no', 'no.', 'nope', 'nope.']
 IS_END = ['bye', 'bye.', 'the end', 'the end.']
 
+""" CONSTANT VALUES CONTROL """
+# ARRAY INDICES
+ACTOR = 0
+ACTION = 1
+DIRECT_OBJECT = 2
+ADVERB = 3
+# NEGATED = 3 # NOT USED
+
 
 """ DIALOGUE MOVES """
 #BASIC ORSEN
@@ -40,6 +48,16 @@ DIALOGUE_TYPE_SUGGESTING = "SUGGESTING"
 
 DIALOGUE_TYPE_INPUT_MISHEARD = "INPUT_MISHEARD"
 DIALOGUE_TYPE_UNKNOWN = "UNKNOWN"
+
+""" CONSTANTS BASED ON ENGLISH CONCEPTS """
+
+VOICE_PASSIVE = "PASSIVE"
+VOICE_ACTIVE = "ACTIVE"
+
+# 23 TOTAL HELPING VERBS
+HELPING_VERBS = ["am", "are", "is", "was", "were", "be", "being", "been", "have", "has", "had", "shall", "will", "do", "does", "did", "may", "must", "might", "can", "could", "would", "should"]
+RELATIVE_PRONOUNS = ["who", " whom", " whose", " which", " that", " whoever", " what", " whomever", " whatever", " whichever"]
+
 
 """ QUOTES """
 

@@ -8,6 +8,7 @@ from src.constants import *
 
 import spacy
 import neuralcoref
+from spacy.tokens import Token
 
 class Annotator(object):
     def __init__(self, model_to_use = "en_core_web_sm"):
@@ -31,6 +32,12 @@ class Annotator(object):
             blacklist = True)
         
         print("Done initializing coreference resolution module.")
+
+        try:
+            Token.set_extension("is_traversed", default=False)
+        except ValueError:
+            print("Field is_traversed is already existing on Token type")
+
         
     def annotate(self, content):
         self.content = content

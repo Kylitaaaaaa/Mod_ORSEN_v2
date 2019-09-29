@@ -1,3 +1,5 @@
+from nltk import Tree
+
 from src.dataprocessor import Annotator
 from src.dataprocessor.coreference import SpacyCoreference
 from src import Logger
@@ -37,7 +39,7 @@ class InputDecoder:
         return chunk_list
 
 
-    def __coref_resolve(self, raw_text):
+    def coref_resolve(self, raw_text):
         self.annotator.annotate(raw_text)
         crf = SpacyCoreference(self.annotator)
         resolved = crf.resolve()
@@ -55,7 +57,7 @@ class InputDecoder:
         # if len(world.content) == 0:
         #   resolved = InputDecoder.get_instance().coref_resolve()
         # else:
-        resolved = self.__coref_resolve(text)
+        resolved = self.coref_resolve(text)
         print(resolved)
         Logger.log_information_extraction('Done with coreference resolution')
 
@@ -107,9 +109,27 @@ class InputDecoder:
 
         return text
 
+    def to_nltk_tree(self, node):
+        if node.n_lefts + node.n_rights > 0:
+            return Tree(node.orth_, [self.to_nltk_tree(child) for child in node.children])
+        else:
+            return node.orth_
 
-
-
+    def display_tokens(self, sentence):
+        print("TEXT\tPoS\tTag\tStop?\tDep\tDep-Meaning")
+        for token in sentence:
+            print(token.text, "\t",
+                  token.pos_, "\t",
+                  token.tag_, "\t",
+                  token.is_stop, "\t",
+                  #                      token.ent_type_, "\t",
+                  token.dep_, "\t",
+                  spacy.explain(token.dep_), "\t",
+                  # token.head.text, "\t",
+                  # token.head.pos_, "\t",
+                  #   [child for child in token.children]
+                  )
+        self.to_nltk_tree(sentence.root).pretty_print()
 
 
 
