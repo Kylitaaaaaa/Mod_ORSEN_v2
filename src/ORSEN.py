@@ -2,6 +2,7 @@ from src.models import World
 from src.textunderstanding import InputDecoder
 from src.constants import *
 from . import Logger
+from src.textunderstanding.InputDecoder import InputDecoder
 
 class ORSEN:
 
@@ -42,21 +43,25 @@ class ORSEN:
         return False
 
     def get_response(self, response):
-        if self.endstory:
-            if (not self.endstorygen):
-                if response.lower() in IS_AFFIRM:
-                    pass
-                else:
-                    pass
-            elif self.endstorygen:
-                if response.lower() in IS_AFFIRM:
-                    pass
-                else:
-                    pass
-        elif response.lower() in IS_END:
-            pass
-        else:
-            pass
+        print("Response is: ", response)
+        result = InputDecoder.get_instance().coref_resolve(response)
+        print("returned response is: ", response)
+
+        # if self.endstory:
+        #     if (not self.endstorygen):
+        #         if response.lower() in IS_AFFIRM:
+        #             pass
+        #         else:
+        #             pass
+        #     elif self.endstorygen:
+        #         if response.lower() in IS_AFFIRM:
+        #             pass
+        #         else:
+        #             pass
+        # elif response.lower() in IS_END:
+        #     pass
+        # else:
+        #     pass
 
 
 

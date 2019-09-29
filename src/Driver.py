@@ -2,6 +2,7 @@ from src.dbo.user import DBOUser
 from src.models.user import User
 from src import Logger
 from src.ORSEN import ORSEN
+from src.textunderstanding.InputDecoder import InputDecoder
 
 # Database access
 dbo_user = DBOUser('users', User)
@@ -95,23 +96,31 @@ curr_user = None
 print("---------Launching ORSEN---------")
 orsen = ORSEN()
 
+#ORIG CODE
 # is_engaged = True
 # while is_engaged:
 #     response = get_input()
 #     ORSEN.get_response(response)
 #     is_engaged = ORSEN.talk()
 
-is_engaged = True
-while is_engaged:
-    response = get_input()
-    if ORSEN.is_end_story(ORSEN, response):
-        ###end of story
-        print("End of story")
-    else:
-        # story world stuff here
-        print("Story time")
-        ORSEN.get_response(ORSEN, response)
-        is_engaged = ORSEN.talk()
+
+orsen.get_response("My mother's name is Sasha, she likes dogs.")
+
+print("Output: ", InputDecoder.get_instance().perform_input_decoding("My mother's name is Sasha, she likes dogs."))
+
+#TESTING CODE
+# is_engaged = True
+# while is_engaged:
+#     response = get_input()
+#     if ORSEN.is_end_story(ORSEN, response):
+#         ###end of story
+#         print("End of story")
+#         is_engaged = False
+#     else:
+#         # story world stuff here
+#         print("Story time")
+#         ORSEN.get_response(ORSEN, response)
+#         is_engaged = ORSEN.talk()
 
 print("---------Closing ORSEN---------")
 
