@@ -3,6 +3,7 @@ from src.textunderstanding import InputDecoder
 from src.constants import *
 from . import Logger
 from src.textunderstanding.InputDecoder import InputDecoder
+from src.dialoguemanager.DialoguePlanner import DialoguePlanner
 
 class ORSEN:
 
@@ -44,7 +45,7 @@ class ORSEN:
 
     def get_response(self, response):
         ##Executing Text Understanding
-        result = ORSEN.perform_text_understanding(self, response)
+        # result = ORSEN.perform_text_understanding(self, response)
 
         ##Executing Dialogue Manager
         ORSEN.perform_dialogue_manager(self)
@@ -70,6 +71,8 @@ class ORSEN:
         return result
 
     def perform_dialogue_manager(self):
+        DialoguePlanner.perform_dialogue_planner(self)
+
 
         return None
 

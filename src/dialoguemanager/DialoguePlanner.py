@@ -7,6 +7,7 @@ class DialoguePlanner:
         super().__init__()
         self.weights = np.zeros(len(DIALOGUE_LIST))
 
+
     def choose_dialogue(self, to_check=[]):
         usable = np.zeros(len(DIALOGUE_LIST))
         for i in range(len(usable)):
@@ -21,8 +22,15 @@ class DialoguePlanner:
 
         self.weights = self.weights + 1
         self.weights[move_index] = self.weights[move_index] - 1
-
-
+        print("Here are the dialogues")
+        for X in self.weights:
+            print(X)
 
         return None
+
+    def perform_dialogue_planner(self):
+        print("hello at perform dialogue planner")
+
+        pass
+
 
