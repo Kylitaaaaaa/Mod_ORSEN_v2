@@ -43,9 +43,11 @@ class ORSEN:
         return False
 
     def get_response(self, response):
-        print("Response is: ", response)
-        result = InputDecoder.get_instance().coref_resolve(response)
-        print("returned response is: ", response)
+        ##Executing Text Understanding
+        result = ORSEN.perform_text_understanding(self, response)
+
+        ##Executing Dialogue Manager
+        ORSEN.perform_dialogue_manager(self)
 
         # if self.endstory:
         #     if (not self.endstorygen):
@@ -62,6 +64,16 @@ class ORSEN:
         #     pass
         # else:
         #     pass
+
+    def perform_text_understanding(self, response):
+        result = InputDecoder.get_instance().perform_input_decoding(response)
+        return result
+
+    def perform_dialogue_manager(self):
+
+        return None
+
+
 
 
 

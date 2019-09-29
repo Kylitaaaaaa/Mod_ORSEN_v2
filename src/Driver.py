@@ -106,7 +106,7 @@ orsen = ORSEN()
 
 orsen.get_response("My mother's name is Sasha, she likes dogs.")
 
-print("Output: ", InputDecoder.get_instance().perform_input_decoding("My mother's name is Sasha, she likes dogs."))
+# print("Output: ", InputDecoder.get_instance().perform_input_decoding("My mother's name is Sasha, she likes dogs."))
 
 #TESTING CODE
 # is_engaged = True
