@@ -4,7 +4,7 @@ Created on Tue Jul  9 05:48:18 2019
 
 @author: Wisner
 """
-from constants import *
+from src.constants import *
 
 import numpy as np
 

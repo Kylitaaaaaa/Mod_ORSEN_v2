@@ -20,3 +20,6 @@ from src import Logger
 # Logger.log_conversation("I HAD A PUPPY")
 # Logger.log_dialogue_model("IT WAS SAD")
 # Logger.log_conversation("THE PUPPY DIEID")
+
+from src.textunderstanding import InputDecoder
+InputDecoder.get_instance().perform_input_decoding("Matthew used the drink that he got from from the vending machine.")
