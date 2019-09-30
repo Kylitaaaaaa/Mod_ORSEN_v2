@@ -1,5 +1,5 @@
 from . import Event
-from .constants import  EVENT_DESCRIPTION
+from src.constants import  EVENT_DESCRIPTION
 
 class DescriptionEvent(Event):
 

@@ -30,6 +30,8 @@ class ExtractorState:
 
 
 class EizenExtractor(object):
+    MODE_LISTING = "list"
+    MODE_CONCATENATING = "concatenate"
 
     def __init__(self, model_to_use="en_core_web_lg"):
         print("Last compatibility version check: %s.\n" % (LAST_CHECK_DATE))
@@ -51,7 +53,6 @@ class EizenExtractor(object):
         return doc
 
     """Check verb type given spacy token. Unused"""
-
     def check_token(self, token):
         if token.pos_ == 'VERB':
             indirect_object = False
@@ -88,7 +89,6 @@ class EizenExtractor(object):
         - link 1: https://www.visualthesaurus.com/cm/dictionary/the-forgotten-helping-verbs/
         - link 2: http://www.softschools.com/language_arts/grammar/helping_verbs/list/
     """
-
     def is_action_verb(self, token):
         if token.pos_ == "VERB":
             if "aux" in token.dep_ or token.text in HELPING_VERBS:
@@ -188,9 +188,14 @@ class EizenExtractor(object):
 
     """Retrieves a token that qualifies in the required POS tag and dependency tag. Connectors are traversed since they are simply connectors."""
 
-    def retrieve_tokens(self, pos_tags, dependencies, token, excluded_tags=[]):
+    def retrieve_tokens(self, pos_tags, dependencies, token, excluded_tags=[], additional_connecting_tags=[], mode=MODE_LISTING):
         connectors = ["cc", "det", "punct", "agent", "prep"]
-        tokens = []
+        connectors.extend(additional_connecting_tags)
+        # print("FINAL RESULING CONNECTIONS:", connectors)
+        if mode == self.MODE_CONCATENATING:
+            tokens = ""
+        elif mode == self.MODE_LISTING:
+            tokens = []
 
         for child in token.children:
             #        print("  child:", child.text)
@@ -199,19 +204,29 @@ class EizenExtractor(object):
 
             if child.dep_ in dependencies and child.pos_ in pos_tags:
                 if child.tag_ == 'WP' and 'WP' in excluded_tags:
-                    tokens.append(token.head)
-                    child._.is_traversed = True;
-                    tokens = tokens + self.retrieve_tokens(pos_tags, dependencies, token.head, excluded_tags)
+                    if mode == self.MODE_CONCATENATING:
+                        tokens = tokens + ' ' + token.head.text
+                    elif mode == self.MODE_LISTING:
+                        tokens.append(token.head)
+
+                    child._.is_traversed = True
+                    tokens = tokens + self.retrieve_tokens(pos_tags, dependencies, token.head, excluded_tags, additional_connecting_tags, mode)
                 else:
-                    #               print("\tadding",child)
-                    tokens.append(child)
-                    child._.is_traversed = True;
-                    tokens = tokens + self.retrieve_tokens(pos_tags, dependencies, child, excluded_tags)
+                    if mode == self.MODE_CONCATENATING:
+                        tokens = tokens + ' ' + child.text
+                    elif mode == self.MODE_LISTING:
+                        tokens.append(child)
+
+                    child._.is_traversed = True
+                    tokens = tokens + self.retrieve_tokens(pos_tags, dependencies, child, excluded_tags, additional_connecting_tags, mode)
 
             elif child.dep_ in connectors:
+                if mode == self.MODE_CONCATENATING:
+                    tokens = tokens + ' |' + child.text
+
                 #            print("\ttraversing '%s'(child of %s)" % (child.text, token.text))
-                child._.is_traversed = True;
-                tokens = tokens + self.retrieve_tokens(pos_tags, dependencies, child, excluded_tags)
+                child._.is_traversed = True
+                tokens = tokens + self.retrieve_tokens(pos_tags, dependencies, child, excluded_tags, additional_connecting_tags, mode)
 
         #    print("RETURNING:", tokens)
         return tokens
@@ -233,13 +248,12 @@ class EizenExtractor(object):
         return nsubj
 
     """Retrieves the direct OBJECT associated with a given action"""
-
     def get_objects(self, action, sentence_state):
         dobj = []
         if sentence_state.voice == VOICE_ACTIVE:
             #        print("\nSEARCH FOR ACTION", action, "START!\n")
             dobj = self.retrieve_tokens(pos_tags=["NOUN", "PROPN", "ADP"],
-                                        dependencies=["dobj", "pobj", "conj"],
+                                        dependencies=["dobj", "conj"],
                                         token=action)
         elif sentence_state.voice == VOICE_PASSIVE:
             #        print("\nSEARCH FOR ACTION", action, "START!\n")
@@ -254,12 +268,51 @@ class EizenExtractor(object):
         adv = self.retrieve_tokens(pos_tags=['ADV'],
                                    dependencies=['advmod'],
                                    token=action)
-        print()
-        print()
-        print('RETURNING THE FOLLOWING ADVERBS:', adv)
-        print()
-        print()
+
+        print("Adverbs found: ", adv)
         return adv
+
+    def get_preposition(self, action, sentence_state):
+        prep = self.retrieve_tokens(pos_tags=['ADP', 'NOUN'],
+                                    dependencies=['prep'],
+                                    token=action,
+                                    additional_connecting_tags=['pobj'],
+                                    mode=self.MODE_CONCATENATING)
+        split = prep.split(" ")
+        while "|" in split[0]:
+            split.pop(0)
+        while "|" in split[len(split)-1]:
+            split.pop(len(split)-1)
+
+        new_prep = ' '.join(split)
+        new_prep = new_prep.replace('|', '')
+
+        return new_prep.strip()
+
+    def get_object_of_preposition(self, action, sentence_state, preposition):
+        obj_prep = self.retrieve_tokens(pos_tags=['ADP', 'NOUN'],
+                                    dependencies=['pobj', 'prep'],
+                                    token=action,
+                                    mode=self.MODE_CONCATENATING)
+
+        obj_prep = obj_prep.replace(preposition, '')
+
+        split = obj_prep.split(" ")
+        while "|" in split[0]:
+            split.pop(0)
+        while "|" in split[len(split)-1]:
+            split.pop(len(split)-1)
+
+        new_obj_prep = ' '.join(split)
+        new_obj_prep = new_obj_prep.replace('|', '')
+
+        return new_obj_prep.strip()
+
+    def guess_event_type(self, sentence):
+        for token in sentence:
+            if token.dep_ == 'expl':
+                return EVENT_CREATION
+        return EVENT_ACTION
 
     def extract_event_aao(self, sentence):
         events = []
@@ -311,6 +364,16 @@ class EizenExtractor(object):
             for token in sentence:
                 token._.is_traversed = False
 
+            event_prepositions = self.get_preposition(event_action, sentence_state)
+            for token in sentence:
+                token._.is_traversed = False
+
+            event_obj_prepositions = self.get_object_of_preposition(event_action, sentence_state, event_prepositions)
+            for token in sentence:
+                token._.is_traversed = False
+
+
+
             if not event_actors:
                 event_actors = actors_state
                 event_actors = self.convert_noun_to_noun_chunks(subjects, event_actors)
@@ -318,7 +381,8 @@ class EizenExtractor(object):
                 # print()
                 actors_state = event_actors
 
-            event = [event_actors, event_action, event_objects, event_adverbs]
+            event = [event_actors, event_action, event_objects, event_adverbs, event_prepositions, event_obj_prepositions]
+            print("RESULT:", event)
             unspliced_events.append(event)
 
         if sentence_state.voice == VOICE_PASSIVE:
@@ -332,61 +396,32 @@ class EizenExtractor(object):
                 pre_partial.append(event)
         # print(partial)
 
-        """
-        This part of the code handles the removal of extradiegetic events (as in events that do not aid in the 
-        construction of the development of the narrative. This is done by removing the following:
-        - subordinate clauses: The subrdinates here either refer to things that have already happened or future conditionals; and 
-        - relative clause: The relatives here refer to descriptors (e.g. "x who is y, did z" has a relative clause of "who is y")
-        """
-        partial = []
-        partial_prepend = []
-        for p in pre_partial:
-            action = p[ACTION]
-            # print()
-            # print()
-            # print("NOW CHECKING", action)
-            # print()
-            # print()
-
-            if self.is_negated(action) == True:
-                continue
-
-            if self.is_relative_clause(action):
-                continue
-
-            if self.is_subordinate_clause(action):
-                if self.is_future_subordinate_clause(action):
-                    continue
-                else:
-                    self.extractor_flags.subordinate = True
-                    partial_prepend.append(p)
-                    # print("Appending p:", p)
-                    continue
-
-            if self.extractor_flags.subordinate == True:
-                partial, partial_prepend = self.append_and_empty_list(partial_prepend, partial)
-                self.extractor_flags.subordinate = False
-
-            # print("Inserting P:", p)
-            partial.append(p)
-
-        if self.extractor_flags.subordinate == True:
-            partial, partial_prepend = self.append_and_empty_list(partial_prepend, partial)
-            self.extractor_flags.subordinate = False
+        print("PREPARTIAL IS", pre_partial)
+        partial = pre_partial
 
         for event in partial:
             event_objects = event[DIRECT_OBJECT]
 
             if len(event_objects) > 0:
                 for o in event_objects:
-                    event = event[:ACTION + 1] + [o]
+                    event = event[:ACTION + 1] + [o] + event[DIRECT_OBJECT:]
                     events.append(event)
             else:
-                event = event[:ACTION + 1] + [None]
+                event = event[:ACTION + 1] + [None] + event[DIRECT_OBJECT:]
                 events.append(event)
 
         return events
 
+    def extract_event_creation(self, s):
+        events = []
+
+        event = []
+        for token in s:
+            if token.dep == 'attr':
+                event.append(token)
+        events.append(event)
+
+        return events
 
     def parse_user_input(self, content, world):
         self.doc = self.nlp(content)
@@ -409,22 +444,39 @@ class EizenExtractor(object):
             # TODO: event-type determiner
             # event = self.extract_event(s)
 
-            events = self.extract_event_aao(s)
+            type = self.guess_event_type(s)
+            if type == EVENT_ACTION:
+                events = self.extract_event_aao(s)
+                # print("FINAL EVENTS LISTING:", events)
+                for event in events:
+                    # print(event)
+                    event_entity = ActionEvent(len(world.event_chains),
+                                               subject=event[ACTOR],
+                                               verb=event[ACTION],
+                                               direct_object=event[DIRECT_OBJECT],
+                                               adverb=event[ADVERB],
+                                               preposition=event[PREPOSITION],
+                                               object_of_preposition=event[OBJ_PREPOSITION])
+                    event_entity = [EVENT_ACTION,
+                                    event[ACTOR],
+                                    event[ACTION],
+                                    event[DIRECT_OBJECT],
+                                    event[ADVERB],
+                                    event[PREPOSITION],
+                                    event[OBJ_PREPOSITION]]
 
-            for event in events:
-                print(event)
+                    # world.add_event(event_entity, s.text)
+                    event_entities.append(event_entity)
 
-                event_entity = ActionEvent(len(world.event_chains),
-                                           subject=event[ACTOR],
-                                           verb=event[ACTION],
-                                           direct_object=event[DIRECT_OBJECT],
-                                           adverb=event[ADVERB],
-                                           preposition="",
-                                           object_of_preposition="")
-                world.add_event(event_entity, s.text)
-                event_entities.append(event_entity)
-                # print()
-            # self.display_tokens(s)
+            elif type == EVENT_CREATION:
+                # TODO
+                events = self.extract_event_creation(s)
+                for event in events:
+                    event_entity = [EVENT_CREATION,
+                                    events[SUBJECT]
+                                    ]
+
+            self.display_tokens(s)
 
         return event_entities
 
