@@ -9,4 +9,4 @@ class Object:
         self.mention_count = mention_count
 
     def __str__(self):
-        return str(self.id) + " " + self.name
+        return self.name + ' (' + self.id + ')'

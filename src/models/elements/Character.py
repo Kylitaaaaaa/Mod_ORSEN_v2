@@ -9,22 +9,23 @@ class Character(Object):
         self.gender = gender
 
     @staticmethod
-    def create_character(self, sentence, token, id="", attribute=[], in_setting="", mention_count=0, gender=""):
-
+    def create_character(sentence, token, id="", attribute=[], in_setting="", mention_count=0, gender=""):
         char_type = ""
         for ent in sentence.ents:
             if ent.start <= token.i < ent.end:
                 char_type = ent.label_
 
-        new_character = Character(id = id,
+        new_character = Character(id = token.text,
                                   name = token.text,
                                   type = char_type,
                                   attribute = attribute,
                                   in_setting= in_setting,
                                   mention_count = mention_count,
-                                  gender = gender
-                                  )
+                                  gender = gender)
+        return new_character
 
+    def __infer_gender__(self, sentence, token):
+        pass
 
     @staticmethod
     def convert_from_object(object):

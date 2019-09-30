@@ -264,12 +264,13 @@ class EizenExtractor(object):
         #    print("All direct objects for action", action, ":", dobj)
         return dobj
 
+    """Retrieves the adverbs associated with a given action (specifically, adverb of manner)"""
     def get_adverbs(self, action, sentence_state):
         adv = self.retrieve_tokens(pos_tags=['ADV'],
                                    dependencies=['advmod'],
                                    token=action)
 
-        print("Adverbs found: ", adv)
+        # print("Adverbs found: ", adv)
         return adv
 
     def get_preposition(self, action, sentence_state):
@@ -417,11 +418,14 @@ class EizenExtractor(object):
 
         event = []
         for token in s:
-            if token.dep == 'attr':
+            if token.dep_ == 'attr':
                 event.append(token)
         events.append(event)
-
+        print("CREATED CREATION EVENT: ", events)
         return events
+
+    def extract_event_attribute(self, s):
+        self.retrieve_tokens()
 
     def parse_user_input(self, content, world):
         self.doc = self.nlp(content)
@@ -469,16 +473,17 @@ class EizenExtractor(object):
                     event_entities.append(event_entity)
 
             elif type == EVENT_CREATION:
-                # TODO
+
                 events = self.extract_event_creation(s)
                 for event in events:
                     event_entity = [EVENT_CREATION,
-                                    events[SUBJECT]
-                                    ]
+                                    event[SUBJECT]]
+
+                    event_entities.append(event_entity)
 
             self.display_tokens(s)
 
-        return event_entities
+        return event_entities, self.doc.sents
 
     def append_and_empty_list(self, partial_prepend, partial):
         partial_prepend.extend(partial)

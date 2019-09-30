@@ -24,3 +24,11 @@ class World:
     def add_event(self, event, sentence):
         self.event_chains.append(event)
         self.sentence_references.append(event)
+
+    def add_character(self, character):
+        self.characters.append(character)
+
+    def get_character(self, character_name):
+        for c in self.characters:
+            if c.name == character_name:
+                return c
