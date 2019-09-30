@@ -29,5 +29,7 @@ class DialogueTemplate(ABC):
 
    @staticmethod
    @abstractmethod
-   def is_usable(self, to_check=[]):
-      pass
+
+   def get_template_to_use(self):
+      # check if it has usable templates
+      return []

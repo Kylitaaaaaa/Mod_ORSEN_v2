@@ -71,7 +71,9 @@ class ORSEN:
         return result
 
     def perform_dialogue_manager(self):
-        DialoguePlanner.perform_dialogue_planner(self)
+        dialogue_planner = DialoguePlanner()
+        # dialogue_planner.choose_dialogue()
+        dialogue_planner.perform_dialogue_planner()
 
 
         return None

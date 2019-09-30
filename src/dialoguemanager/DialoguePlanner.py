@@ -76,6 +76,7 @@ class DialoguePlanner:
         # num_to_pick = 1
         # draw = np.random.choice(DIALOGUE_LIST, num_to_pick, p=self.weights)
         # return draw
+        print("win's chosen one: ", self.move_index)
         return self.move_index
 
 

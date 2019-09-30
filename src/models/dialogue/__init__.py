@@ -9,5 +9,6 @@ from .HintingDialogueTemplate import HintingDialogueTemplate
 from .InputMisheardDialogueTemplate import InputMisheardDialogueTemplate
 from .PromptDialogueTemplate import PromptDialogueTemplate
 from .PumpingGeneralDialogueTemplate import PumpingGeneralDialogueTemplate
+from .PumpingSpecificDialogueTemplate import PumpingSpecificDialogueTemplate
 
 
