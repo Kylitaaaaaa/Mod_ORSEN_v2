@@ -6,12 +6,13 @@ import random
 
 
 class ContentDetermination:
-    move_to_execute = ""
-    curr_event = []
 
-
-    def __init__(self, move_to_execute, curr_event):
+    def __init__(self):
         super().__init__()
+        self.move_to_execute = ""
+        self.curr_event = []
+
+    def set_state(self, move_to_execute, curr_event):
         self.move_to_execute = move_to_execute
         self.curr_event = curr_event
 
@@ -29,7 +30,7 @@ class ContentDetermination:
         print("CHOSEN TEMPLATE IS: ", chosen_template)
 
         #fill template to use
-        response = chosen_template.fill_blanks()
+        response = chosen_template.fill_blanks(self.curr_event)
 
         #return response
         return response

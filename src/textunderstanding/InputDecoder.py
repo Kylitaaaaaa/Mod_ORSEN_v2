@@ -46,47 +46,47 @@ class InputDecoder:
         return resolved._.coref_resolved
 
 
-    def perform_input_decoding(self, text, current_world=None):
-        print("---------Perform Input Decoding---------")
-        #categorization ###probs add intents here TODO
-
-        """ COREFERENCE RESOLUTION """
-        Logger.log_information_extraction('Starting coreference resolution')
-        # TODO: context checking (as in, get the previous inputs (from user) and outputs (from ORSEN) to use as
-        #  context for the resolution of the text.
-        # if len(world.content) == 0:
-        #   resolved = InputDecoder.get_instance().coref_resolve()
-        # else:
-        resolved = self.coref_resolve(text)
-        print(resolved)
-        Logger.log_information_extraction('Done with coreference resolution')
-
-
-        self.annotator.annotate(resolved)
-        doc = self.annotator.get_annotated()
-
-
-        """ NAMED ENTITY RECOGNITION """
-        Logger.log_information_extraction('Starting NER parsing')
-        named_entities = self.__get_named_entities(doc)
-        print(named_entities)
-        Logger.log_information_extraction('Done with NER parsing')
-
-        """ NOUN CHUNKS """
-        Logger.log_information_extraction('Starting noun chunk extraction')
-        noun_chunks = self.__get_noun_chunks(doc)
-
-        """ SENTENCE DISAMBIGUATION """
-        for sent in doc.sents:
-
-            """ DEPENDENCY PARSING """
-            # https://spacy.io/usage/linguistic-features
-            Logger.log_information_extraction('Starting dependency parsing ')
-            self.extract_details(sent, current_world)
-
-            Logger.log_information_extraction('Done dependency parsing')
-
-        print("---------Done with Input Decoding---------")
+    # def perform_input_decoding(self, text, current_world=None):
+    #     print("---------Perform Input Decoding---------")
+    #     #categorization ###probs add intents here TODO
+    #
+    #     """ COREFERENCE RESOLUTION """
+    #     Logger.log_information_extraction('Starting coreference resolution')
+    #     # TODO: context checking (as in, get the previous inputs (from user) and outputs (from ORSEN) to use as
+    #     #  context for the resolution of the text.
+    #     # if len(world.content) == 0:
+    #     #   resolved = InputDecoder.get_instance().coref_resolve()
+    #     # else:
+    #     resolved = self.coref_resolve(text)
+    #     print(resolved)
+    #     Logger.log_information_extraction('Done with coreference resolution')
+    #
+    #
+    #     self.annotator.annotate(resolved)
+    #     doc = self.annotator.get_annotated()
+    #
+    #
+    #     """ NAMED ENTITY RECOGNITION """
+    #     Logger.log_information_extraction('Starting NER parsing')
+    #     named_entities = self.__get_named_entities(doc)
+    #     print(named_entities)
+    #     Logger.log_information_extraction('Done with NER parsing')
+    #
+    #     """ NOUN CHUNKS """
+    #     Logger.log_information_extraction('Starting noun chunk extraction')
+    #     noun_chunks = self.__get_noun_chunks(doc)
+    #
+    #     """ SENTENCE DISAMBIGUATION """
+    #     for sent in doc.sents:
+    #
+    #         """ DEPENDENCY PARSING """
+    #         # https://spacy.io/usage/linguistic-features
+    #         Logger.log_information_extraction('Starting dependency parsing ')
+    #         self.extract_details(sent, current_world)
+    #
+    #         Logger.log_information_extraction('Done dependency parsing')
+    #
+    #     print("---------Done with Input Decoding---------")
 
 
     def extract_details(self, sent, world, subj="", neg="", text=""):

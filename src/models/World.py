@@ -15,7 +15,7 @@ class World:
     event_chains = []
 
     # The temporary event chain that contains the events from the last dialogue entered by the user.
-    curr_event_chain = []
+    curr_event = []
 
     # The previous sentences used to build the event chains
     sentence_references = []
@@ -32,6 +32,8 @@ class World:
     def add_event(self, event, sentence):
         self.event_chains.append(event)
         self.sentence_references.append(event)
+
+        self.curr_event = event
 
     def add_character(self, character):
         self.characters.append(character)

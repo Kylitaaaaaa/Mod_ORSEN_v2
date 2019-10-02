@@ -3,13 +3,14 @@ from src.models.dialogue.constants import *
 
 
 class DialoguePlanner:
-    dialogue_history = []
 
     def __init__(self):
         super().__init__()
         self.weights = np.zeros(len(DIALOGUE_LIST))
         self.is_usable = np.zeros(len(DIALOGUE_LIST))
         self.move_index = -1
+
+        self.dialogue_history = []
 
     #TODO Handle triggered
 

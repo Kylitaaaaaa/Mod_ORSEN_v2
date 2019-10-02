@@ -25,7 +25,7 @@ class Event():
         characters = []
 
         if type(self.subject) == Character:
-            characters.add(self.subject)
+            characters.append(self.subject)
 
         return characters
 
@@ -33,7 +33,7 @@ class Event():
         objects = []
 
         if type(self.subject) == Object:
-            objects.add(self.subject)
+            objects.append(self.subject)
 
         return objects
 

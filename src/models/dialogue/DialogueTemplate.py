@@ -67,14 +67,19 @@ class DialogueTemplate(ABC):
         if self.relation[0][0] == 'None':
             return True
         else:
-            if len(curr_event) == 0:
+            if curr_event is None:
                 return False
             else:
-                #if only 1 relation
-                if len(self.relation) == 1:
-                    for X in curr_event:
-                        if self.is_usable_1_relation(self.relation[0][1], X):
-                            return True
+                if self.is_usable_1_relation(self.relation[0][1], curr_event):
+                    return True
+            # if len(curr_event) == 0:
+            #     return False
+            # else:
+            #     #if only 1 relation
+            #     if len(self.relation) == 1:
+            #         for X in curr_event:
+            #             if self.is_usable_1_relation(self.relation[0][1], X):
+            #                 return True
         return False
 
     def is_usable_1_relation(self, relation, curr_event):

@@ -111,11 +111,11 @@ class ActionEvent(Event):
         characters = []
 
         if type(self.subject) == Character:
-            characters.add(self.subject)
+            characters.append(self.subject)
         if type(self.direct_object) == Character:
-            characters.add(self.direct_object)
+            characters.append(self.direct_object)
         if type(self.object_of_preposition) == Character:
-            characters.add(self.object_of_preposition)
+            characters.append(self.object_of_preposition)
 
         return characters
 
@@ -123,10 +123,10 @@ class ActionEvent(Event):
         objects = []
 
         if type(self.subject) == Object:
-            objects.add(self.subject)
+            objects.append(self.subject)
         if type(self.direct_object) == Object:
-            objects.add(self.direct_object)
+            objects.append(self.direct_object)
         if type(self.object_of_preposition) == Object:
-            objects.add(self.object_of_preposition)
+            objects.append(self.object_of_preposition)
 
         return objects
