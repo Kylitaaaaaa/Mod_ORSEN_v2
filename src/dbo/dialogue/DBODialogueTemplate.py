@@ -45,6 +45,7 @@ class DBODialogueTemplate():
 
         dialogue_templates = []
         for r in result:
+            print("result is: ", r)
             dialogue_templates.append(DialogueTemplateBuilder.build(*r))
 
         return dialogue_templates

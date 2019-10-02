@@ -23,15 +23,15 @@ class DialoguePlanner:
             # gets number of occurences
             self.weights[i] = self.get_num_usage(DIALOGUE_LIST[i].get_type())
 
-        self.get_weights()
+        chosen_dialogue_move = DIALOGUE_LIST[self.get_weights()].get_type()
 
-        print("I choose: ", self.choose_dialogue())
+        # chosen_dialogue_move = DIALOGUE_LIST[self.choose_dialogue()]
 
         # add chosen dialogue move to dialogue history TODO call DialogueTemplateBuilder
-        # curr_dialogue_move = None
-        # self.dialogue_history.append(curr_dialogue_move)
+        self.dialogue_history.append(chosen_dialogue_move)
+        print("CHOSEN DIALOGUE MOVE: ", chosen_dialogue_move)
 
-        pass
+        return chosen_dialogue_move
 
     def is_dialogue_usable(self, dialogue_type):
         #can be repeated 3 times only
@@ -72,12 +72,15 @@ class DialoguePlanner:
         for X in self.weights:
             print(X)
 
+        #returning chosen index
+        return self.move_index
+
     def choose_dialogue(self):
         # num_to_pick = 1
         # draw = np.random.choice(DIALOGUE_LIST, num_to_pick, p=self.weights)
         # return draw
-        print("win's chosen one: ", self.move_index)
-        return self.move_index
+        # return self.move_index
+        pass
 
 
 

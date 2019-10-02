@@ -1,4 +1,4 @@
-from src.models.dialogue import PromptDialogueTemplate, PumpingGeneralDialogueTemplate, InputMisheardDialogueTemplate, UnknownDialogueTemplate
+from src.models.dialogue import *
 from src.constants import *
 
 class DialogueTemplateBuilder():
@@ -15,10 +15,22 @@ class DialogueTemplateBuilder():
       nodes = str(nodes_string).split(",")
       dependent_nodes = str(dependent_nodes_string).split(",")
 
+
       if dialogue_type == DIALOGUE_TYPE_PROMPT:
          return PromptDialogueTemplate(id, templates, relations, blanks, nodes, dependent_nodes)
       elif dialogue_type == DIALOGUE_TYPE_PUMPING_GENERAL:
          return PumpingGeneralDialogueTemplate(id, templates, relations, blanks, nodes, dependent_nodes)
+
+      elif dialogue_type == DIALOGUE_TYPE_FEEDBACK:
+         return FeedbackDialogueTemplate(id, templates, relations, blanks, nodes, dependent_nodes)
+
+      elif dialogue_type == DIALOGUE_TYPE_HINTING:
+         return HintingDialogueTemplate(id, templates, relations, blanks, nodes, dependent_nodes)
+
+      elif dialogue_type == DIALOGUE_TYPE_PUMPING_SPECIFIC:
+         return PumpingSpecificDialogueTemplate(id, templates, relations, blanks, nodes, dependent_nodes)
+
+
       elif dialogue_type == DIALOGUE_TYPE_INPUT_MISHEARD:
          return InputMisheardDialogueTemplate(id, templates, relations, blanks, nodes, dependent_nodes)
       else:
