@@ -27,8 +27,13 @@ class Event():
         if type(self.subject) == Character:
             characters.add(self.subject)
 
+        return characters
+
     def get_objects_involved(self):
         objects = []
 
         if type(self.subject) == Object:
             objects.add(self.subject)
+
+        return objects
+

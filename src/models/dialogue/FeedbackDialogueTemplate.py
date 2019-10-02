@@ -20,5 +20,5 @@ class FeedbackDialogueTemplate(DialogueTemplate):
         # check if it has usable templates
         return []
 
-    def is_usable(self, to_check=[]):
-        pass
+    # def is_usable(self, to_check=[]):
+    #     pass
