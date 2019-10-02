@@ -1,3 +1,4 @@
+from src.models import Attribute
 from . import Event
 from src.constants import  EVENT_DESCRIPTION
 
@@ -14,16 +15,31 @@ class DescriptionEvent(Event):
         return self.attributes
 
     def __str__(self):
-        subject_string = "\tSubject = [ "
-        for object in self.subject:
-            subject_string += object + ","
-        subject_string += " ]\n"
+        my_string = "" \
+                    "============================\n" \
+                    "= EVENT " + str(self.sequence_number) + "\t================\n" \
+                    "============================\n" \
+                    "Subject: " + str(self.subject) + "\n" + \
+                    "Attributes: \n"
 
-        string = "EVENT #" + str(self.sequence_no) + " - "
+        if type(self.attributes) == Attribute:
+            my_string = my_string + "\t" + str(self.attributes)
+        else:
+            for a in self.attributes:
+                my_string = my_string + str(a)
 
-        string += "DESCRIPTIVE\n"
-        string += subject_string
-        string += "\tattributes = [ "
-        for attr in self.attributes:
-            string += attr + ","
-        string += " ]\n"
+        return my_string.strip()
+    # def __str__(self):
+        # subject_string = "\tSubject = [ "
+        # for object in self.subject:
+        #     subject_string += object + ","
+        # subject_string += " ]\n"
+        #
+        # string = "EVENT #" + str(self.sequence_no) + " - "
+        #
+        # string += "DESCRIPTIVE\n"
+        # string += subject_string
+        # string += "\tattributes = [ "
+        # for attr in self.attributes:
+        #     string += attr + ","
+        # string += " ]\n"

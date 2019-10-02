@@ -4,7 +4,6 @@ from src import *
 class World:
     # The different object entities in the world
     objects = [] #Object object
-    dialogue_move_history = [] #Move history -- number of times each dialogue has been used
 
     # The different character entities
     characters = []
@@ -15,6 +14,7 @@ class World:
     # The sequence of events used to store the event frames
     event_chains = []
 
+    # The temporary event chain that contains the events from the last dialogue entered by the user.
     curr_event_chain = []
 
     # The previous sentences used to build the event chains
