@@ -12,6 +12,8 @@ class World:
     # The sequence of events used to store the event frames
     event_chains = []
 
+    curr_event_chain = []
+
     # The previous sentences used to build the event chains
     sentence_references = []
 

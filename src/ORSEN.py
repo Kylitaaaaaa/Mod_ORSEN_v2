@@ -4,7 +4,7 @@ from src.constants import *
 from . import Logger
 from src.textunderstanding.InputDecoder import InputDecoder
 from src.dialoguemanager import *
-
+from src.models.events import *
 class ORSEN:
 
     def __init___(self):
@@ -71,11 +71,23 @@ class ORSEN:
         return result
 
     def perform_dialogue_manager(self):
+        # curr_event = self.world.curr_event_chain
+        curr_event = None
+
         dialogue_planner = DialoguePlanner()
         #choose dialogue move
         move_to_execute = dialogue_planner.perform_dialogue_planner()
 
-        content_determination = ContentDetermination(move_to_execute)
+        #time to choose the template to be used
+        curr_event = []
+        curr_event.append(ActionEvent(1, "Winfred", "kicked", "ball", "angrily", "at", "park"))
+        print("HERE'S THE CURRENT EVENT: ", len(curr_event))
+        curr_event[0].print_event()
+
+
+        # send current event to ContentDetermination
+        content_determination = ContentDetermination('feedback', curr_event)
+        # content_determination = ContentDetermination(move_to_execute, curr_event)
         content_determination.perform_content_determination()
 
 
