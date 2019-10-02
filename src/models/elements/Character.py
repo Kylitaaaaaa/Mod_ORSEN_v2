@@ -12,8 +12,12 @@ class Character(Object):
     def create_character(sentence, token, id="", attribute=[], in_setting="", mention_count=0, gender=""):
         char_type = ""
         for ent in sentence.ents:
-            if ent.start <= token.i < ent.end:
-                char_type = ent.label_
+            if type(ent) == type(token):
+                if ent.start >= token.start and token.end <= ent.end:
+                    char_type = ent.label_
+            elif type(ent[0]) == type(token):
+                if ent.start <= token.i < ent.end:
+                    char_type = ent.label_
 
         new_character = Character(id = token.text,
                                   name = token.text,

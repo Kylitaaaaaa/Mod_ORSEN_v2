@@ -3,8 +3,17 @@ from src.constants import EVENT_CREATION
 
 class CreationEvent(Event):
 
-    def __init__(self, sequence_number, subject):
+    def __init__(self, sequence_number, subject, attributes=[]):
         super().__init__(sequence_number, EVENT_CREATION, subject)
+
+    def __str__(self):
+        my_string = "" \
+                    "============================\n" \
+                    "= EVENT " + str(self.sequence_number) + "\t================\n" \
+                    "============================\n" \
+                    "Subject: " + str(self.subject) + "\n"
+
+        return my_string.strip()
 
     # def __str__(self):
         # subject_string = "\tSubject = [ "

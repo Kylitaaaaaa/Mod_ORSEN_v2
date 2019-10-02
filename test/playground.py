@@ -81,9 +81,7 @@ def extract(story, world):
     print("This is now the world:")
     for i in range(len(world.event_chains)):
         event = world.event_chains[i]
-
-        print("EVENT %d: " % (i))
-        print(event)
+        print(str(event))
 
 def display_tokens(doc):
     extractor = EizenExtractor()

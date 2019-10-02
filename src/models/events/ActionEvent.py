@@ -1,3 +1,4 @@
+from src.models.elements import Character, Object
 from . import Event
 from src.constants import EVENT_ACTION
 
@@ -32,7 +33,46 @@ class ActionEvent(Event):
     def get_object_of_preposition(self):
         return self.object_of_preposition
 
-    # def __str__(self):
+    def get_characters_involved(self):
+        characters = []
+
+        if type(self.subject) == Character:
+            characters.add(self.subject)
+        if type(self.direct_object) == Character:
+            characters.add(self.direct_object)
+        if type(self.object_of_preposition) == Character:
+            characters.add(self.object_of_preposition)
+
+        return characters
+
+    def get_objects_involved(self):
+        objects = []
+
+        if type(self.subject) == Object:
+            objects.add(self.subject)
+        if type(self.direct_object) == Object:
+            objects.add(self.direct_object)
+        if type(self.object_of_preposition) == Object:
+            objects.add(self.object_of_preposition)
+
+        return objects
+
+    def __str__(self):
+        my_string = "" \
+                    "============================\n" \
+                    "= EVENT " + str(self.sequence_number) + "\t================\n" \
+                    "============================\n" \
+                    "Subject: " + str(self.subject) + "\n" + \
+                    "Action : " + str(self.verb) + "\n" + \
+                    "D.O.   : " + str(self.direct_object) + "\n" + \
+                    "Adverb : " + str(self.adverb) + "\n" + \
+                    "Prep   : " + str(self.preposition) + "\n" + \
+                    "ObjPrep: " + str(self.object_of_preposition) + "\n"
+
+        return my_string.strip()
+
+
+# def __str__(self):
         # subject_string = "\tSubject = [ "
         # for object in self.subject:
         #     subject_string += object + ","

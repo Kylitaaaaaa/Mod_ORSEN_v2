@@ -9,7 +9,9 @@ import spacy
 from nltk import Tree
 
 from src.constants import *
+from src.dbo.extraction import DBOExtractionTemplate
 from src.models.events import ActionEvent
+from src.models.nlp.Relation import Relation
 from src.textunderstanding import InputDecoder
 
 
@@ -313,7 +315,11 @@ class EizenExtractor(object):
         for token in sentence:
             if token.dep_ == 'expl':
                 return EVENT_CREATION
-        return EVENT_ACTION
+
+        if len(self.get_action_verbs(sentence)):
+            return EVENT_ACTION
+
+        return EVENT_DESCRIPTION
 
     def extract_event_aao(self, sentence):
         events = []
@@ -414,6 +420,7 @@ class EizenExtractor(object):
         return events
 
     def extract_event_creation(self, s):
+        print("Sentence I am working with: %s" % (s))
         events = []
 
         event = []
@@ -424,8 +431,101 @@ class EizenExtractor(object):
         print("CREATED CREATION EVENT: ", events)
         return events
 
-    def extract_event_attribute(self, s):
-        self.retrieve_tokens()
+    def extract_relation_via_template(self, template, token):
+
+        first_pass = False
+        second_pass = False
+        third_pass = False
+        if template.third.strip() == "":
+            third_pass = True
+
+        relation = Relation()
+        relation.keyword = template.keyword
+        relation.keyword_type = template.keyword_type
+        relation.relation = template.relation
+        relation.is_flipped = template.is_flipped
+
+        for child in token.children:
+            if child.dep_ == 'neg':
+                relation.is_negated = True
+
+            if template.is_flipped == False:
+                if template.first == child.dep_ or first_pass == True:
+                    print("In first with token %s(%s):" % (child, child.dep_))
+
+                    if template.second == child.dep_ or second_pass == True:
+                        print("In second with token %s(%s):" % (child, child.dep_))
+
+                        if template.third.strip is not "":
+                            if template.third == child.dep_:
+
+                                if third_pass == False:
+                                    third_pass = True
+                                    relation.third_token = child
+
+                        if second_pass == False:
+                            second_pass = True
+                            relation.second_token = child
+
+                    if first_pass == False:
+                        first_pass = True
+                        relation.first_token = child
+
+        if first_pass and second_pass and third_pass:
+            return relation
+        else:
+            return None
+
+    def get_relations_from_sentence(self, event_type, template, token):
+        relations = []
+        if event_type == EVENT_DESCRIPTION:
+            if template.relation in [IS_A, HAS_PROPERTY, HAS_A, CAPABLE_OF]:
+                print("CHECKING IF THIS RELATION IS POSSIBLE TO WORK WITH")
+                extracted = self.extract_relation_via_template(template, token)
+                if extracted is not None:
+                    print("Appending", extracted)
+                    relations.append(extracted)
+
+        return relations
+
+
+
+    def extract_event_attribute(self, sentence, event_type_flag):
+        # If event type flag is True, then the passed sentence has a smaller chance of containing a description type thing.
+        # Otherwise, if the flag is False, it is more likely to be a Description event.
+
+        extraction_manager = DBOExtractionTemplate("extraction_templates")
+        relations = []
+        for token in sentence:
+            extraction_templates = extraction_manager.get_extraction_templates_by_keyword(token.lemma_)
+            extraction_templates.extend(extraction_manager.get_extraction_templates_by_keyword(token.dep_))
+
+            for i in range(len(extraction_templates)):
+                print("\n\nExtraction Template %d: %s" % (i, extraction_templates[i]))
+                print(extraction_templates[i])
+                extracted_relations = self.get_relations_from_sentence(EVENT_DESCRIPTION, extraction_templates[i], token)
+                if extracted_relations is not None:
+                    relations.extend(extracted_relations)
+
+        return relations
+        # events = []
+        # if relations:
+        #     for relation in relations:
+        #         if relations is not None:
+        #             event = []
+        #             event.append(relation.first_token)
+        #             event.append(relation.relation)
+        #             event.append(relation.keyword)
+        #             event.append(relation.second_token)
+        #             event.append(relation.third_token)
+        #             event.append(relation.is_negated)
+        #
+        #             events.append(event)
+        #
+        # return events
+
+
+
 
     def parse_user_input(self, content, world):
         self.doc = self.nlp(content)
@@ -435,23 +535,39 @@ class EizenExtractor(object):
             old_sentence = old_sentence + ' ' + s
 
         sentence = old_sentence + content
+
+        print("\n\n")
+        print("Sentence before coref: %s" % (sentence))
+        print("\n\n")
         resolved = InputDecoder.get_instance().coref_resolve(sentence)
+
+        print("\n\n")
+        print("Sentence after coref: %s" % (resolved))
+        print("\n\n")
+
+        print("Sentence to delete: %s" % (old_sentence))
         resolved = resolved.replace(old_sentence, "")
         resolved = resolved.strip()
+
+        print("\n\n")
+        print("Final processed sentence: %s" % (resolved))
+        print("\n\n")
 
         self.doc = self.nlp(resolved)
 
         event_entities = []
+        sentence_entities = []
         for s in self.doc.sents:
             # print("Sentence: %s " % (s.text.strip()))
-
-            # TODO: event-type determiner
-            # event = self.extract_event(s)
-
             type = self.guess_event_type(s)
+
+            # Used to check if the passed sentence is already one of the events in the if-else case (either action event or creation event)
+            event_type_flag = False
+
             if type == EVENT_ACTION:
+                event_type_flag = True
+
                 events = self.extract_event_aao(s)
-                # print("FINAL EVENTS LISTING:", events)
                 for event in events:
                     # print(event)
                     event_entity = ActionEvent(len(world.event_chains),
@@ -471,8 +587,10 @@ class EizenExtractor(object):
 
                     # world.add_event(event_entity, s.text)
                     event_entities.append(event_entity)
+                    sentence_entities.append(s)
 
             elif type == EVENT_CREATION:
+                event_type_flag = True
 
                 events = self.extract_event_creation(s)
                 for event in events:
@@ -480,10 +598,17 @@ class EizenExtractor(object):
                                     event[SUBJECT]]
 
                     event_entities.append(event_entity)
+                    sentence_entities.append(s)
+
+            events = self.extract_event_attribute(s, event_type_flag)
+            for event in events:
+                event_entity = [EVENT_DESCRIPTION, event]
+                event_entities.append(event_entity)
+                sentence_entities.append(s)
 
             self.display_tokens(s)
 
-        return event_entities, self.doc.sents
+        return event_entities, sentence_entities
 
     def append_and_empty_list(self, partial_prepend, partial):
         partial_prepend.extend(partial)

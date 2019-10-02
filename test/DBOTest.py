@@ -12,7 +12,7 @@ from src import DialogueTemplateBuilder
 #
 # concept_manager = DBOConceptGlobalImpl()
 # local_concept_manager = DBOConceptLocalImpl()
-dialogue_manager = DBODialogueTemplate("templates")
+# dialogue_manager = DBODialogueTemplate("templates")
 
 # concept = concept_manager.get_concept_by_id(4000)
 # concept = local_concept_manager.get_concept_by_id(1)
@@ -51,10 +51,10 @@ dialogue_manager = DBODialogueTemplate("templates")
 # for concept in concepts:
 #     print(concept)
 
-user_manager = DBOUser("users", User)
-user = User(-1, "wisner", "xd")
-new_user = user_manager.add_user(user)
-print(new_user)
+# user_manager = DBOUser("users", User)
+# user = User(-1, "wisner", "xd")
+# new_user = user_manager.add_user(user)
+# print(new_user)
 
 # template = dialogue_manager.get_specific_template(1)
 # print(template)
@@ -66,3 +66,9 @@ print(new_user)
 # a = UnknownDialogueTemplate(-1, 'a', 'a', 'a', 'a', 'a')
 # a = DialogueTemplateBuilder.build(-1, 'a', 'a', 'a', 'a', 'a')
 # print(a)
+
+from src.dbo.extraction import DBOExtractionTemplate
+extraction_template = DBOExtractionTemplate("extraction_templates")
+templates = extraction_template.get_all_extraction_templates()
+for t in templates:
+    print(t)
