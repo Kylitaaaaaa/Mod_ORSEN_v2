@@ -1,3 +1,6 @@
+from src import *
+
+
 class World:
     # The different object entities in the world
     objects = [] #Object object
@@ -18,6 +21,7 @@ class World:
     sentence_references = []
 
     def __init__(self, objects=[], characters=[], settings=[], event_chains=[], sentence_references=[], dialogue_move_history=[]):
+        print("IM AT WORLD")
         self.objects = objects
         self.characters = characters
         self.settings = settings

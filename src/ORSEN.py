@@ -1,13 +1,16 @@
 from src.models import World
+from src.models.elements import Object, Character
 from src.textunderstanding import InputDecoder
 from src.constants import *
 from . import Logger
 from src.textunderstanding.InputDecoder import InputDecoder
 from src.dialoguemanager import *
 from src.models.events import *
+
+
 class ORSEN:
 
-    def __init___(self):
+    def __init__(self):
         super().__init__()
         self.turn_count = 1
         self.prereqs = []
@@ -75,39 +78,24 @@ class ORSEN:
         curr_event = None
 
         dialogue_planner = DialoguePlanner()
-        #choose dialogue move
+        # choose dialogue move
         move_to_execute = dialogue_planner.perform_dialogue_planner()
 
-        #time to choose the template to be used
+        # time to choose the template to be used
         curr_event = []
         curr_event.append(ActionEvent(1, "Winfred", "kicked", "ball", "angrily", "at", "park"))
-        print("HERE'S THE CURRENT EVENT: ", len(curr_event))
-        curr_event[0].print_event()
-
+        # print("HERE'S THE CURRENT EVENT: ", len(curr_event))
+        # curr_event[0].print_event()
+        # self.world.objects.append(Object(name="ball"))
+        self.world.objects.append(Object(name="ball"))
+        self.world.add_character(Character(name="Winfred"))
+        #
+        # print("BALL TYPE: ", type("ball"))
+        # print("WINFRED TYPE: ", type("Winfred"))
 
         # send current event to ContentDetermination
-        content_determination = ContentDetermination('feedback', curr_event)
+        content_determination = ContentDetermination('specific', curr_event)
         # content_determination = ContentDetermination(move_to_execute, curr_event)
         content_determination.perform_content_determination()
 
-
-
-
-
-
-
         return None
-
-
-
-
-
-
-
-
-
-
-
-
-
-

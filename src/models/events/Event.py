@@ -1,3 +1,6 @@
+from src.models.elements import Character, Object
+
+
 class Event():
 
     sequence_number = -1
@@ -17,3 +20,20 @@ class Event():
 
     def get_subject(self):
         return self.subject
+
+    def get_characters_involved(self):
+        characters = []
+
+        if type(self.subject) == Character:
+            characters.add(self.subject)
+
+        return characters
+
+    def get_objects_involved(self):
+        objects = []
+
+        if type(self.subject) == Object:
+            objects.add(self.subject)
+
+        return objects
+
