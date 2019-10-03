@@ -1,4 +1,4 @@
-class Setting():
+class Setting:
 
     place = None
     date = None

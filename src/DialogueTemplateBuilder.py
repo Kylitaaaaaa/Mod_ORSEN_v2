@@ -1,7 +1,7 @@
 from src.models.dialogue import *
 from src.constants import *
 
-class DialogueTemplateBuilder():
+class DialogueTemplateBuilder:
 
    @staticmethod
    def build(id = -1, dialogue_type = "", template_string = "", relation_string = "", blank_string = "", nodes_string = "", dependent_nodes_string = ""):

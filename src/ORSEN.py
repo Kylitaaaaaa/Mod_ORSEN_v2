@@ -1,5 +1,6 @@
 from src.dataprocessor import Annotator
-from src.models import World, Attribute
+from src.models import World
+from src.models.elements import Attribute
 from src.models.elements import Object, Character
 from src.textunderstanding import InputDecoder, EizenExtractor
 from src.constants import *

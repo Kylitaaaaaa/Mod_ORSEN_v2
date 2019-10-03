@@ -44,3 +44,17 @@ class World:
         for c in self.characters:
             if c.name == character_name:
                 return c
+        return None
+
+    def add_object(self, object):
+        self.objects.append(object)
+
+    def get_object(self, object_name):
+        for o in self.objects:
+            if o.name == object_name:
+                return o
+        return None
+
+    def remove_object(self, object):
+        return self.objects.remove(object)
+

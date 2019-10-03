@@ -1,27 +1,35 @@
-from . import Object
+from src import IS_A
+from src.models.elements import Object, Attribute
 
 class Character(Object):
-    gender = ""
 
-    def __init__(self, id="", name="", type="", attribute=[], in_setting="", mention_count=0, gender=""):
+    def __init__(self, id="", name="", type=[], attribute=[], in_setting="", mention_count=0, gender=""):
         super().__init__(id, name, type, attribute, in_setting, mention_count)
 
         self.gender = gender
 
     @staticmethod
     def create_character(sentence, token, id="", attribute=[], in_setting="", mention_count=0, gender=""):
-        char_type = ""
-        for ent in sentence.ents:
-            if type(ent) == type(token):
-                if ent.start >= token.start and token.end <= ent.end:
-                    char_type = ent.label_
-            elif type(ent[0]) == type(token):
-                if ent.start <= token.i < ent.end:
-                    char_type = ent.label_
+        entity = Object.get_object_entity_via_token(token, sentence)
 
-        new_character = Character(id = token.text,
-                                  name = token.text,
-                                  type = char_type,
+        entity_text = token.text
+        entity_types = []
+
+        if entity is not None:
+            entity_text = entity.text
+            entity_type = Attribute(relation=IS_A, description=entity.label_, is_negated=False)
+            entity_types.append(entity_type)
+
+        if type(attribute) == Attribute:
+            attribute = [attribute]
+
+        for a in attribute:
+            if a.relation == IS_A:
+                entity_types.append(a)
+
+        new_character = Character(id = entity_text,
+                                  name = entity_text,
+                                  type = entity_types,
                                   attribute = attribute,
                                   in_setting= in_setting,
                                   mention_count = mention_count,
@@ -32,7 +40,7 @@ class Character(Object):
         pass
 
     @staticmethod
-    def convert_from_object(object):
+    def create_from_object(object):
         new_char = Character(id = object.id,
                              name = object.name,
                              type = object.type,

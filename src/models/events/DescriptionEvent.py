@@ -1,6 +1,7 @@
-from src.models import Attribute
+from src.models.elements import Attribute
 from . import Event
-from src.constants import  EVENT_DESCRIPTION
+from src.constants import EVENT_DESCRIPTION, IS_A
+
 
 class DescriptionEvent(Event):
 
@@ -10,6 +11,13 @@ class DescriptionEvent(Event):
         super().__init__(sequence_number, EVENT_DESCRIPTION, subject)
 
         self.attributes = attributes
+        if type(attributes) == Attribute:
+            attributes = [attributes]
+
+        for a in attributes:
+            subject.attribute.append(a)
+            if a.relation == IS_A:
+                subject.type.append(a)
 
     def get_attributes(self):
         return self.attributes

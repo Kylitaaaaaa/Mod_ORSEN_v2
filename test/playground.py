@@ -1,9 +1,17 @@
-from src.models import World, Attribute
-from src.models.elements import Character, Object
+from src.models import World
+from src.models.elements import Character, Object, Attribute
 from src.textunderstanding import InputDecoder, EizenExtractor
 from src.dataprocessor import Annotator
 from src.models.events import CreationEvent, ActionEvent, DescriptionEvent
 from src.constants import *
+
+def search_world_characters(entity_name, world):
+    actor = world.get_character(entity_name)
+    return actor
+
+def search_world_objects(entity_name, world):
+    object = world.get_object(entity_name)
+    return object
 
 def extract(story, world):
     extractor = EizenExtractor()
@@ -29,56 +37,88 @@ def extract(story, world):
         event_entity = event_entity[1:]
 
         if event_type == EVENT_CREATION:
-            print(event_entity)
-            new_char = Character.create_character(sentence=sentence, token=event_entity[SUBJECT])
+
+
+            # Create an object corresponded by this event (NOT CHARACTER)
+            new_char = Object.create_object(sentence=sentence, token=event_entity[SUBJECT])
             new_char.mention_count += 1
 
-            event = CreationEvent(len(world.event_chains),
-                                  subject=new_char)
+            # Create the creation event and add the new character to the world
+            event = CreationEvent(len(world.event_chains), subject=new_char)
             world.add_character(new_char)
 
+
+        elif event_type == EVENT_DESCRIPTION:
+
+
+            # Get the whole relation entity object passed from the extractor
+            relation_entity = event_entity[0]
+            print(relation_entity)
+
+            # Convert the relation entity into an attribute entity. Attributes can be used to describe any given object/character
+            attribute_entity = Attribute.create_from_relation(relation_entity)
+
+            # Find the object/entity that will be described. Object may or may not be a character.
+            # If not yet existing, create an instance of the object, and add it to the world.
+            subject = world.get_character(relation_entity.first_token.text)
+            if subject == None:
+                subject = world.get_object(event_entity[ACTOR].text)
+                if subject == None:
+                    subject = Object.create_object(sentence=sentence, token=relation_entity.first_token)
+                    subject.mention_count += 1
+                    world.add_object(subject)
+
+            # Create the description event
+            event = DescriptionEvent(len(world.event_chains), subject=subject, attributes=attribute_entity)
+
+
         elif event_type == EVENT_ACTION:
-            print("Finding actor object with name %s" % (event_entity[ACTOR].text))
+
+
+            # Find the actor in the world characters.
+            # If existing as an object, convert the object into a character.
+            # If not existing anywhere, create it as a new CHARACTER (not an object)
             actor = world.get_character(event_entity[ACTOR].text)
             if actor == None:
-                print("START CREATION FROM EVENT_ACTION")
-                print(event_entity[ACTOR])
-                print(type(event_entity[ACTOR]))
-                actor = Character.create_character(sentence=sentence, token=event_entity[ACTOR])
-                print("FINISH CREATION FROM EVENT_ACTION")
-
+                actor = world.get_object(event_entity[ACTOR].text)
+                if actor == None:
+                    actor = Character.create_character(sentence=sentence, token=event_entity[ACTOR])
+                    world.add_character(actor)
+                else:
+                    actor = Character.create_character(world.remove_object(actor))
+                    world.add_character(actor)
             actor.mention_count += 1
+
+            # Almost the same as the one above, except this is for the direct objects and not for the actors
+            if event_entity[DIRECT_OBJECT].text.strip() is not "":
+                direct_object = world.get_character(event_entity[DIRECT_OBJECT].text)
+                if direct_object == None:
+                    direct_object = world.get_object(event_entity[DIRECT_OBJECT].text)
+                    if direct_object == None:
+                        direct_object = Object.create_object(sentence=sentence, token=event_entity[DIRECT_OBJECT])
+                        world.add_object(direct_object)
+                    else:
+                        direct_object = Object.create_object(world.remove_object(direct_object))
+                        world.add_object(direct_object)
+                direct_object.mention_count += 1
+
+
 
             print("Actor  :", actor)
             event = ActionEvent(len(world.event_chains),
                                 subject=actor,
                                 verb=event_entity[ACTION],
-                                direct_object=event_entity[DIRECT_OBJECT],
+                                direct_object=direct_object,
                                 adverb=event_entity[ADVERB],
                                 preposition=event_entity[PREPOSITION],
                                 object_of_preposition=event_entity[OBJ_PREPOSITION])
 
-        elif event_type == EVENT_DESCRIPTION:
-            relation_entity = event_entity[0]
-            print(relation_entity)
-            attribute_entity = Attribute.create_from_relation(relation_entity)
-
-            print("Finding actor object with name %s" % (relation_entity.first_token))
-            actor = world.get_character(relation_entity.first_token.text)
-            if actor == None:
-                print("START CREATION FROM EVENT_ACTION")
-                print(event_entity[ACTOR])
-                print(type(event_entity[ACTOR]))
-                actor = Character.create_character(sentence=sentence, token=relation_entity.first_token)
-                # print("FINISH CREATION FROM EVENT_ACTION")
-
-            event = DescriptionEvent(len(world.event_chains),
-                                     subject=actor,
-                                     attributes=attribute_entity)
 
         current_event_list.append(event)
         current_sentence_list.append(sentence)
         # world.add_event(event, sentence)
+
+
 
     for i in range(len(current_event_list)):
         world.add_event(current_event_list[i], current_sentence_list[i])
@@ -86,12 +126,27 @@ def extract(story, world):
     print()
     print()
     print("#############################")
-    print("# Current world content #####")
+    print("# Current world events ######")
     print("#############################")
 
     for i in range(len(world.event_chains)):
         event = world.event_chains[i]
         print(str(event))
+        # print(event.subject.name)
+        # for t in event.subject.type:
+        #     print(">>:", t)
+
+    print("CURRENT CHARACTERS:")
+    for i in range(len(world.characters)):
+        character = world.characters[i]
+        print(str(character))
+
+    print("CURRENT OBJECTS:")
+    for i in range(len(world.objects)):
+        object = world.objects[i]
+        print(str(object))
+
+
 
 def display_tokens(doc):
     extractor = EizenExtractor()
@@ -102,7 +157,7 @@ def display_tokens(doc):
 # story = "Once upon a time, there was a boy named Mario."
 # story= "Hansel chopped the garlic, Mary killed the bees and flew to the moon, and Susan fried the onions and peeled the potatoes."
 # story= "Pepper is barking at the delivery man angrily."
-# story= "The delivery man was hastily approached by the young man."
+# story= " delivery man was hastily approached by the young man."
 # story= "Pepper is angrily barking at the delivery man"
 # story= "Phillip sings rather enormously too loudly."
 # story= angrily barking at the delivery man."
@@ -118,6 +173,8 @@ def display_tokens(doc):
 story = "Once upon a time, there was a boy named John. John, the ruler of the seas, is angry. John angrily kicked a ball."
 # story = "The sweet girl is happy."
 # story = "happy is the sweet girl."
+# story = "Mark is a knight."
+# story = "My mother's name is Sasha. My mother likes dogs."
 annotator = Annotator()
 annotator.annotate(story)
 
