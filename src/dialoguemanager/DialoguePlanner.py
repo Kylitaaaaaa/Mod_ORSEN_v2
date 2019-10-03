@@ -30,7 +30,7 @@ class DialoguePlanner:
 
         # add chosen dialogue move to dialogue history TODO call DialogueTemplateBuilder
         self.dialogue_history.append(chosen_dialogue_move)
-        print("CHOSEN DIALOGUE MOVE: ", chosen_dialogue_move)
+        print("\n\nCHOSEN DIALOGUE MOVE: ", chosen_dialogue_move)
 
         return chosen_dialogue_move
 
@@ -69,9 +69,9 @@ class DialoguePlanner:
         # increases weight of everything except the one that will be used. It wouldn't make much sense to increase the weight of the most recently used, thus being the reason why it retains the current value it has.
         self.weights = self.weights + 1
         self.weights[self.move_index] = self.weights[self.move_index] - 1
-        print("Here are the weights")
-        for X in self.weights:
-            print(X)
+        # print("Here are the weights")
+        # for X in self.weights:
+        #     print(X)
 
         #returning chosen index
         return self.move_index

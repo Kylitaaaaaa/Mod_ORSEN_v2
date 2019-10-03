@@ -164,13 +164,6 @@ class ORSEN:
         # choose dialogue move
         move_to_execute = self.dialogue_planner.perform_dialogue_planner()
 
-        # time to choose the template to be used
-        # self.world.objects.append(Object(name="ball"))
-        # self.world.objects.append(Object(name="ball"))
-        # self.world.add_character(Character(name="Winfred"))
-        # print("BALL TYPE: ", type("ball"))
-        # print("WINFRED TYPE: ", type("Winfred"))
-
         # send current event to ContentDetermination
         move_to_execute = 'specific' # TODO Delete this after finishing the testing of this particular dialogue move.
         self.content_determination.set_state(move_to_execute, curr_event)

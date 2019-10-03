@@ -17,7 +17,7 @@ class ContentDetermination:
         self.curr_event = curr_event
 
     def perform_content_determination(self):
-        print("trying to get: ", self.move_to_execute)
+        print("FETCHING: ", self.move_to_execute)
 
         #get all usable templates
         usable_template_list = self.get_usable_templates()
@@ -44,16 +44,17 @@ class ContentDetermination:
 
         # check which template is usable
         for X in template_list:
-            print("Checking: ", X)
-            print("Relation: ", len(X.relation), " : ", X.relation[0])
-            print("X.relation[0]: ", X.relation[0][0])
+            print("==============================")
+            print("TEMPLATE: ", X)
+            print("==============================")
+            print("Relation: ", X.relation)
             print("Template: ", X.template)
             print("Relations: ", X.relation)
             print("Blanks: ", X.blanks)
             print("Nodes: ", X.nodes)
             print("Dependent Nodes: ", X.dependent_nodes)
             result = X.is_usable(self.curr_event)
-            print("RESULT IS: ", result)
+            print("Is it usable? ", result)
             if X.is_usable(self.curr_event):
                 usable_template_list.append(X)
             print("\n")
