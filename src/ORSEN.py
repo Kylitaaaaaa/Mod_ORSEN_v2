@@ -162,11 +162,15 @@ class ORSEN:
         curr_event = self.world.curr_event
 
         # choose dialogue move
-        move_to_execute = self.dialogue_planner.perform_dialogue_planner()
+        self.dialogue_planner.set_event(curr_event)
+        self.dialogue_planner.perform_dialogue_planner()
+        move_to_execute = self.dialogue_planner.chosen_dialogue_move
+        available_templates = self.dialogue_planner.chosen_dialogue_template
 
+        
         # send current event to ContentDetermination
-        move_to_execute = 'specific' # TODO Delete this after finishing the testing of this particular dialogue move.
-        self.content_determination.set_state(move_to_execute, curr_event)
+        # move_to_execute = 'specific' # TODO Delete this after finishing the testing of this particular dialogue move.
+        self.content_determination.set_state(move_to_execute, curr_event, available_templates)
         self.content_determination.perform_content_determination()
 
         return None

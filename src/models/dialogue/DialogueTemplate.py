@@ -4,6 +4,7 @@ from abc import ABC, abstractmethod
 from src import *
 
 
+
 class DialogueTemplate(ABC):
     __metaclass__ = abc.ABCMeta
 
@@ -15,6 +16,7 @@ class DialogueTemplate(ABC):
         self.blanks = blanks
         self.nodes = nodes
         self.dependent_nodes = dependent_nodes
+        self.is_move_usable = False
 
     def fill_blanks(self, event):
         #if it does not require any details
@@ -48,9 +50,6 @@ class DialogueTemplate(ABC):
 
         return response
 
-
-
-
     def get_string_response(self):
         return "".join(self.template)
 
@@ -61,17 +60,19 @@ class DialogueTemplate(ABC):
     def get_type(self):
         return self.dialogue_type
 
+
     def is_usable(self, curr_event):
-        print('CHECKING IS USABLE: ', self.relation[0][1])
+        # print('CHECKING IS USABLE: ', self.relation[0][1])
+        decision = False
         # Requires a relation
         if self.relation[0][0] == 'None':
-            return True
+            decision = True
         else:
             if curr_event is None:
-                return False
+                decision = False
             else:
                 if self.is_usable_1_relation(self.relation[0][1], curr_event):
-                    return True
+                    decision = True
             # if len(curr_event) == 0:
             #     return False
             # else:
@@ -80,7 +81,9 @@ class DialogueTemplate(ABC):
             #         for X in curr_event:
             #             if self.is_usable_1_relation(self.relation[0][1], X):
             #                 return True
-        return False
+
+        self.is_move_usable = decision
+        return decision
 
     def is_usable_1_relation(self, relation, curr_event):
         if relation == 'Repeat':

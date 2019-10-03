@@ -12,7 +12,7 @@ class Event():
         self.type = type
         self.subject = subject
 
-    def  get_sequence_number(self):
+    def get_sequence_number(self):
         return self.sequence_number
 
     def get_type(self):
