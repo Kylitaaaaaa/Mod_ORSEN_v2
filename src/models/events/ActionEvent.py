@@ -18,20 +18,20 @@ class ActionEvent(Event):
         self.preposition = preposition
         self.object_of_preposition = object_of_preposition
 
-    def get_verb(self):
-        return self.verb
-
-    def get_direct_object(self):
-        return self.direct_object
-
-    def get_adverb(self):
-        return self.adverb
-
-    def get_preposition(self):
-        return self.preposition
-
-    def get_object_of_preposition(self):
-        return self.object_of_preposition
+    # def get_verb(self):
+    #     return self.verb
+    #
+    # def get_direct_object(self):
+    #     return self.direct_object
+    #
+    # def get_adverb(self):
+    #     return self.adverb
+    #
+    # def get_preposition(self):
+    #     return self.preposition
+    #
+    # def get_object_of_preposition(self):
+    #     return self.object_of_preposition
 
     def get_characters_involved(self):
         characters = []
@@ -62,6 +62,7 @@ class ActionEvent(Event):
                     "============================\n" \
                     "= EVENT " + str(self.sequence_number) + "\t================\n" \
                     "============================\n" \
+                    "Type: Action Event\n" \
                     "Subject: " + str(self.subject) + "\n" + \
                     "Action : " + str(self.verb) + "\n" + \
                     "D.O.   : " + str(self.direct_object) + "\n" + \

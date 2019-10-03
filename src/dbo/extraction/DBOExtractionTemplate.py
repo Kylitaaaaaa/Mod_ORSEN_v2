@@ -31,13 +31,22 @@ class DBOExtractionTemplate():
 
         return extraction_templates
 
-    def get_extraction_templates_by_keyword(self, keyword):
-        q = Query \
-            .from_(self.table_reference) \
-            .select("*") \
-            .where(
-                self.table_reference.keywords == keyword
-        )
+    def get_extraction_templates_by_keyword(self, keyword_lemma, keyword_dep, include_blanks=True):
+        if include_blanks:
+            q = Query \
+                .from_(self.table_reference) \
+                .select("*") \
+                .where(
+                    (self.table_reference.keywords == keyword_lemma) | (self.table_reference.keywords == keyword_dep) | (self.table_reference.keywords == "")
+            )
+
+        else:
+            q = Query \
+                .from_(self.table_reference) \
+                .select("*") \
+                .where(
+                    self.table_reference.keywords == keyword
+            )
 
         query = q.get_sql()
         query = query.replace("\"", "")

@@ -13,6 +13,8 @@ def extract(story, world):
 
     event_entities, sentence_references = extractor.parse_user_input(story, world)
 
+    current_event_list = []
+    current_sentence_list = []
     for event_entity, sentence in zip(event_entities, sentence_references):
         sequence_no = len(world.event_chains)
         print("==============================")
@@ -68,17 +70,25 @@ def extract(story, world):
                 print(event_entity[ACTOR])
                 print(type(event_entity[ACTOR]))
                 actor = Character.create_character(sentence=sentence, token=relation_entity.first_token)
-                print("FINISH CREATION FROM EVENT_ACTION")
+                # print("FINISH CREATION FROM EVENT_ACTION")
 
             event = DescriptionEvent(len(world.event_chains),
                                      subject=actor,
                                      attributes=attribute_entity)
-        world.add_event(event, sentence)
 
-    for sentence in world.sentence_references:
-        print(sentence)
+        current_event_list.append(event)
+        current_sentence_list.append(sentence)
+        # world.add_event(event, sentence)
 
-    print("This is now the world:")
+    for i in range(len(current_event_list)):
+        world.add_event(current_event_list[i], current_sentence_list[i])
+
+    print()
+    print()
+    print("#############################")
+    print("# Current world content #####")
+    print("#############################")
+
     for i in range(len(world.event_chains)):
         event = world.event_chains[i]
         print(str(event))
@@ -105,8 +115,9 @@ def display_tokens(doc):
 # story = "She is swimming."
 # story = "Eric, the prince, was handsome, and kind"
 # story = "The book was thrown by Mark."
-story = "Once upon a time, there was a boy named John. John, the ruler of the seas, is angry. John kicked a ball."
-
+story = "Once upon a time, there was a boy named John. John, the ruler of the seas, is angry. John angrily kicked a ball."
+# story = "The sweet girl is happy."
+# story = "happy is the sweet girl."
 annotator = Annotator()
 annotator.annotate(story)
 

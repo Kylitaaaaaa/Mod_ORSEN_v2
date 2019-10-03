@@ -11,6 +11,7 @@ from nltk import Tree
 from src.constants import *
 from src.dbo.extraction import DBOExtractionTemplate
 from src.models.events import ActionEvent
+from src.models.nlp import ExtractionTemplate
 from src.models.nlp.Relation import Relation
 from src.textunderstanding import InputDecoder
 
@@ -411,12 +412,16 @@ class EizenExtractor(object):
 
             if len(event_objects) > 0:
                 for o in event_objects:
-                    event = event[:ACTION + 1] + [o] + event[DIRECT_OBJECT:]
+                    event = event[:ACTION + 1] + [o] + event[ADVERB:]
+                    print('NEW EVENT TO GO IN: ', event)
                     events.append(event)
             else:
-                event = event[:ACTION + 1] + [None] + event[DIRECT_OBJECT:]
+                event = event[:ACTION + 1] + [None] + event[ADVERB:]
                 events.append(event)
 
+        print("FINAL EVENT LISTING IS:")
+        for e in events:
+            print(e)
         return events
 
     def extract_event_creation(self, s):
@@ -431,8 +436,7 @@ class EizenExtractor(object):
         print("CREATED CREATION EVENT: ", events)
         return events
 
-    def extract_relation_via_template(self, template, token):
-
+    def extract_keyword_connected_relation(self, template, token):
         first_pass = False
         second_pass = False
         third_pass = False
@@ -451,10 +455,10 @@ class EizenExtractor(object):
 
             if template.is_flipped == False:
                 if template.first == child.dep_ or first_pass == True:
-                    print("In first with token %s(%s):" % (child, child.dep_))
+                    # print("In first with token %s(%s):" % (child, child.dep_))
 
                     if template.second == child.dep_ or second_pass == True:
-                        print("In second with token %s(%s):" % (child, child.dep_))
+                        # print("In second with token %s(%s):" % (child, child.dep_))
 
                         if template.third.strip is not "":
                             if template.third == child.dep_:
@@ -476,14 +480,67 @@ class EizenExtractor(object):
         else:
             return None
 
+    def extract_keywordless_relation(self, template, token):
+        # print("Checking %s against %s (dep_ of %s)" % (template.first, token.text, token.dep_))
+        if template.first == token.dep_:
+
+            second_pass = False
+            third_pass = False
+            if template.third.strip() == "":
+                third_pass = True
+
+            relation = Relation()
+            relation.keyword = template.keyword
+            relation.keyword_type = template.keyword_type
+            relation.relation = template.relation
+            relation.is_flipped = template.is_flipped
+
+            relation.first_token = token
+
+            for child in token.children:
+
+                if template.second == child.dep_ or second_pass == True:
+                    # print("In second with token %s(%s):" % (child, child.dep_))
+
+                    if template.third.strip is not "":
+                        if template.third == child.dep_:
+
+                            if third_pass == False:
+                                third_pass = True
+                                relation.third_token = child
+
+                    if second_pass == False:
+                        second_pass = True
+                        relation.second_token = child
+
+            if second_pass and third_pass:
+                return relation
+
+        return None
+
+    def extract_relation_via_template(self, template, token):
+
+        unflipped = ExtractionTemplate.create_unflipped_template(template)
+        # if template.is_flipped:
+        #     print("\t", str(unflipped))
+
+        # return self.extract_keyword_connected_relation(unflipped, token)
+        if template.keyword.strip() == "":
+            # print(">>> Keyword-less approach")
+            return self.extract_keywordless_relation(unflipped, token)
+        else:
+            # print(">>> Keyword-connected approach")
+            return self.extract_keyword_connected_relation(unflipped, token)
+
+
     def get_relations_from_sentence(self, event_type, template, token):
         relations = []
         if event_type == EVENT_DESCRIPTION:
             if template.relation in [IS_A, HAS_PROPERTY, HAS_A, CAPABLE_OF]:
-                print("CHECKING IF THIS RELATION IS POSSIBLE TO WORK WITH")
+                # print("CHECKING IF THIS RELATION IS POSSIBLE TO WORK WITH")
                 extracted = self.extract_relation_via_template(template, token)
                 if extracted is not None:
-                    print("Appending", extracted)
+                    # print("Appending", extracted)
                     relations.append(extracted)
 
         return relations
@@ -497,12 +554,16 @@ class EizenExtractor(object):
         extraction_manager = DBOExtractionTemplate("extraction_templates")
         relations = []
         for token in sentence:
-            extraction_templates = extraction_manager.get_extraction_templates_by_keyword(token.lemma_)
-            extraction_templates.extend(extraction_manager.get_extraction_templates_by_keyword(token.dep_))
+            # print("==========================")
+            # print("=", token.text)
+            # print("==========================")
+
+            extraction_templates = extraction_manager.get_extraction_templates_by_keyword(token.lemma_, token.dep_)
+            # extraction_templates.extend(extraction_manager.get_extraction_templates_by_keyword(token.dep_))
 
             for i in range(len(extraction_templates)):
-                print("\n\nExtraction Template %d: %s" % (i, extraction_templates[i]))
-                print(extraction_templates[i])
+                # print("\n\nExtraction Template %d: %s" % (i, extraction_templates[i]))
+                # print(extraction_templates[i])
                 extracted_relations = self.get_relations_from_sentence(EVENT_DESCRIPTION, extraction_templates[i], token)
                 if extracted_relations is not None:
                     relations.extend(extracted_relations)
@@ -570,13 +631,6 @@ class EizenExtractor(object):
                 events = self.extract_event_aao(s)
                 for event in events:
                     # print(event)
-                    event_entity = ActionEvent(len(world.event_chains),
-                                               subject=event[ACTOR],
-                                               verb=event[ACTION],
-                                               direct_object=event[DIRECT_OBJECT],
-                                               adverb=event[ADVERB],
-                                               preposition=event[PREPOSITION],
-                                               object_of_preposition=event[OBJ_PREPOSITION])
                     event_entity = [EVENT_ACTION,
                                     event[ACTOR],
                                     event[ACTION],

@@ -22,3 +22,9 @@ class Attribute():
         if self.is_negated:
             my_string = my_string + " (negated)"
         return my_string
+
+    def __eq__(self, other):
+        if self.relation == other.relation:
+            if self.description == other.desciption:
+                if self.is_negated == other.is_negated:
+                    return True

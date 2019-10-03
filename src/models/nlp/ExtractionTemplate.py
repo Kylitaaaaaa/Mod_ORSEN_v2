@@ -25,3 +25,27 @@ class ExtractionTemplate:
                     + "\t(type %s, flipped: %s)" % (self.keyword_type, self.is_flipped)
 
         return my_string
+
+    @staticmethod
+    def create_unflipped_template(template):
+        new_template = template
+        if template.is_flipped == True:
+            if template.third.strip() == "":
+                new_template = ExtractionTemplate(id=template.id,
+                                                  relation=template.relation,
+                                                  first=template.second,
+                                                  keyword=template.keyword,
+                                                  second=template.first,
+                                                  third=template.third,
+                                                  keyword_type=template.keyword_type,
+                                                  is_flipped='n')
+            else:
+                new_template = ExtractionTemplate(id=template.id,
+                                                  relation=template.relation,
+                                                  first=template.third,
+                                                  keyword=template.keyword,
+                                                  second=template.second,
+                                                  third=template.first,
+                                                  keyword_type=template.keyword_type,
+                                                  is_flipped='n')
+        return new_template

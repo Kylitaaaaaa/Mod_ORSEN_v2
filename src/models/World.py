@@ -30,8 +30,10 @@ class World:
         self.dialogue_move_history = dialogue_move_history
 
     def add_event(self, event, sentence):
+        event.sequence_number = len(self.event_chains) + 1
+
         self.event_chains.append(event)
-        self.sentence_references.append(event)
+        self.sentence_references.append(sentence)
 
         self.curr_event = event
 

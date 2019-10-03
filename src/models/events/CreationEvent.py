@@ -11,6 +11,7 @@ class CreationEvent(Event):
                     "============================\n" \
                     "= EVENT " + str(self.sequence_number) + "\t================\n" \
                     "============================\n" \
+                    "Type: Creation Event\n" \
                     "Subject: " + str(self.subject) + "\n"
 
         return my_string.strip()

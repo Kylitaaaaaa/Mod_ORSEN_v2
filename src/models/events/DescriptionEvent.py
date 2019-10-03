@@ -19,6 +19,7 @@ class DescriptionEvent(Event):
                     "============================\n" \
                     "= EVENT " + str(self.sequence_number) + "\t================\n" \
                     "============================\n" \
+                    "Type: Description Event\n" \
                     "Subject: " + str(self.subject) + "\n" + \
                     "Attributes: \n"
 
@@ -29,17 +30,12 @@ class DescriptionEvent(Event):
                 my_string = my_string + str(a)
 
         return my_string.strip()
-    # def __str__(self):
-        # subject_string = "\tSubject = [ "
-        # for object in self.subject:
-        #     subject_string += object + ","
-        # subject_string += " ]\n"
-        #
-        # string = "EVENT #" + str(self.sequence_no) + " - "
-        #
-        # string += "DESCRIPTIVE\n"
-        # string += subject_string
-        # string += "\tattributes = [ "
-        # for attr in self.attributes:
-        #     string += attr + ","
-        # string += " ]\n"
+
+    def __eq__(self, other):
+        if self.subject == other.subject:
+            if len(self.attributes) == len(other.attributes):
+                for i in range(len(self.attributes)):
+                   if self.attributes[i] != other.attributes[i]:
+                       return False
+                return True
+        return False
