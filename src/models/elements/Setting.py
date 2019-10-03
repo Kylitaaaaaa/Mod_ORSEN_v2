@@ -1,10 +1,8 @@
 class Setting:
 
-    place = None
-    date = None
-    time = None
+    def __init__(self, type, value):
+        self.type = type
+        self.value = value
 
-    def __init__(self, place, date, time):
-        self.place = place
-        self.date = date
-        self.time = time
+    def __str__(self):
+        return self.type + ": " + self.value
