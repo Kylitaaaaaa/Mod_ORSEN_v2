@@ -35,7 +35,7 @@ def extract(story, world):
         print("ET     : %s" % event_entity)
         print("SR     : %s" % sentence)
 
-        print(prev_sentence + " vs " + curr_sentence)
+        # print(prev_sentence + " vs " + curr_sentence)
         if prev_sentence != curr_sentence:
             # print("CHECKING FOR SETTINGS")
             for ent in sentence.ents:
@@ -98,14 +98,19 @@ def extract(story, world):
             # Find the actor in the world characters.
             # If existing as an object, convert the object into a character.
             # If not existing anywhere, create it as a new CHARACTER (not an object)
+            print("Actor entity is now:", event_entity[ACTOR].text)
             actor = world.get_character(event_entity[ACTOR].text)
+            print("Actor entity after world.get_character():", str(actor))
             if actor == None:
                 actor = world.get_object(event_entity[ACTOR].text)
+                print("Actor entity after world.get_object():", str(actor))
                 if actor == None:
+                    print("Actor entity not found. Creating one now via create_character():", str(actor))
                     actor = Character.create_character(sentence=sentence, token=event_entity[ACTOR])
                     world.add_character(actor)
                 else:
-                    actor = Character.create_character(world.remove_object(actor))
+                    print("Actor entity object found. Remove from objects and add to characters", str(actor))
+                    actor = Character.create_character(sentence=sentence, token=world.remove_object(actor))
                     world.add_character(actor)
             actor.mention_count += 1
 
@@ -119,11 +124,13 @@ def extract(story, world):
                         direct_object = Object.create_object(sentence=sentence, token=event_entity[DIRECT_OBJECT])
                         world.add_object(direct_object)
                     else:
-                        direct_object = Object.create_object(world.remove_object(direct_object))
+                        direct_object = Object.create_object(sentence=sentence, token=world.remove_object(direct_object))
                         world.add_object(direct_object)
                 direct_object.mention_count += 1
 
-            print("Actor  :", actor)
+            print("Actor        :", actor)
+            print("Direct object:", direct_object)
+            
             event = ActionEvent(len(world.event_chains),
                                 subject=actor,
                                 verb=event_entity[ACTION],

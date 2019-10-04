@@ -9,7 +9,7 @@ class CreationEvent(Event):
     def __str__(self):
         my_string = "" \
                     "============================\n" \
-                    "= EVENT " + str(self.sequence_number) + "\t================\n" \
+                    "= EVENT " + str(self.sequence_number) + "\t============\n" \
                     "============================\n" \
                     "Type: Creation Event\n" \
                     "Subject: " + str(self.subject) + "\n"

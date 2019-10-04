@@ -13,19 +13,33 @@ class Object:
         self.mention_count = mention_count
 
     def __str__(self):
-        return self.name + ' (' + self.id + ')'
+        my_string = "(" + self.id + ")" + self.name + "\n" 
+        for a in self.attribute:
+            my_string = my_string + str(a) + "\n"
+        
+        for t in self.type:
+            my_string = my_string + str(t) + "\n"
+        
+        my_string = my_string + "mentioned: " + str(self.mention_count)
+                    
+        return my_string.strip()
 
     @staticmethod
     def get_object_entity_via_token(token, sentence):
         entities = sentence.ents
 
         for ent in entities:
+            print(token.text, "vs", ent)
+            print("Ent range:", ent.start, "to", ent.end)
             if type(ent) == type(token):
-                if ent.start >= token.start and token.end <= ent.end:
+                print("Entity range:", token.start, "to", token.end)
+                if ent.start <= token.start and ent.end >= token.end:
                     return ent
             elif type(ent[0]) == type(token):
+                print("Token index:", token.i)
                 if ent.start <= token.i < ent.end:
                     return ent
+            print()
         return None
 
     @staticmethod

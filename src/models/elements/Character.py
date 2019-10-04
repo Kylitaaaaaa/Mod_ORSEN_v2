@@ -11,7 +11,7 @@ class Character(Object):
     @staticmethod
     def create_character(sentence, token, id="", attribute=[], in_setting="", mention_count=0, gender=""):
         entity = Object.get_object_entity_via_token(token, sentence)
-
+        print("The entity I found is: ", entity)
         entity_text = token.text
         entity_types = []
 
@@ -36,7 +36,7 @@ class Character(Object):
                                   gender = gender)
         return new_character
 
-    def __infer_gender__(self, sentence, token):
+    def infer_gender(self, sentence, token):
         pass
 
     @staticmethod
