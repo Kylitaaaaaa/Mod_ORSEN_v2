@@ -27,11 +27,18 @@ class ContentDetermination:
         #     print(X)
 
         #choose template
+        print("CURR EVENT: ", self.curr_event.type)
+        print(self.curr_event)
+        print("subject is: ", self.curr_event.subject)
+        
         chosen_template = self.choose_template()
         print("CHOSEN TEMPLATE IS: ", chosen_template)
 
         #fill template to use
-        response = chosen_template.fill_blanks(self.curr_event)
+        if len(chosen_template.template) == 1:
+            response = chosen_template.template[0]
+        else:
+            response = chosen_template.fill_blanks(self.curr_event)
 
         print("RESPONSE IS: ", response)
 

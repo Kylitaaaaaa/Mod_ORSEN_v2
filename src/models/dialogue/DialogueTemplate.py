@@ -18,38 +18,46 @@ class DialogueTemplate(ABC):
         self.dependent_nodes = dependent_nodes
         self.is_move_usable = False
 
+#    def fill_blanks(self, event):
+#        #if it does not require any details
+#        print("relations are: ")
+#        print(self.relation)
+#        if self.relation[0][0] is None:
+#            return self.template
+#
+#        print("subject name: ", event.subject.name)
+#        print("subject: ", event.subject)
+#        response = self.template
+#        for i in range (len(self.nodes)):
+#            to_insert = ""
+#            curr_index = response.index(self.nodes[i])
+#            if self.blanks[i] == 'Character':
+#                to_insert = event.get_characters_involved()[0].name
+#            elif self.blanks[i] == 'Object':
+#                to_insert = event.get_objects_involved()[0].name
+#            elif self.blanks[i] == 'Event':
+#                to_insert = event.subject.name + " " + event.verb + " " +  event.direct_object.name + " " +  event.adverb + " " +  event.preposition + " " +  event.object_of_preposition
+#            elif self.blanks[i] == 'Repeat':
+#                if event.get_type() == EVENT_ACTION:
+#                    to_insert = event.subject.name + " " + event.verb + " " +  event.direct_object.name + " " +  event.adverb + " " +  event.preposition + " " +  event.object_of_preposition
+#                elif event.get_type() == EVENT_CREATION:
+#                    to_insert = event.subject.name
+#                elif event.get_type() == EVENT_DESCRIPTION:
+#                    to_insert = event.subject.name + " is "
+#                    # for j in range (len(event.get_attributes())):
+#                    #     if j == len(event.get_attributes()) - 1:
+#                    #         to_insert = to_insert
+#                    #     else:
+#                    #         to_insert = to_insert + " and "
+#
+#            response[curr_index] = to_insert
+#
+#        return response
+
     def fill_blanks(self, event):
-        #if it does not require any details
-        if len(self.relation) == 0:
-            return self.template
-
-        response = self.template
-        for i in range (len(self.nodes)):
-            to_insert = ""
-            curr_index = response.index(self.nodes[i])
-            if self.blanks[i] == 'Character':
-                to_insert = event.get_characters_involved()[0].name
-            elif self.blanks[i] == 'Object':
-                to_insert = event.get_objects_involved()[0].name
-            elif self.blanks[i] == 'Event':
-                to_insert = event.subject.name + " " + event.verb + " " +  event.direct_object.name + " " +  event.adverb + " " +  event.preposition + " " +  event.object_of_preposition
-            elif self.blanks[i] == 'Repeat':
-                if event.get_type() == EVENT_ACTION:
-                    to_insert = event.subject.name + " " + event.verb + " " +  event.direct_object.name + " " +  event.adverb + " " +  event.preposition + " " +  event.object_of_preposition
-                elif event.get_type() == EVENT_CREATION:
-                    to_insert = event.subject.name
-                elif event.get_type() == EVENT_DESCRIPTION:
-                    to_insert = event.subject.name + " is "
-                    # for j in range (len(event.get_attributes())):
-                    #     if j == len(event.get_attributes()) - 1:
-                    #         to_insert = to_insert
-                    #     else:
-                    #         to_insert = to_insert + " and "
-
-            response[curr_index] = to_insert
-
-        return response
-
+        pass
+        
+    
     def get_string_response(self):
         return "".join(self.template)
 
