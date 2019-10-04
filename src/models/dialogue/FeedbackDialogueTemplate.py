@@ -9,6 +9,9 @@ class FeedbackDialogueTemplate(DialogueTemplate):
 
 
     def fill_blanks(self, event):
+        print("EVENT ATTRIBUTES")
+        print(event.attributes)
+        
 
         print("subject name: ", event.subject.name)
         print("subject: ", event.subject)
