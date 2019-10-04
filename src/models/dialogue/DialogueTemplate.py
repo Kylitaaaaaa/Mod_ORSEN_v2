@@ -28,23 +28,23 @@ class DialogueTemplate(ABC):
             to_insert = ""
             curr_index = response.index(self.nodes[i])
             if self.blanks[i] == 'Character':
-                to_insert = event.get_characters_involved()[0]
+                to_insert = event.get_characters_involved()[0].name
             elif self.blanks[i] == 'Object':
-                to_insert = event.get_objects_involved()[0]
+                to_insert = event.get_objects_involved()[0].name
             elif self.blanks[i] == 'Event':
-                to_insert = event.get_subject() + " " + event.get_verb() + " " +  event.get_direct_object() + " " +  event.get_adverb() + " " +  event.get_preposition() + " " +  event.get_object_of_preposition()
+                to_insert = event.subject.name + " " + event.verb + " " +  event.direct_object.name + " " +  event.adverb + " " +  event.preposition + " " +  event.object_of_preposition
             elif self.blanks[i] == 'Repeat':
                 if event.get_type() == EVENT_ACTION:
-                    to_insert = event.get_subject() + " " + event.get_verb() + " " + event.get_direct_object() + " " + event.get_adverb() + " " + event.get_preposition() + " " + event.get_object_of_preposition()
+                    to_insert = event.subject.name + " " + event.verb + " " +  event.direct_object.name + " " +  event.adverb + " " +  event.preposition + " " +  event.object_of_preposition
                 elif event.get_type() == EVENT_CREATION:
-                    to_insert = event.get_subject()
+                    to_insert = event.subject.name
                 elif event.get_type() == EVENT_DESCRIPTION:
-                    to_insert = event.get_subject() + " is "
-                    for j in range (len(event.get_attributes())):
-                        if j == len(event.get_attributes()) - 1:
-                            to_insert = to_insert
-                        else:
-                            to_insert = to_insert + " and "
+                    to_insert = event.subject.name + " is "
+                    # for j in range (len(event.get_attributes())):
+                    #     if j == len(event.get_attributes()) - 1:
+                    #         to_insert = to_insert
+                    #     else:
+                    #         to_insert = to_insert + " and "
 
             response[curr_index] = to_insert
 
