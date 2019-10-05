@@ -32,7 +32,6 @@ class DialoguePlanner:
         print("Dialogue_list: ", len(DIALOGUE_LIST))
         for i in range(len(DIALOGUE_LIST)):
             # check if dialogue has templates
-
             curr_usable_templates = self.get_usable_templates(DIALOGUE_LIST[i].get_type())
             self.usable_templates.append(curr_usable_templates)
 
@@ -49,6 +48,12 @@ class DialoguePlanner:
         # add chosen dialogue move to dialogue history TODO call DialogueTemplateBuilder
         self.dialogue_history.append(self.chosen_dialogue_move)
         print("\n\nCHOSEN DIALOGUE MOVE: ", self.chosen_dialogue_move)
+
+        return self.chosen_dialogue_move
+
+    def test_perform_dialogue_planner(self, dialogue_move):
+        self.chosen_dialogue_move = dialogue_move
+        self.chosen_dialogue_template = self.get_usable_templates(dialogue_move)
 
         return self.chosen_dialogue_move
 

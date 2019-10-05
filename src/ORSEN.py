@@ -164,7 +164,11 @@ class ORSEN:
 
         # choose dialogue move
         self.dialogue_planner.set_event(curr_event)
-        self.dialogue_planner.perform_dialogue_planner()
+
+
+        # self.dialogue_planner.perform_dialogue_planner()
+        move_to_execute = 'specific'  # TODO Delete this after finishing the testing of this particular dialogue move.
+        self.dialogue_planner.test_perform_dialogue_planner(move_to_execute) # TODO: Delete after testing
         move_to_execute = self.dialogue_planner.chosen_dialogue_move
         available_templates = self.dialogue_planner.chosen_dialogue_template
 

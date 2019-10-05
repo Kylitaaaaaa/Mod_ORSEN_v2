@@ -4,16 +4,34 @@ class Attribute:
     description = ""
     is_negated = False
 
-    def __init__(self, relation, description, is_negated):
+    def __init__(self, relation, description, is_negated, keyword=""):
         self.relation = relation
         self.description = description
         self.is_negated = is_negated
+        self.keyword = keyword
 
     @staticmethod
     def create_from_relation(relation):
         new_attribute = None
         if relation.is_flipped == False:
-            new_attribute = Attribute(relation.relation, relation.second_token, relation.is_negated)
+            keyword = ""
+            if relation.keyword_type == 1:
+                keyword = relation.keyword
+            else:
+                # keyword = hardcode ka ng somethign dito based sa value niya sa database.
+                if relation.keyword == "aux":
+                    keyword = "can"
+                elif relation.keyword == "agent":
+                    keyword = "by"
+                elif relation.keyword == "auxpass":
+                    keyword = "was"
+                elif relation.keyword == "det":
+                    keyword = "can be"
+                elif relation.keyword == "ROOT":
+                    keyword = "has"
+
+
+            new_attribute = Attribute(relation.relation, relation.second_token, relation.is_negated, keyword)
 
         return new_attribute
 

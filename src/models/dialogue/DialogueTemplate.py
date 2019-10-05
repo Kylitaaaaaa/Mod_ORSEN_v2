@@ -71,27 +71,27 @@ class DialogueTemplate(ABC):
 
     def is_usable(self, curr_event):
         # print('CHECKING IS USABLE: ', self.relation[0][1])
+
+
+        #TODO: UNCOMMENT
+
         decision = False
-        # Requires a relation
         if self.relation[0][0] == 'None':
             decision = True
         else:
+            # Requires a relation
             if curr_event is None:
                 decision = False
             else:
                 if self.is_usable_1_relation(self.relation[0][1], curr_event):
                     decision = True
-            # if len(curr_event) == 0:
-            #     return False
-            # else:
-            #     #if only 1 relation
-            #     if len(self.relation) == 1:
-            #         for X in curr_event:
-            #             if self.is_usable_1_relation(self.relation[0][1], X):
-            #                 return True
-
         self.is_move_usable = decision
         return decision
+
+        ###TODO remove
+        # if self.relation[0][0] == 'None':
+        #     return False
+        # return True
 
     def is_usable_1_relation(self, relation, curr_event):
         if relation == 'Repeat':

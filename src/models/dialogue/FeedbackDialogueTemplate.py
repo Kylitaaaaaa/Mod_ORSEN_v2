@@ -9,31 +9,21 @@ class FeedbackDialogueTemplate(DialogueTemplate):
 
 
     def fill_blanks(self, event):
-        print("EVENT ATTRIBUTES")
-        print(event.attributes)
-        
-
-        print("subject name: ", event.subject.name)
-        print("subject: ", event.subject)
         response = self.template
         for i in range (len(self.nodes)):
             to_insert = ""
             curr_index = response.index(self.nodes[i])
             if self.blanks[i] == 'Repeat':
+                to_insert = event.subject.name + " "
                 if event.get_type() == EVENT_ACTION:
-                    to_insert = event.subject.name + " " + event.verb + " " +  event.direct_object.name + " " +  event.adverb + " " +  event.preposition + " " +  event.object_of_preposition
+                    to_insert = to_insert + str(event.verb)
                 elif event.get_type() == EVENT_CREATION:
                     to_insert = event.subject.name
                 elif event.get_type() == EVENT_DESCRIPTION:
-                    to_insert = event.subject.name + " is "
-                    # for j in range (len(event.get_attributes())):
-                    #     if j == len(event.get_attributes()) - 1:
-                    #         to_insert = to_insert
-                    #     else:
-                    #         to_insert = to_insert + " and "
-
+                    #Iterate through attributes
+                    for X in event.attributes:
+                        to_insert = to_insert + X.keyword + " " + str(X.description.lemma_)
             response[curr_index] = to_insert
-
         return response
 
     def get_usable_templates(self):

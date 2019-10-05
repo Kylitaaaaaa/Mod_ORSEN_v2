@@ -20,7 +20,7 @@ class PumpingSpecificDialogueTemplate(DialogueTemplate):
             elif self.blanks[i] == 'Object':
                 to_insert = event.get_objects_involved()[0].name
             elif self.blanks[i] == 'Event':
-                to_insert = event.subject.name + " " + event.verb + " " +  event.direct_object.name + " " +  event.adverb + " " +  event.preposition + " " +  event.object_of_preposition
+                to_insert = event.subject.name + " " + str(event.verb.lemma_)
            
             response[curr_index] = to_insert
 

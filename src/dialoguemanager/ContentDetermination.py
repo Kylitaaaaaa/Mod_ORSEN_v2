@@ -20,17 +20,7 @@ class ContentDetermination:
     def perform_content_determination(self):
         print("FETCHING: ", self.move_to_execute)
 
-        #get all usable templates
-        # usable_template_list = self.get_usable_templates()
-        # print('USABLE TEMPLATES')
-        # for X in usable_template_list:
-        #     print(X)
-
         #choose template
-        print("CURR EVENT: ", self.curr_event.type)
-        print(self.curr_event)
-        print("subject is: ", self.curr_event.subject)
-        
         chosen_template = self.choose_template()
         print("CHOSEN TEMPLATE IS: ", chosen_template)
 
@@ -40,10 +30,10 @@ class ContentDetermination:
         else:
             response = chosen_template.fill_blanks(self.curr_event)
 
-        print("RESPONSE IS: ", response)
+        str_response = ' '.join(response)
+        print("RESPONSE IS: ", str_response)
 
-        #return response
-        return response
+        return str_response
 
     # def get_usable_templates(self):
     #     usable_template_list = []

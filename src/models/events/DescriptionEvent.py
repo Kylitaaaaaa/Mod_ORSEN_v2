@@ -10,9 +10,9 @@ class DescriptionEvent(Event):
     def __init__(self, sequence_number, subject, attributes):
         super().__init__(sequence_number, EVENT_DESCRIPTION, subject)
 
-        self.attributes = attributes
         if type(attributes) == Attribute:
             attributes = [attributes]
+        self.attributes = attributes
 
         for a in attributes:
             subject.attribute.append(a)
