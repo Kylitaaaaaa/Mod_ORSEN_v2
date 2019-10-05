@@ -43,6 +43,8 @@ class ORSEN:
         return True
 
     def get_response(self, response):
+        Logger.log_dialogue_model(response)
+
         """"
         Check for trigger phrases 
         """""
@@ -57,6 +59,7 @@ class ORSEN:
             """" 
             Executing Dialogue Manager 
             """""
+            Logger.log_dialogue_model("Entering ORSEN.get_response()")
             result = ORSEN.perform_dialogue_manager(self, response)
 
         else:

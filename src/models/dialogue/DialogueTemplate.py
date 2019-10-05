@@ -18,6 +18,15 @@ class DialogueTemplate(ABC):
         self.dependent_nodes = dependent_nodes
         self.is_move_usable = False
 
+    def full_string(self):
+        my_string = "(%s) %s" % (self.dialogue_type, self.get_string_response())
+        my_string = my_string + "TEMPLATE: " + str(self.template) + "\n"
+        my_string = my_string + "RELATION: " + str(self.relation) + "\n"
+        my_string = my_string + "BLANKS  : " + str(self.blanks) + "\n"
+        my_string = my_string + "NODES   : " + str(self.nodes) + "\n"
+        my_string = my_string + "DEP NODE: " + str(self.dependent_nodes)
+
+        return my_string
 #    def fill_blanks(self, event):
 #        #if it does not require any details
 #        print("relations are: ")

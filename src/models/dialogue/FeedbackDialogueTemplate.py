@@ -1,6 +1,7 @@
+from src import DialogueTemplateBuilder
 from . import DialogueTemplate
 from src.constants import DIALOGUE_TYPE_FEEDBACK, EVENT_ACTION, EVENT_CREATION, EVENT_DESCRIPTION
-
+import copy
 
 class FeedbackDialogueTemplate(DialogueTemplate):
 
@@ -9,7 +10,12 @@ class FeedbackDialogueTemplate(DialogueTemplate):
 
 
     def fill_blanks(self, event):
-        response = self.template
+        print(self.full_string())
+
+        # response = self.template
+        # response = DialogueTemplateBuilder.build(*self)
+        response = copy.deepcopy(self.template)
+
         for i in range (len(self.nodes)):
             to_insert = ""
             curr_index = response.index(self.nodes[i])

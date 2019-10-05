@@ -1,4 +1,6 @@
 import numpy as np
+
+from src import Logger
 from src.models.dialogue.constants import *
 from src.dbo.dialogue.DBODialogueTemplate import DBODialogueTemplate, PUMPING_TRIGGER, PROMPT_TRIGGER, \
     DIALOGUE_TYPE_PUMPING_SPECIFIC, DIALOGUE_TYPE_PROMPT, IS_END, THE_END
@@ -33,9 +35,19 @@ class DialoguePlanner:
         if dialogue_move == "":
             print("Dialogue_list: ", len(DIALOGUE_LIST))
             for i in range(len(DIALOGUE_LIST)):
+
+                to_check = DIALOGUE_LIST[i]
+                Logger.log_dialogue_model_basic(to_check)
+
+                # feedback[d1, d4, d5]
+                # general[d7, d9, 10]
+                # pumping[d11, d12, d15]
+                # list.append() --> [[],[],[]]]
+
                 # check if dialogue has templates
                 curr_usable_templates = self.get_usable_templates(DIALOGUE_LIST[i].get_type())
                 self.usable_templates.append(curr_usable_templates)
+
 
                 # check if dialogue can be repeated (Only up to 3 times)
                 self.is_usable[i] = self.is_dialogue_usable(DIALOGUE_LIST[i].get_type(), curr_usable_templates)
@@ -109,8 +121,9 @@ class DialoguePlanner:
     def get_weights(self):
         usable = np.ones(len(DIALOGUE_LIST))
 
-
         totals = usable * self.weights
+        Logger.log_information_extraction_basic_example(totals)
+
         print("totals: ", sum(totals))
         percentages = totals / sum(totals)
         if np.isfinite(percentages).all():
