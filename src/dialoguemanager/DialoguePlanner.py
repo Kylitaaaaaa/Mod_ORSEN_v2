@@ -1,6 +1,7 @@
 import numpy as np
 from src.models.dialogue.constants import *
-from src.dbo.dialogue.DBODialogueTemplate import DBODialogueTemplate
+from src.dbo.dialogue.DBODialogueTemplate import DBODialogueTemplate, PUMPING_TRIGGER, PROMPT_TRIGGER, \
+    DIALOGUE_TYPE_PUMPING_SPECIFIC, DIALOGUE_TYPE_PROMPT, IS_END, THE_END
 
 import time
 timeout = time.time() + 5
@@ -28,26 +29,31 @@ class DialoguePlanner:
 
     #TODO Handle triggered
 
-    def perform_dialogue_planner(self):
-        print("Dialogue_list: ", len(DIALOGUE_LIST))
-        for i in range(len(DIALOGUE_LIST)):
-            # check if dialogue has templates
-            curr_usable_templates = self.get_usable_templates(DIALOGUE_LIST[i].get_type())
-            self.usable_templates.append(curr_usable_templates)
+    def perform_dialogue_planner(self, dialogue_move = ""):
+        if dialogue_move == "":
+            print("Dialogue_list: ", len(DIALOGUE_LIST))
+            for i in range(len(DIALOGUE_LIST)):
+                # check if dialogue has templates
+                curr_usable_templates = self.get_usable_templates(DIALOGUE_LIST[i].get_type())
+                self.usable_templates.append(curr_usable_templates)
 
-            # check if dialogue can be repeated (Only up to 3 times)
-            self.is_usable[i] = self.is_dialogue_usable(DIALOGUE_LIST[i].get_type(), curr_usable_templates)
+                # check if dialogue can be repeated (Only up to 3 times)
+                self.is_usable[i] = self.is_dialogue_usable(DIALOGUE_LIST[i].get_type(), curr_usable_templates)
 
-            # gets number of occurences
-            self.weights[i] = self.get_num_usage(DIALOGUE_LIST[i].get_type())
+                # gets number of occurences
+                self.weights[i] = self.get_num_usage(DIALOGUE_LIST[i].get_type())
 
-        self.chosen_move_index = self.choose_dialogue()
-        self.chosen_dialogue_move = DIALOGUE_LIST[self.chosen_move_index].get_type()
-        self.chosen_dialogue_template = self.usable_templates[self.chosen_move_index]
+            self.chosen_move_index = self.choose_dialogue()
+            self.chosen_dialogue_move = DIALOGUE_LIST[self.chosen_move_index].get_type()
+            self.chosen_dialogue_template = self.usable_templates[self.chosen_move_index]
 
-        # add chosen dialogue move to dialogue history TODO call DialogueTemplateBuilder
-        self.dialogue_history.append(self.chosen_dialogue_move)
-        print("\n\nCHOSEN DIALOGUE MOVE: ", self.chosen_dialogue_move)
+            # add chosen dialogue move to dialogue history TODO call DialogueTemplateBuilder
+            self.dialogue_history.append(self.chosen_dialogue_move)
+            print("\n\nCHOSEN DIALOGUE MOVE: ", self.chosen_dialogue_move)
+
+        else:
+            self.chosen_dialogue_move = dialogue_move
+            self.chosen_dialogue_template = self.get_usable_templates(dialogue_move)
 
         return self.chosen_dialogue_move
 
@@ -145,6 +151,15 @@ class DialoguePlanner:
 
     def set_event(self, curr_event):
         self.curr_event = curr_event
+
+    def check_trigger_phrases(self, response):
+        response = response.lower()
+        if response in PUMPING_TRIGGER:
+            return DIALOGUE_TYPE_PUMPING_SPECIFIC
+        elif response in PROMPT_TRIGGER:
+            return DIALOGUE_TYPE_PROMPT
+
+        return None
 
 
 

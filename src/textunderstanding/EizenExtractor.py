@@ -593,7 +593,7 @@ class EizenExtractor(object):
 
         old_sentence = ""
         for s in world.sentence_references:
-            old_sentence = old_sentence + ' ' + s
+            old_sentence = old_sentence + ' ' + str(s)
 
         sentence = old_sentence + content
 

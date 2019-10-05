@@ -37,53 +37,31 @@ class ORSEN:
         print("Printing result")
         print(result)
 
-    def talk(self):
-        if self.is_done_with_prereqs() == False:
-            pass
-            # TODO implement the modularization of pre-required dialogues
-            # WHAT I'M THINKING IS GAWIN NATIN NA PARANG CLASS UGN MGA SHIT NA NILALAGAY BEFORE THE ACTUAL STORYTELLING THING
-            # prereq_dialogue = self.prereqs[0]
-            # prereq_dialogue.talk(prereq_dialogue[0])
-
-        if self.is_story_done:
-            pass
-        else:
-            result = None
-
-    def is_end_story(self, response):
-        if response == 'the end':
-            return True
-        return False
+    def is_engaged(self, response):
+        if response.lower() in IS_END:
+            return False
+        return True
 
     def get_response(self, response):
-
-
         """"
-        Executes text understanding part. This includes the extraction of important information in the text input 
-        (using previous sentences as context). This also including breaking the sentences into different event entities.  
+        Check for trigger phrases 
         """""
-        ORSEN.perform_text_understanding(self, response)
+        triggered_move = self.dialogue_planner.check_trigger_phrases(response)
+        if triggered_move is None:
+            """"
+            Executes text understanding part. This includes the extraction of important information in the text input 
+            (using previous sentences as context). This also including breaking the sentences into different event entities.  
+            """""
+            ORSEN.perform_text_understanding(self, response)
 
-        """" 
-        Executing Dialogue Manager 
-        """""
-        ORSEN.perform_dialogue_manager(self, response)
+            """" 
+            Executing Dialogue Manager 
+            """""
+            ORSEN.perform_dialogue_manager(self, response)
 
-        # if self.endstory:
-        #     if (not self.endstorygen):
-        #         if response.lower() in IS_AFFIRM:
-        #             pass
-        #         else:
-        #             pass
-        #     elif self.endstorygen:
-        #         if response.lower() in IS_AFFIRM:
-        #             pass
-        #         else:
-        #             pass
-        # elif response.lower() in IS_END:
-        #     pass
-        # else:
-        #     pass
+        else:
+            ORSEN.perform_dialogue_manager(self, response, triggered_move)
+
 
     def perform_text_understanding(self, response):
         story = response
@@ -157,25 +135,47 @@ class ORSEN:
 
             self.world.add_event(event, sentence)
 
-    def perform_dialogue_manager(self, response):
-
+    def perform_dialogue_manager(self, response, move_to_execute=""):
         # curr_event = None
         curr_event = self.world.curr_event
-
-        # choose dialogue move
         self.dialogue_planner.set_event(curr_event)
 
+        if move_to_execute == "":
+            move_to_execute = self.dialogue_planner.perform_dialogue_planner()
+        else:
+            self.dialogue_planner.test_perform_dialogue_planner(move_to_execute)
 
-        # self.dialogue_planner.perform_dialogue_planner()
-        move_to_execute = 'specific'  # TODO Delete this after finishing the testing of this particular dialogue move.
-        self.dialogue_planner.test_perform_dialogue_planner(move_to_execute) # TODO: Delete after testing
-        move_to_execute = self.dialogue_planner.chosen_dialogue_move
+
+        # choose dialogue move
+
+        # # self.dialogue_planner.perform_dialogue_planner()
+        # move_to_execute = 'specific'  # TODO Delete this after finishing the testing of this particular dialogue move.
+        # self.dialogue_planner.test_perform_dialogue_planner(move_to_execute) # TODO: Delete after testing
+        # move_to_execute = self.dialogue_planner.chosen_dialogue_move
         available_templates = self.dialogue_planner.chosen_dialogue_template
 
         
         # send current event to ContentDetermination
-        move_to_execute = 'general' # TODO Delete this after finishing the testing of this particular dialogue move.
         self.content_determination.set_state(move_to_execute, curr_event, available_templates)
-        self.content_determination.perform_content_determination()
+        response = self.content_determination.perform_content_determination()
 
-        return None
+        return response
+
+
+    def repeat_story(self):
+        response = ""
+        for event in self.world.event_chains:
+            to_insert = event.subject.name + " "
+            if event.get_type() == EVENT_ACTION:
+                to_insert = to_insert + str(event.verb)
+            elif event.get_type() == EVENT_CREATION:
+                to_insert = event.subject.name
+            elif event.get_type() == EVENT_DESCRIPTION:
+                # Iterate through attributes
+                for X in event.attributes:
+                    to_insert = to_insert + X.keyword + " " + str(X.description.lemma_)
+            to_insert = to_insert + ". "
+            response = response + to_insert
+        return response
+
+

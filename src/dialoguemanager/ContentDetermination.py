@@ -17,6 +17,11 @@ class ContentDetermination:
         self.curr_event = curr_event
         self.usable_template_list = usable_template_list
 
+    def reset_state(self):
+        self.move_to_execute = ""
+        self.curr_event = []
+        self.usable_template_list = []
+
     def perform_content_determination(self):
         print("FETCHING: ", self.move_to_execute)
 
@@ -33,6 +38,7 @@ class ContentDetermination:
         str_response = ' '.join(response)
         print("RESPONSE IS: ", str_response)
 
+        self.reset_state()
         return str_response
 
     # def get_usable_templates(self):

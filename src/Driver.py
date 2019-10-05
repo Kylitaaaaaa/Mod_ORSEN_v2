@@ -1,6 +1,6 @@
 from src.dbo.user import DBOUser
 from src.models.user import User
-from src import Logger
+from src import Logger, IS_AFFIRM, IS_DENY, IS_END
 from src.ORSEN import ORSEN
 from src.textunderstanding.InputDecoder import InputDecoder
 
@@ -81,6 +81,25 @@ def set_global_curr_user(user):
     global curr_user
     curr_user = user
 
+def is_end_story_func(response):
+    if response.lower() in IS_END:
+        return True
+    return False
+
+def start_storytelling():
+    is_end_story = False
+    while not is_end_story:
+        user_input = get_input()
+        is_end_story = is_end_story_func(user_input)
+        if not is_end_story:
+            orsen_response = orsen.get_response(user_input)
+            print(orsen_response)
+        else:
+            print("Thank you for the story! Do you want to hear it again?")
+            user_input = get_input()
+            if user_input in IS_AFFIRM:
+                print(orsen.repeat_story())
+
 
 #start here
 # Initialize loggers
@@ -97,34 +116,26 @@ print("---------Launching ORSEN---------")
 orsen = ORSEN()
 
 #ORIG CODE
-# is_engaged = True
-# while is_engaged:
-#     response = get_input()
-#     ORSEN.get_response(response)
-#     is_engaged = ORSEN.talk()
-
 # test_sentence = "My mother's name is Sasha, she likes dogs."
 # test_sentence = "John kicked the ball."
-test_sentence = "The ball was kicked by John."
+# test_sentence = "The ball was kicked by John."
 # test_sentence = "John the mighty is a brave, strong warrior"
 # test_sentence = "Once there was a boy"
-orsen.get_response(test_sentence)
 
-# print("Output: ", InputDecoder.get_instance().perform_input_decoding("My mother's name is Sasha, she likes dogs."))
 
-#TESTING CODE
-# is_engaged = True
-# while is_engaged:
-#     response = get_input()
-#     if ORSEN.is_end_story(ORSEN, response):
-#         ###end of story
-#         print("End of story")
-#         is_engaged = False
-#     else:
-#         # story world stuff here
-#         print("Story time")
-#         ORSEN.get_response(ORSEN, response)
-#         is_engaged = ORSEN.talk()
+
+
+#for repeating the story
+is_engaged = True
+while is_engaged:
+    print("Let's make another story! You go first")
+    start_storytelling()
+    print("Do you want to make another story?")
+    user_input = get_input()
+    if user_input in IS_DENY:
+        is_engaged = False
+
+
 
 print("---------Closing ORSEN---------")
 
