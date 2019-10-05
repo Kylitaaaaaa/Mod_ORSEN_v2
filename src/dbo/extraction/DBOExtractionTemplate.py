@@ -45,7 +45,7 @@ class DBOExtractionTemplate():
                 .from_(self.table_reference) \
                 .select("*") \
                 .where(
-                    self.table_reference.keywords == keyword
+                    (self.table_reference.keywords == keyword_lemma) | (self.table_reference.keywords == keyword_dep)
             )
 
         query = q.get_sql()

@@ -8,11 +8,10 @@ Created on Sun Aug  4 04:20:35 2019
 import spacy
 from nltk import Tree
 
+from src import Logger
 from src.constants import *
 from src.dbo.extraction import DBOExtractionTemplate
-from src.models.events import ActionEvent
-from src.models.nlp import ExtractionTemplate
-from src.models.nlp.Relation import Relation
+from src.models.nlp import ExtractionTemplate, Relation
 from src.textunderstanding import InputDecoder
 
 
@@ -324,24 +323,21 @@ class EizenExtractor(object):
 
     def extract_event_aao(self, sentence):
         events = []
-        #        subjects = [chunk for chunk in sentence.noun_chunks if 'nsubj' in chunk.root.dep_ and chunk.root.ent_type_ == 'PERSON']
-        subjects = [chunk for chunk in sentence.noun_chunks]
-        # print("Noun chunks:", subjects)
 
-        # for subject in subjects:
-        # print(subject.text, subject.start, subject.end)
+        subjects = [chunk for chunk in sentence.noun_chunks]
+        Logger.log_information_extraction_basic("Noun chunks extracted: " + str(subjects))
 
         sentence_state = State(sentence)
-        # print("Voice: %s" % (sentence_state.voice))
+        Logger.log_information_extraction_basic("Inferred sentence voice: " + sentence_state.voice)
+
         actions = self.get_action_verbs(sentence)
-        # print("Actions:", actions)
+        Logger.log_information_extraction_basic("Inferred sentence actions: " + str(actions))
 
         actors_state = []
 
         start = 0
         end = 0
 
-        # print("VOICE PATTERN: %s" % (sentence_state.voice))
         if sentence_state.voice == VOICE_ACTIVE:
             start = 0
             end = len(actions)
@@ -352,49 +348,59 @@ class EizenExtractor(object):
             end = -1
             factor = -1
 
-        # print("all actions:", actions)
-
         unspliced_events = []
         for i in range(start, end, factor):
             event_action = actions[i]
+            Logger.log_information_extraction_basic("Starting extraction centered on action '" + str(event_action).upper() + "'")
 
             event_actors = self.get_actors(event_action, sentence_state)
-            # print("Actors: ", event_actors)
+            Logger.log_information_extraction_basic("ACTORS:" + str(event_actors))
             for token in sentence:
                 token._.is_traversed = False
 
             event_objects = self.get_objects(event_action, sentence_state)
-            # event_objects = self.convert_noun_to_noun_chunks(subjects, event_objects)
+            Logger.log_information_extraction_basic("OBJECTS:" + str(event_objects))
             for token in sentence:
                 token._.is_traversed = False
 
             event_adverbs = self.get_adverbs(event_action, sentence_state)
+            Logger.log_information_extraction_basic("ADVERBS:" + str(event_adverbs))
             for token in sentence:
                 token._.is_traversed = False
 
             event_prepositions = self.get_preposition(event_action, sentence_state)
+            Logger.log_information_extraction_basic("PREPOSITIONS:" + str(event_prepositions))
             for token in sentence:
                 token._.is_traversed = False
 
             event_obj_prepositions = self.get_object_of_preposition(event_action, sentence_state, event_prepositions)
+            Logger.log_information_extraction_basic("OBJECT OF PREPOSITIONS:" + str(event_obj_prepositions))
             for token in sentence:
                 token._.is_traversed = False
 
 
-
             if not event_actors:
+                Logger.log_information_extraction_basic("No actors found. Using previous actor set: " + str(actors_state))
                 event_actors = actors_state
-                event_actors = self.convert_noun_to_noun_chunks(subjects, event_actors)
             else:
-                # print()
+                event_actors = self.convert_noun_to_noun_chunks(subjects, event_actors)
+                Logger.log_information_extraction_basic("New set after converting actor tokens to actor noun chunks: " + str(event_actors))
+
                 actors_state = event_actors
+                Logger.log_information_extraction_basic("Storing current set for future use: " + str(actors_state))
+
 
             event = [event_actors, event_action, event_objects, event_adverbs, event_prepositions, event_obj_prepositions]
-            print("RESULT:", event)
+            Logger.log_information_extraction_basic("Currently formed event:")
+            Logger.log_information_extraction_basic_example(str(event))
+
             unspliced_events.append(event)
 
+        Logger.log_information_extraction_basic("All unspliced events:")
+        Logger.log_information_extraction_basic_example(str(unspliced_events))
         if sentence_state.voice == VOICE_PASSIVE:
             unspliced_events.reverse()
+            Logger.log_information_extraction_basic_example("Reversing events caused by passive voice:\n" + str(unspliced_events))
 
         pre_partial = []
         for unspliced_event in unspliced_events:
@@ -402,38 +408,35 @@ class EizenExtractor(object):
             for a in event_actors:
                 event = [a] + unspliced_event[ACTION:]
                 pre_partial.append(event)
-        # print(partial)
 
-        print("PREPARTIAL IS", pre_partial)
         partial = pre_partial
-
+        partial_do = []
         for event in partial:
             event_objects = event[DIRECT_OBJECT]
 
             if len(event_objects) > 0:
                 for o in event_objects:
                     event = event[:ACTION + 1] + [o] + event[ADVERB:]
-                    print('NEW EVENT TO GO IN: ', event)
-                    events.append(event)
+                    partial_do.append(event)
             else:
                 event = event[:ACTION + 1] + [None] + event[ADVERB:]
+                partial_do.append(event)
+
+        for event in partial_do:
+            event_adverbs = event[ADVERB]
+
+            if len(event_adverbs) > 0:
+                for a in event_adverbs:
+                    event = event[:DIRECT_OBJECT + 1] + [a] + event[PREPOSITION:]
+                    events.append(event)
+            else:
+                event = event[:DIRECT_OBJECT + 1] + [None] + event[PREPOSITION:]
                 events.append(event)
 
-        print("FINAL EVENT LISTING IS:")
+        Logger.log_information_extraction_basic("Extracted events from user input:")
         for e in events:
-            print(e)
-        return events
+            Logger.log_information_extraction_basic_example(e)
 
-    def extract_event_creation(self, s):
-        print("Sentence I am working with: %s" % (s))
-        events = []
-
-        event = []
-        for token in s:
-            if token.dep_ == 'attr':
-                event.append(token)
-        events.append(event)
-        print("CREATED CREATION EVENT: ", events)
         return events
 
     def extract_keyword_connected_relation(self, template, token):
@@ -537,33 +540,37 @@ class EizenExtractor(object):
         relations = []
         if event_type == EVENT_DESCRIPTION:
             if template.relation in [IS_A, HAS_PROPERTY, HAS_A, CAPABLE_OF]:
-                # print("CHECKING IF THIS RELATION IS POSSIBLE TO WORK WITH")
                 extracted = self.extract_relation_via_template(template, token)
                 if extracted is not None:
-                    # print("Appending", extracted)
+                    Logger.log_information_extraction_basic_example(str(extracted))
                     relations.append(extracted)
 
         return relations
 
 
 
-    def extract_event_attribute(self, sentence, event_type_flag):
+    def extract_event_attribute(self, sentence, event_type_flag=True):
         # If event type flag is True, then the passed sentence has a smaller chance of containing a description type thing.
         # Otherwise, if the flag is False, it is more likely to be a Description event.
 
         extraction_manager = DBOExtractionTemplate("extraction_templates")
         relations = []
         for token in sentence:
-            # print("==========================")
-            # print("=", token.text)
-            # print("==========================")
+            Logger.log_information_extraction_basic("Target token: '" + str(token).upper() + "'")
 
             extraction_templates = extraction_manager.get_extraction_templates_by_keyword(token.lemma_, token.dep_)
-            # extraction_templates.extend(extraction_manager.get_extraction_templates_by_keyword(token.dep_))
+            Logger.log_information_extraction_basic("Extracted the following templates:")
 
+            extraction_strings = ""
             for i in range(len(extraction_templates)):
-                # print("\n\nExtraction Template %d: %s" % (i, extraction_templates[i]))
-                # print(extraction_templates[i])
+                template = extraction_templates[i]
+                extraction_strings = extraction_strings + "(" + template.first + ", " + template.keyword + "[" + template.relation + "]" + ", " + template.second + ")"
+                if i != len(extraction_templates) -1:
+                    extraction_strings = extraction_strings + ", "
+            Logger.log_information_extraction_basic(extraction_strings)
+
+            Logger.log_information_extraction_basic("Extracted relations:")
+            for i in range(len(extraction_templates)):
                 extracted_relations = self.get_relations_from_sentence(EVENT_DESCRIPTION, extraction_templates[i], token)
                 if extracted_relations is not None:
                     relations.extend(extracted_relations)
@@ -586,9 +593,26 @@ class EizenExtractor(object):
         # return events
 
 
+    def extract_event_creation(self, s):
+        events = []
+
+        event = []
+        for token in s:
+            if token.dep_ == 'attr':
+                event.append(token)
+        events.append(event)
+
+        Logger.log_information_extraction_basic("Extracted creation events from user input:")
+        for e in events:
+            Logger.log_information_extraction_basic_example(e)
+
+        return events
 
 
     def parse_user_input(self, content, world):
+        Logger.log_information_extraction(content)
+        Logger.log_information_extraction("Entering EizenExtractor.parse_user_input()")
+
         self.doc = self.nlp(content)
 
         old_sentence = ""
@@ -597,30 +621,25 @@ class EizenExtractor(object):
 
         sentence = old_sentence + content
 
-        print("\n\n")
-        print("Sentence before coref: %s" % (sentence))
-        print("\n\n")
         resolved = InputDecoder.get_instance().coref_resolve(sentence)
 
-        print("\n\n")
-        print("Sentence after coref: %s" % (resolved))
-        print("\n\n")
-
-        print("Sentence to delete: %s" % (old_sentence))
         resolved = resolved.replace(old_sentence, "")
         resolved = resolved.strip()
 
-        print("\n\n")
-        print("Final processed sentence: %s" % (resolved))
-        print("\n\n")
+        Logger.log_information_extraction_basic("Sentence after coreference resolution via coref_resolve():")
+        Logger.log_information_extraction_basic_example(resolved)
 
         self.doc = self.nlp(resolved)
+        Logger.log_information_extraction_basic("Annotating resolved sentence. Start processing by splitting into different sentences.")
 
         event_entities = []
         sentence_entities = []
         for s in self.doc.sents:
-            # print("Sentence: %s " % (s.text.strip()))
+            Logger.log_information_extraction_basic("Sentence to parse:")
+            Logger.log_information_extraction_basic_example(str(s))
+
             type = self.guess_event_type(s)
+            Logger.log_information_extraction("Inferred sentence type: " + type)
 
             # Used to check if the passed sentence is already one of the events in the if-else case (either action event or creation event)
             event_type_flag = False
@@ -655,6 +674,7 @@ class EizenExtractor(object):
                     sentence_entities.append(s)
 
             events = self.extract_event_attribute(s, event_type_flag)
+
             for event in events:
                 event_entity = [EVENT_DESCRIPTION, event]
                 event_entities.append(event_entity)

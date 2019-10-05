@@ -57,10 +57,12 @@ class ORSEN:
             """" 
             Executing Dialogue Manager 
             """""
-            ORSEN.perform_dialogue_manager(self, response)
+            result = ORSEN.perform_dialogue_manager(self, response)
 
         else:
-            ORSEN.perform_dialogue_manager(self, response, triggered_move)
+            result = ORSEN.perform_dialogue_manager(self, response, triggered_move)
+
+        return result
 
 
     def perform_text_understanding(self, response):
