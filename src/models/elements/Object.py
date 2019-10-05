@@ -4,7 +4,7 @@ from . import Attribute
 
 class Object:
 
-    def __init__(self, id="", name="", type=[], attribute=[], in_setting="", mention_count=0):
+    def __init__(self, id="", name="", type=[], attribute=[], in_setting=[], mention_count=0):
         self.id = id
         self.name = name
         self.type = type
@@ -12,15 +12,29 @@ class Object:
         self.in_setting = in_setting
         self.mention_count = mention_count
 
+    def add_in_setting(self, setting):
+        self.in_setting.add(setting)
+
     def __str__(self):
-        my_string = "(" + self.id + ")" + self.name + "\n" 
+        my_string = "Entity " + self.id + " (" + self.name + ")\n" 
+        
+        print(" Attribute:")
         for a in self.attribute:
-            my_string = my_string + str(a) + "\n"
+            my_string = my_string + "\t" + str(a) + "\n"
         
+        print(" Type: ")
         for t in self.type:
-            my_string = my_string + str(t) + "\n"
+            my_string = my_string + "\t" + str(t) + "\n"
         
-        my_string = my_string + "mentioned: " + str(self.mention_count)
+        print(" Places: ")
+        for s in self.in_setting:
+            my_string = my_string + "\t" + s.value + "\n"
+#        if not self.in_setting:
+#            for s in self.in_setting:
+#                my_string = my_string = str(s) + "\n"
+#        else:
+#            my_string = my_string = "Not presented in any settings so far\n"
+        my_string = my_string + "Times mentioned: " + str(self.mention_count)
                     
         return my_string.strip()
 

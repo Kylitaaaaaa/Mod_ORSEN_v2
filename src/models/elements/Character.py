@@ -3,13 +3,19 @@ from src.models.elements import Object, Attribute
 
 class Character(Object):
 
-    def __init__(self, id="", name="", type=[], attribute=[], in_setting="", mention_count=0, gender=""):
+    def __init__(self, id="", name="", type=[], attribute=[], in_setting=[], mention_count=0, gender=""):
         super().__init__(id, name, type, attribute, in_setting, mention_count)
 
         self.gender = gender
 
+    def infer_gender(self, sentence, token):
+        pass
+
+    def add_in_setting(self, setting):
+        self.in_setting.append(setting)
+        
     @staticmethod
-    def create_character(sentence, token, id="", attribute=[], in_setting="", mention_count=0, gender=""):
+    def create_character(sentence, token, id="", attribute=[], in_setting=[], mention_count=0, gender=""):
         entity = Object.get_object_entity_via_token(token, sentence)
         print("The entity I found is: ", entity)
         entity_text = token.text
@@ -35,9 +41,6 @@ class Character(Object):
                                   mention_count = mention_count,
                                   gender = gender)
         return new_character
-
-    def infer_gender(self, sentence, token):
-        pass
 
     @staticmethod
     def create_from_object(object):

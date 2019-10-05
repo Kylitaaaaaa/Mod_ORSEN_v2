@@ -15,6 +15,7 @@ def extract(story, world):
 
     current_event_list = []
     current_sentence_list = []
+    current_setting_list = []
 
     prev_sentence = "<START>"
     curr_sentence = ""
@@ -28,13 +29,13 @@ def extract(story, world):
             prev_sentence = curr_sentence
             curr_sentence = sentence.text
 
-        sequence_no = len(world.event_chains)
         print("==============================")
-        print("EVENT #: %d" % (sequence_no))
+        print("== !!EVENT FOUND!! ===========" )
         print("==============================")
         print("ET     : %s" % event_entity)
         print("SR     : %s" % sentence)
 
+        settings = []
         # print(prev_sentence + " vs " + curr_sentence)
         if prev_sentence != curr_sentence:
             # print("CHECKING FOR SETTINGS")
@@ -48,7 +49,8 @@ def extract(story, world):
                     setting = Setting(type=SETTING_PLACE, value=ent.text)
 
                 if setting is not None:
-                    world.add_setting(setting)
+                    print("NEW SETTING:", str(setting))
+                    settings.append(setting)
 
 
         event = None
@@ -63,9 +65,12 @@ def extract(story, world):
             new_char = Object.create_object(sentence=sentence, token=event_entity[SUBJECT])
             new_char.mention_count += 1
 
+            for s in settings:
+                new_char.add_in_setting(s)
+    
             # Create the creation event and add the new character to the world
-            event = CreationEvent(len(world.event_chains), subject=new_char)
             world.add_character(new_char)
+            event = CreationEvent(len(world.event_chains), subject=new_char)
 
 
         elif event_type == EVENT_DESCRIPTION:
@@ -82,11 +87,15 @@ def extract(story, world):
             # If not yet existing, create an instance of the object, and add it to the world.
             subject = world.get_character(relation_entity.first_token.text)
             if subject == None:
-                subject = world.get_object(event_entity[ACTOR].text)
+                subject = world.get_object(relation_entity.first_token.text)
                 if subject == None:
                     subject = Object.create_object(sentence=sentence, token=relation_entity.first_token)
-                    subject.mention_count += 1
-                    world.add_object(subject)
+                    world.add_object(subject)        
+                    
+            subject.mention_count += 1
+
+            for s in settings:
+                subject.add_in_setting(s)
 
             # Create the description event
             event = DescriptionEvent(len(world.event_chains), subject=subject, attributes=attribute_entity)
@@ -112,7 +121,13 @@ def extract(story, world):
                     print("Actor entity object found. Remove from objects and add to characters", str(actor))
                     actor = Character.create_character(sentence=sentence, token=world.remove_object(actor))
                     world.add_character(actor)
+                    
             actor.mention_count += 1
+            print(str(actor))
+            
+            for s in settings:
+                print("ADDING %S IN CHARACTER", str(s))
+                actor.add_in_setting(s)
 
             # Almost the same as the one above, except this is for the direct objects and not for the actors
             direct_object = None
@@ -128,6 +143,9 @@ def extract(story, world):
                         world.add_object(direct_object)
                 direct_object.mention_count += 1
 
+                for s in settings:
+                    direct_object.add_in_setting(s)
+
             print("Actor        :", actor)
             print("Direct object:", direct_object)
             
@@ -142,6 +160,8 @@ def extract(story, world):
 
         current_event_list.append(event)
         current_sentence_list.append(sentence)
+        
+        current_setting_list.extend(settings)
         # world.add_event(event, sentence)
 
 
@@ -149,6 +169,9 @@ def extract(story, world):
 
     for i in range(len(current_event_list)):
         world.add_event(current_event_list[i], current_sentence_list[i])
+
+    for i in range(len(current_setting_list)):
+        world.add_setting(setting)
 
     print()
     print()
@@ -211,9 +234,9 @@ def display_tokens(doc):
 # story = "The sweet girl is happy."
 # story = "happy is the sweet girl."
 # story = "Mark is a knight."
-# story = "My mother's name is Sasha. My mother likes dogs."
+story = "My mother's name is Sasha. My mother likes dogs."
 # story = "I will go there at 5pm."
-story = "Today I don't feel like doing anything in the Philippines"
+#story = "Today I don't feel like doing anything in the Philippines"
 
 annotator = Annotator()
 annotator.annotate(story)

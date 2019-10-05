@@ -170,7 +170,7 @@ class ORSEN:
 
         
         # send current event to ContentDetermination
-        # move_to_execute = 'specific' # TODO Delete this after finishing the testing of this particular dialogue move.
+        move_to_execute = 'general' # TODO Delete this after finishing the testing of this particular dialogue move.
         self.content_determination.set_state(move_to_execute, curr_event, available_templates)
         self.content_determination.perform_content_determination()
 
