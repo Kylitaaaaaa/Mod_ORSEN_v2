@@ -17,7 +17,7 @@ class CreationEvent(Event):
         return my_string.strip()
 
     def print_basic(self):
-        my_string = "Created new entity: " + str(self.subject.text)
+        my_string = "Created new entity: " + str(self.subject)
 
         return my_string
 
