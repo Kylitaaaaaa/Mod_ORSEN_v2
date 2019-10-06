@@ -203,10 +203,9 @@ class DBOConcept(ABC):
         query = query.replace("\"","")
         print(query)
 
-        result = SQLExecuter.execute_read_query(query, FETCH_ALL)
+        result = SQLExecuter.execute_read_query(query, FETCH_ONE)
         if result is None: return None
 
-        concepts = []
-        for r in result:
-            concepts.append(self.concept_type(*r))
-        return concepts
+        concept = self.concept_type(*result)
+
+        return concept
