@@ -121,15 +121,11 @@ curr_user = None
 print("---------Launching ORSEN---------")
 orsen = ORSEN()
 
-#ORIG CODE
 # test_sentence = "My mother's name is Sasha, she likes dogs."
 # test_sentence = "John kicked the ball."
 # test_sentence = "The ball was kicked by John."
 # test_sentence = "John the mighty is a brave, strong warrior"
 # test_sentence = "Once there was a boy"
-
-
-
 
 #for repeating the story
 is_engaged = True

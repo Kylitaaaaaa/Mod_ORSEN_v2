@@ -1,9 +1,4 @@
-import numpy as np
-from src.models.dialogue.constants import *
-
-from src.dbo.dialogue.DBODialogueTemplate import DBODialogueTemplate
 import random
-
 
 class ContentDetermination:
 
@@ -46,32 +41,6 @@ class ContentDetermination:
 
         self.reset_state()
         return str_response
-
-    # def get_usable_templates(self):
-    #     usable_template_list = []
-    #     dialogue_template = DBODialogueTemplate('templates')
-    #     # dialogue_template.get_templates_of_type()
-    #
-    #     template_list = dialogue_template.get_templates_of_type(self.move_to_execute)
-    #
-    #     # check which template is usable
-    #     for X in template_list:
-    #         print("==============================")
-    #         print("TEMPLATE: ", X)
-    #         print("==============================")
-    #         print("Relation: ", X.relation)
-    #         print("Template: ", X.template)
-    #         print("Relations: ", X.relation)
-    #         print("Blanks: ", X.blanks)
-    #         print("Nodes: ", X.nodes)
-    #         print("Dependent Nodes: ", X.dependent_nodes)
-    #         result = X.is_usable(self.curr_event)
-    #         print("Is it usable? ", result)
-    #         if X.is_usable(self.curr_event):
-    #             usable_template_list.append(X)
-    #         print("\n")
-    #
-    #     return usable_template_list
 
     def choose_template(self):
         print("templates:")

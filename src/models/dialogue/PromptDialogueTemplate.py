@@ -13,8 +13,6 @@ class PromptDialogueTemplate(DialogueTemplate):
 
     def fill_blanks(self, fill):
         dBOConceptGlobalImpl = DBOConceptGlobalImpl()
-        print("CHOSEN CONCEPT")
-        print(dBOConceptGlobalImpl)
 
         rand_concept = dBOConceptGlobalImpl.get_random_concept()
 
