@@ -121,6 +121,11 @@ CLOSING_QUOTES = CLOSING_QUOTES_STANDARD
 
 """ DIALOGUE TRIGGERS """
 
-PROMPT_TRIGGER = ["help me start."]
+PROMPT_TRIGGER = ["help me start.",
+                  "help me start"]
 PUMPING_TRIGGER = ["give me an idea.", "what should i talk about?", "help me.", "i'm stuck.",
-                   "what's next?", "give me a hint."] #Supposedly hinting
+                   "give me an idea", "what should i talk about", "help me", "i'm stuck",
+                   "orsen + suggest"]
+HINTING_TRIGGER = ["what's next?", "give me a hint.",
+                   "what's next", "give me a hint",
+                   "orsen + hint"]
