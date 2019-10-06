@@ -3,7 +3,7 @@ from src import *
 
 class World:
     # The different object entities in the world
-    objects = [] #Object object
+    objects = []  # Object object
 
     # The different character entities
     characters = []
@@ -20,7 +20,8 @@ class World:
     # The previous sentences used to build the event chains
     sentence_references = []
 
-    def __init__(self, objects=[], characters=[], settings=[], event_chains=[], sentence_references=[], dialogue_move_history=[]):
+    def __init__(self, objects=[], characters=[], settings=[], event_chains=[], sentence_references=[],
+                 dialogue_move_history=[]):
         print("IM AT WORLD")
         self.objects = objects
         self.characters = characters
@@ -60,3 +61,10 @@ class World:
 
     def add_setting(self, setting):
         self.settings.append(setting)
+
+    def get_num_action_events(self):
+        count = 0
+        for X in self.event_chains:
+            if X.type == EVENT_ACTION:
+                count = count + 1
+        return count

@@ -248,7 +248,7 @@ class ORSEN:
         curr_event = self.world.curr_event
         print("THIS IS THE CURRENT EVENT")
         print(curr_event)
-        self.dialogue_planner.set_event(curr_event)
+        self.dialogue_planner.set_state(curr_event, self.world.get_num_action_events())
 
         if move_to_execute == "":
             move_to_execute = self.dialogue_planner.perform_dialogue_planner()

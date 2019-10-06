@@ -1,4 +1,4 @@
-from . import FeedbackDialogueTemplate, HintingDialogueTemplate, PromptDialogueTemplate, PumpingGeneralDialogueTemplate, PumpingSpecificDialogueTemplate
+from . import FeedbackDialogueTemplate, HintingDialogueTemplate, PromptDialogueTemplate, PumpingGeneralDialogueTemplate, PumpingSpecificDialogueTemplate, SuggestingDialogueTemplate
 
 # from src.models.dialogue import FeedbackDialogueTemplate, HintingDialogueTemplate, PromptDialogueTemplate, PumpingGeneralDialogueTemplate, PumpingSpecificDialogueTemplate
 
@@ -10,6 +10,7 @@ from . import FeedbackDialogueTemplate, HintingDialogueTemplate, PromptDialogueT
 #                  PumpingSpecificDialogueTemplate()]
 
 DIALOGUE_LIST = [FeedbackDialogueTemplate(),
-                 # PromptDialogueTemplate(),
                  PumpingGeneralDialogueTemplate(),
-                 PumpingSpecificDialogueTemplate()]
+                 PumpingSpecificDialogueTemplate(),
+                 HintingDialogueTemplate(),
+                 SuggestingDialogueTemplate()]
