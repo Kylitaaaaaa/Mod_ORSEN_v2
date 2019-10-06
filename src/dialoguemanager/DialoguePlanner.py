@@ -1,7 +1,8 @@
 import numpy as np
 import time
 
-from src import Logger
+from src import Logger, DIALOGUE_TYPE_FEEDBACK, DIALOGUE_TYPE_PUMPING_GENERAL
+from src.models.dialogue import DialogueHistoryTemplate
 from src.models.dialogue.constants import *
 from src.dbo.dialogue.DBODialogueTemplate import DBODialogueTemplate, PUMPING_TRIGGER, PROMPT_TRIGGER, \
     DIALOGUE_TYPE_PUMPING_SPECIFIC, DIALOGUE_TYPE_PROMPT
@@ -13,7 +14,7 @@ class DialoguePlanner:
     def __init__(self):
         super().__init__()
         self.frequency_count = np.zeros(len(DIALOGUE_LIST))
-        self.is_usable = []
+        self.is_usable = [False] * len(DIALOGUE_LIST)
         self.move_index = -1
 
         self.dialogue_history = []
@@ -28,7 +29,13 @@ class DialoguePlanner:
         self.chosen_dialogue_template = []
 
         self.seed_time = time.time()
-    #TODO Handle triggered
+        self.num_action_events =0
+        #TODO Handle triggered
+
+
+    def set_state(self, curr_event, num_action_events):
+        self.curr_event = curr_event
+        self.num_action_events =num_action_events
 
     def reset_state(self):
         self.chosen_dialogue_move = None
@@ -37,33 +44,41 @@ class DialoguePlanner:
         self.move_index = -1
         self.is_usable = []
         self.curr_event = None
+        self.num_action_events = 0
 
     def perform_dialogue_planner(self, dialogue_move = ""):
         if dialogue_move == "":
-            for i in range(len(DIALOGUE_LIST)):
-                if DIALOGUE_LIST[i].get_type() == DIALOGUE_TYPE_PROMPT:
-                    print("IT'S A PROMPT")
-                    self.usable_templates.append([])
-                    self.is_usable.append(False)
-                else:
-                    print("IT'S NOT A PROMPT")
-                    to_check = DIALOGUE_LIST[i]
-                    Logger.log_dialogue_model_basic(to_check)
+            self.setup_templates_is_usable()
 
-                    # feedback[d1, d4, d5]
-                    # general[d7, d9, 10]
-                    # pumping[d11, d12, d15]
-                    # list.append() --> [[],[],[]]]
 
-                    # check if dialogue has templates
-                    curr_usable_templates = self.get_usable_templates(DIALOGUE_LIST[i].get_type())
-                    self.usable_templates.append(curr_usable_templates)
 
-                    # check if dialogue can be repeated (Only up to 3 times)
-                    self.is_usable.append(self.is_dialogue_usable(DIALOGUE_LIST[i].get_type(), curr_usable_templates))
 
-                # gets number of occurences
-                self.frequency_count[i] = self.get_num_usage(DIALOGUE_LIST[i].get_type())
+            # for i in range(len(DIALOGUE_LIST)):
+                # if DIALOGUE_LIST[i].get_type() == DIALOGUE_TYPE_PROMPT:
+                #     print("IT'S A PROMPT")
+                #     self.usable_templates.append([])
+                #     self.is_usable.append(False)
+                # else:
+                #     print("IT'S NOT A PROMPT")
+                #     to_check = DIALOGUE_LIST[i]
+                #     Logger.log_dialogue_model_basic(to_check)
+                #
+                #     # check if dialogue has templates
+                #     curr_usable_templates = self.get_usable_templates(DIALOGUE_LIST[i].get_type())
+                #     self.usable_templates.append(curr_usable_templates)
+
+
+            #check if should randomize weights
+            # if self.is_randomizable():
+            #     #if yes do this
+            #         # check if dialogue can be repeated (Only up to 3 times)
+            #         self.is_usable.append(self.is_dialogue_usable(DIALOGUE_LIST[i].get_type(), curr_usable_templates))
+            # else:
+            #     pass
+            #     #manually set is_usable
+            #
+            #     # gets number of occurences
+            #     self.frequency_count[i] = self.get_num_usage(DIALOGUE_LIST[i].get_type())
 
             Logger.log_dialogue_model_basic("Breakdown of values used:")
             Logger.log_dialogue_model_basic_example(DIALOGUE_LIST)
@@ -77,7 +92,7 @@ class DialoguePlanner:
             self.chosen_dialogue_template = self.usable_templates[self.chosen_move_index]
 
             # add chosen dialogue move to dialogue history TODO call DialogueTemplateBuilder
-            self.dialogue_history.append(self.chosen_dialogue_move)
+            self.dialogue_history.append(DialogueHistoryTemplate(dialogue_type = self.chosen_dialogue_move))
             print("\n\nCHOSEN DIALOGUE MOVE: ", self.chosen_dialogue_move)
 
             print("move", "\t", "num_temp", "\t", "is_usable", "\t", "weight")
@@ -89,6 +104,29 @@ class DialoguePlanner:
             self.chosen_dialogue_template = self.get_usable_templates(dialogue_move)
 
         return self.chosen_dialogue_move
+
+
+    def setup_templates_is_usable(self):
+        if self.num_action_events <= 3:
+            self.is_usable[DIALOGUE_LIST.index(DIALOGUE_TYPE_FEEDBACK)] = True
+            self.is_usable[DIALOGUE_LIST.index(DIALOGUE_TYPE_PUMPING_GENERAL)] = True
+        elif self.get_num_usage(DIALOGUE_TYPE_FEEDBACK) == 3 or self.get_num_usage(DIALOGUE_TYPE_PUMPING_GENERAL) == 3:
+            self.is_usable[DIALOGUE_LIST.index(DIALOGUE_TYPE_PUMPING_SPECIFIC)] = True
+
+        for i in range(len(DIALOGUE_LIST)):
+            to_check = DIALOGUE_LIST[i]
+            Logger.log_dialogue_model_basic(to_check)
+
+            # check if dialogue has templates
+            self.usable_templates.append(self.get_usable_templates(DIALOGUE_LIST[i].get_type()))
+
+            # check if dialogue can be repeated (Only up to 3 times)
+            self.is_usable.append(self.is_dialogue_usable(DIALOGUE_LIST[i].get_type(), self.usable_templates[i]))
+
+            # gets number of occurences
+            self.frequency_count[i] = self.get_num_usage(DIALOGUE_LIST[i].get_type())
+
+        #TODO check suggestion
 
     def is_dialogue_usable(self, dialogue_type, curr_usable_templates):
         if len(curr_usable_templates) == 0:
@@ -110,14 +148,18 @@ class DialoguePlanner:
 
         # check which template is usable
         for X in template_list:
-            if X.is_usable(self.curr_event):
+            if X.is_usable(self.curr_event, self.get_num_usage(X.get_type())):
                 usable_template_list.append(X)
 
         return usable_template_list
 
     def get_num_usage(self, dialogue_type):
         #returns number of times it has been used
-        return self.dialogue_history.count(dialogue_type)
+        count = 0
+        for X in self.dialogue_history:
+            if X.dialogue_type == dialogue_type:
+                count = count + 1
+        return count
 
     def select_dialogue_from_weights(self):
         weights_to_use = self.frequency_count
@@ -164,8 +206,7 @@ class DialoguePlanner:
 
         return dialogue_move_index
 
-    def set_event(self, curr_event):
-        self.curr_event = curr_event
+
 
     def check_trigger_phrases(self, response, event_chain):
         response = response.lower()
