@@ -702,8 +702,6 @@ class EizenExtractor(object):
         Logger.log_information_extraction(content)
         Logger.log_information_extraction("Entering EizenExtractor.parse_user_input()")
 
-        self.doc = self.nlp(content)
-
         old_sentence = ""
         for s in world.sentence_references:
             old_sentence = old_sentence + ' ' + str(s)
@@ -712,10 +710,10 @@ class EizenExtractor(object):
         sentence = old_sentence + ' ' + content
 
         old_sentence_resolved = InputDecoder.get_instance().coref_resolve(old_sentence)
-        old_sentence_resolved = old_sentence_resolved._.coref_resolved
+        old_sentence_resolved = old_sentence_resolved
 
         resolved = InputDecoder.get_instance().coref_resolve(sentence)
-        resolved = resolved._.coref_resolved
+        resolved = resolved
 
         resolved = resolved.replace(old_sentence_resolved, "")
         resolved = resolved.strip()
