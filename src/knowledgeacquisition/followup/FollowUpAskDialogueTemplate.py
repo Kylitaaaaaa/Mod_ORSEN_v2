@@ -1,5 +1,5 @@
-from src.models.dialogue.followup import FollowUpDialogueTemplate
-from src.models.dialogue.constants import DIALOGUE_TYPE_FOLLOW_UP_ASK
+from src.knowledgeacquisition.followup import FollowUpDialogueTemplate
+from src.constants import DIALOGUE_TYPE_FOLLOW_UP_ASK
 
 
 class FollowUpAskDialogueTemplate(FollowUpDialogueTemplate):
