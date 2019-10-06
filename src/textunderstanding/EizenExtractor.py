@@ -604,8 +604,8 @@ class EizenExtractor(object):
                                                                  relation=str(relation.relation),
                                                                  second=str(relation.second_token))
             if concept is None:
-                # user = UserHandler.get_instance().curr_user)
-                user = User(id=-1, name='Wisner', code='testing')
+                user = UserHandler.get_instance().curr_user
+                # user = User(id=-1, name='Wisner', code='testing')
                 new_concept = LocalConcept.create_local_concept_from_relation(relation=relation,
                                                                               # user=UserHandler.get_instance().curr_user)
                                                                               user=user)

@@ -1,3 +1,6 @@
+from src.models.user import User
+
+
 class UserHandler:
     __instance = None
 
@@ -13,7 +16,9 @@ class UserHandler:
             raise Exception("This class is a singleton!")
         else:
             UserHandler.__instance = self
-            self.curr_user = None
+            self.curr_user = User(id=-1,
+                                  name="???",
+                                  code="???")
 
     def set_global_curr_user(self, user):
         self.curr_user = user
