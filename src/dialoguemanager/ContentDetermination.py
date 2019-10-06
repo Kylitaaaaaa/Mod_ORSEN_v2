@@ -72,6 +72,8 @@ class ContentDetermination:
     #     return usable_template_list
 
     def choose_template(self):
+        print("templates:")
+        print(self.usable_template_list)
         return random.choice(self.usable_template_list)
 
 

@@ -60,7 +60,8 @@ class ORSEN:
             Executing Dialogue Manager 
             """""
             Logger.log_dialogue_model("Entering ORSEN.get_response()")
-            result = ORSEN.perform_dialogue_manager(self, response)
+            # result = ORSEN.perform_dialogue_manager(self, response)
+            result = ORSEN.perform_dialogue_manager(self)
 
         else:
             result = ORSEN.perform_dialogue_manager(self, triggered_move)

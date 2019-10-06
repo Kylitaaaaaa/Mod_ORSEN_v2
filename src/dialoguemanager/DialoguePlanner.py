@@ -89,9 +89,9 @@ class DialoguePlanner:
         #can be repeated 3 times only
         if len(self.dialogue_history) >= 3:
             len_dialogue = len(self.dialogue_history)
-            if self.dialogue_history[len_dialogue-2] == dialogue_type and \
-                    self.dialogue_history[len_dialogue-1] == dialogue_type and \
-                    self.dialogue_history[len_dialogue] == dialogue_type:
+            if self.dialogue_history[len_dialogue-3] == dialogue_type and \
+                    self.dialogue_history[len_dialogue-2] == dialogue_type and \
+                    self.dialogue_history[len_dialogue-1] == dialogue_type:
                 return False
         return True
 
