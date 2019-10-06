@@ -1,7 +1,7 @@
 from . import DBOConcept
 from src.constants import *
 from src.db import SQLExecuter
-from src.models.concept import LocalConcept
+from src.models.concept import LocalConcept, GlobalConcept
 
 from pypika import Query, Table, Criterion, Field
 
@@ -75,4 +75,12 @@ class DBOConceptLocalImpl(DBOConcept):
         sql_response = SQLExecuter.execute_write_query(query)
 
         return sql_response
+
+    def migrate_local_to_global(self, id):
+        local_concept = self.get_concept_by_id(id)
+
+        global_concept_manager = DBOConceptLocalImpl()
+        global_concept = GlobalConcept.convert_local_to_global(local_concept)
+
+        global_concept_manager.add_concept(global_concept)
 

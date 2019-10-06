@@ -75,7 +75,8 @@ class DBOConcept(ABC):
         print(query)
 
         result = SQLExecuter.execute_read_query(query, FETCH_ONE)
-        if result is None: return None
+        print("RESULT IS THIS:", result)
+        if result is None or not result: return None
 
         concept = self.concept_type(*result)
 

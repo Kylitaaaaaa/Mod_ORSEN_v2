@@ -1,13 +1,11 @@
 from src.dbo.user import DBOUser
 from src.models.user import User
-from src import Logger, IS_AFFIRM, IS_DENY, IS_END
+from src import Logger, IS_AFFIRM, IS_DENY, IS_END, UserHandler
 from src.ORSEN import ORSEN
 from src.textunderstanding.InputDecoder import InputDecoder
 
 # Database access
 dbo_user = DBOUser('users', User)
-
-global curr_user
 
 """ A part of me tells me na we need to have a different method for getting input para mabilis na lang ayusin soon pag sa iba gagamitin."""
 def get_input():
@@ -22,7 +20,7 @@ def login_signup():
         login()
     else:
         signup()
-    print(curr_user)
+    print(UserHandler.get_instance().curr_user)
 
 def login():
     # ask for user details
@@ -41,7 +39,7 @@ def login():
 
         else:
             # store user
-            set_global_curr_user(temp_user)
+            UserHandler.get_instance().set_global_curr_user(temp_user)
             print("Hi! Welcome back ", name)
             is_done = True
 
@@ -51,7 +49,7 @@ def signup():
     print("What's is the secret code?")
     code = input()
 
-    set_global_curr_user(dbo_user.add_user(User(-1, name, code)))
+    UserHandler.get_instance().set_global_curr_user(dbo_user.add_user(User(-1, name, code)))
 
 def login_signup_automatic():
     print("What's your name?")
@@ -74,12 +72,8 @@ def login_signup_automatic():
             input_code = get_input()
             temp_user = dbo_user.add_user(User(-1, name, input_code))
 
-        set_global_curr_user(temp_user)
+        UserHandler.get_instance().set_global_curr_user(temp_user)
         print("Alright %s, let's make a story. You start!")
-
-
-def set_global_curr_user(user):
-    curr_user = user
 
 def is_end_story_func(response):
     if response.lower() in IS_END:
@@ -100,10 +94,10 @@ def start_storytelling():
         user_input = get_input()
         user_input = clean_user_input(user_input)
 
-        if curr_user is None:
+        if UserHandler.get_instance().curr_user is None:
             Logger.log_conversation("User : " + str(user_input))
         else:
-            Logger.log_conversation(curr_user.name.strip() + ": " + str(user_input))
+            Logger.log_conversation(UserHandler.get_instance().curr_user.name.strip() + ": " + str(user_input))
 
         is_end_story = is_end_story_func(user_input)
 
@@ -124,7 +118,6 @@ Logger.setup_loggers()
 
 #Retrieve User Details --- User objects
 print("---------Retrieving User Details---------")
-curr_user = None
 # login_signup()
 # print("done")
 

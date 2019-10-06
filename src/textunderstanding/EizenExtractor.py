@@ -8,12 +8,14 @@ Created on Sun Aug  4 04:20:35 2019
 import spacy
 from nltk import Tree
 
-from src import Logger
+from src import Logger, UserHandler
 from src.constants import *
+from src.dbo.concept import DBOConceptGlobalImpl, DBOConceptLocalImpl
 from src.dbo.extraction import DBOExtractionTemplate
+from src.models.concept import LocalConcept
 from src.models.nlp import ExtractionTemplate, Relation
+from src.models.user import User
 from src.textunderstanding import InputDecoder
-
 
 class State:
     def __init__(self, sentence):
@@ -584,10 +586,34 @@ class EizenExtractor(object):
                     # extracted.first_token = self.convert_noun_to_entities(subjects, ents, extracted.first_token)
                     # extracted.second_token = self.convert_noun_to_entities(subjects, ents, extracted.second_token)
                     # Logger.log_information_extraction_basic_example(str(extracted))
+                    self.add_relation_to_concepts_if_not_existing(extracted)
+
                     relations.append(extracted)
 
         return relations
 
+    def add_relation_to_concepts_if_not_existing(self, relation):
+        global_concept_manager = DBOConceptGlobalImpl()
+        local_concept_manager = DBOConceptLocalImpl()
+
+        concept = global_concept_manager.get_specific_concept(first=str(relation.first_token),
+                                                              relation=str(relation.relation),
+                                                              second=str(relation.second_token))
+        if concept is None:
+            concept = local_concept_manager.get_specific_concept(first=str(relation.first_token),
+                                                                 relation=str(relation.relation),
+                                                                 second=str(relation.second_token))
+            if concept is None:
+                # user = UserHandler.get_instance().curr_user)
+                user = User(id=-1, name='Wisner', code='testing')
+                new_concept = LocalConcept.create_local_concept_from_relation(relation=relation,
+                                                                              # user=UserHandler.get_instance().curr_user)
+                                                                              user=user)
+                local_concept_manager.add_concept(new_concept)
+                Logger.log_information_extraction_basic("Adding new concept from "
+                                                        + str(user.id)
+                                                        + "(" + str(user.name) + "): "
+                                                        + new_concept.one_line_print())
 
 
     def extract_event_attribute(self, sentence, event_type_flag=True):

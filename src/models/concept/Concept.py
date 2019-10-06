@@ -1,4 +1,4 @@
-class Concept():
+class   Concept():
 
     id = -1
     relation = ""
@@ -11,6 +11,10 @@ class Concept():
         self.relation = rel
         self.second = second
 
+
+    def one_line_print(self):
+        my_string = "%s --(%s)--> %s" % (str(self.first), str(self.relation), str(self.second))
+        return my_string
 
     def __str__(self):
         value = ""
