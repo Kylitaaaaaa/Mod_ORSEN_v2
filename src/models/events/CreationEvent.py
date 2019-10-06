@@ -16,6 +16,11 @@ class CreationEvent(Event):
 
         return my_string.strip()
 
+    def print_basic(self):
+        my_string = "Created new entity: " + str(self.subject.text)
+
+        return my_string
+
     # def __str__(self):
         # subject_string = "\tSubject = [ "
         # for object in self.subject:

@@ -86,16 +86,27 @@ def is_end_story_func(response):
         return True
     return False
 
+def clean_user_input(response):
+    response = response.strip()
+    if response.endswith(".") == False:
+        response = response + "."
+
+    return response
+
+
 def start_storytelling():
     is_end_story = False
     while not is_end_story:
         user_input = get_input()
+        user_input = clean_user_input(user_input)
+
         if curr_user is None:
             Logger.log_conversation("User : " + str(user_input))
         else:
             Logger.log_conversation(curr_user.name.strip() + ": " + str(user_input))
 
         is_end_story = is_end_story_func(user_input)
+
         if not is_end_story:
             orsen_response = orsen.get_response(user_input)
             print("ORSEN:", orsen_response)

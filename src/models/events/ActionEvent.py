@@ -57,6 +57,29 @@ class ActionEvent(Event):
 
         return objects
 
+    def print_basic(self):
+        my_string = ""
+        my_string = my_string + str(self.subject.name) + ", "
+        my_string = my_string + str(self.verb)
+
+        if self.direct_object is not None:
+            if str(self.direct_object.name).strip() is not "":
+                my_string = my_string + ", " + str(self.direct_object.name)
+
+        if self.adverb is not None:
+            if str(self.adverb).strip() is not "":
+                my_string = my_string + ", " + str(self.adverb)
+
+        if self.preposition is not None:
+            if str(self.preposition).strip() is not "":
+                my_string = my_string + ", " + str(self.preposition)
+
+        if self.object_of_preposition is not None:
+            if str(self.object_of_preposition).strip() is not "":
+                my_string = my_string + ", " + str(self.object_of_preposition)
+
+        return my_string
+
     def __str__(self):
         my_string = "" \
                     "============================\n" \

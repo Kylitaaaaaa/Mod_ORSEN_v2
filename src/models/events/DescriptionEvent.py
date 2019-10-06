@@ -22,6 +22,14 @@ class DescriptionEvent(Event):
     def get_attributes(self):
         return self.attributes
 
+    def print_basic(self):
+        my_string = ""
+        my_string = my_string + str(self.subject.name) + " [ "
+        for a in self.attributes:
+            my_string = my_string + str(a.relation) + ">" + str(a.description) + "(" + str(a.is_negated) + ") "
+        my_string = my_string + "]"
+        return my_string
+
     def __str__(self):
         my_string = "" \
                     "============================\n" \

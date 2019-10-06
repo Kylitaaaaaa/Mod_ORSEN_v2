@@ -1,3 +1,4 @@
+from src import Logger
 from src.models import World
 from src.models.elements import Character, Object, Attribute, Setting
 from src.textunderstanding import InputDecoder, EizenExtractor
@@ -5,7 +6,7 @@ from src.dataprocessor import Annotator
 from src.models.events import CreationEvent, ActionEvent, DescriptionEvent
 from src.constants import *
 
-def extract(story, world):
+def perform_text_understand(story, world):
     extractor = EizenExtractor()
     print(doc[2])
     print("TYPE: ", extractor.check_token(doc[2]))
@@ -71,6 +72,7 @@ def extract(story, world):
             # Create the creation event and add the new character to the world
             world.add_character(new_char)
             event = CreationEvent(len(world.event_chains), subject=new_char)
+            Logger.log_event(EVENT_CREATION, event.print_basic())
 
 
         elif event_type == EVENT_DESCRIPTION:
@@ -99,6 +101,7 @@ def extract(story, world):
 
             # Create the description event
             event = DescriptionEvent(len(world.event_chains), subject=subject, attributes=attribute_entity)
+            Logger.log_event(EVENT_DESCRIPTION, event.print_basic())
 
 
         elif event_type == EVENT_ACTION:
@@ -156,16 +159,16 @@ def extract(story, world):
                                 adverb=event_entity[ADVERB],
                                 preposition=event_entity[PREPOSITION],
                                 object_of_preposition=event_entity[OBJ_PREPOSITION])
-
+            print("PRINTING THE BASIC VERSION OF THE EVENT:")
+            print(event.print_basic())
+            print("DONE PRINTING")
+            Logger.log_event(EVENT_ACTION, event.print_basic())
 
         current_event_list.append(event)
         current_sentence_list.append(sentence)
         
         current_setting_list.extend(settings)
         # world.add_event(event, sentence)
-
-
-
 
     for i in range(len(current_event_list)):
         world.add_event(current_event_list[i], current_sentence_list[i])
@@ -238,11 +241,16 @@ story = "My mother's name is Sasha. My mother likes dogs."
 # story = "I will go there at 5pm."
 #story = "Today I don't feel like doing anything in the Philippines"
 
+# start here
+# Initialize loggers
+Logger.setup_loggers()
+
+
 annotator = Annotator()
 annotator.annotate(story)
 
 doc = annotator.get_annotated()
 world = World()
 
-extract(story, world)
+perform_text_understand(story, world)
 # display_tokens(doc)

@@ -124,7 +124,6 @@ class EizenExtractor(object):
     """Check if the action event given is a part of the subordinate clause by checking for a subordinate conjunction"""
     """If <something> then <another thing> --> something IS REMOVED since it only provides context"""
     """Read more at https://www.grammarly.com/blog/subordinating-conjunctions/"""
-
     def is_subordinate_clause(self, action_token):
         for child in action_token.children:
             if child.pos_ == 'ADP' and child.tag_ == 'IN' and child.dep_ == "mark":
@@ -138,7 +137,6 @@ class EizenExtractor(object):
     """Check if the dependent clause is simply a relative clause, or a clause with the main task of providing more context"""
     """The young shepherd who wished to marry has acquainted the three sisters --> who wished to marry is removed since it only provides context"""
     """Read more at https://www.toppr.com/guides/english/pronoun/relative-pronoun/"""
-
     def is_relative_clause(self, action_token):
         if 'VB' in action_token.tag_:
             if action_token.dep_ == "relcl":
@@ -159,7 +157,6 @@ class EizenExtractor(object):
                 return False
 
     """Checks if a given action is negated via the dependency 'neg' (or negation modifer)"""
-
     def is_negated(self, action):
         for child in action.children:
             if child.dep_ == 'neg':
@@ -167,7 +164,6 @@ class EizenExtractor(object):
         return False
 
     """Given a noun, replace it with the full noun chunk (e.g. instead of getting only Potter, also get the preceeding name 'Harry'"""
-
     def convert_noun_to_noun_chunks(self, noun_chunks, subjects):
         # print("NOUN CHUNK: %s" % (noun_chunks))
         # print("SUBJECTS  : %s" % (subjects))
@@ -188,8 +184,47 @@ class EizenExtractor(object):
 
         return subjects
 
-    """Retrieves a token that qualifies in the required POS tag and dependency tag. Connectors are traversed since they are simply connectors."""
+    def convert_noun_to_entities(self, noun_chunks, entities, subject):
+        # print("NOUN CHUNK: %s" % (noun_chunks))
+        # print("SUBJECTS  : %s" % (subjects))
 
+        try:
+            subject_index = subject .i
+        except:
+            subject_index = subject.start
+
+        for noun_chunk in noun_chunks:
+            if noun_chunk.start <= subject_index <= noun_chunk.end:
+                # subject = noun_chunk
+                return noun_chunk
+
+        for entity in entities:
+            if entity.start <= subject_index <= entity.end:
+                # subject = entity
+                return entity
+
+        return subject
+        # for j in range(len(subjects)):
+        #     # print("READING %s" % subjects[j])
+        #     # print(subjects[j])
+        #
+        #     try:
+        #         subject_index = subjects[j].i
+        #     except:
+        #         subject_index = subjects[j].start
+        #
+        #     for noun_chunk in noun_chunks:
+        #         if noun_chunk.start <= subject_index <= noun_chunk.end:
+        #             subjects[j] = noun_chunk
+        #             continue
+        #
+        #     for entity in entities:
+        #         if entity.start <= subject_index <= entity.end:
+        #             subjects[j] = entity
+        #             continue
+        # return subjects
+
+    """Retrieves a token that qualifies in the required POS tag and dependency tag. Connectors are traversed since they are simply connectors."""
     def retrieve_tokens(self, pos_tags, dependencies, token, excluded_tags=[], additional_connecting_tags=[], mode=MODE_LISTING):
         connectors = ["cc", "det", "punct", "agent", "prep"]
         connectors.extend(additional_connecting_tags)
@@ -326,6 +361,9 @@ class EizenExtractor(object):
 
         subjects = [chunk for chunk in sentence.noun_chunks]
         Logger.log_information_extraction_basic("Noun chunks extracted: " + str(subjects))
+
+        ents = [ent for ent in sentence.ents]
+        Logger.log_information_extraction_basic("Entities extracted: " + str(ents))
 
         sentence_state = State(sentence)
         Logger.log_information_extraction_basic("Inferred sentence voice: " + sentence_state.voice)
@@ -536,13 +574,16 @@ class EizenExtractor(object):
             return self.extract_keyword_connected_relation(unflipped, token)
 
 
-    def get_relations_from_sentence(self, event_type, template, token):
+    def get_relations_from_sentence(self, event_type, template, token, subjects, ents):
         relations = []
         if event_type == EVENT_DESCRIPTION:
             if template.relation in [IS_A, HAS_PROPERTY, HAS_A, CAPABLE_OF]:
                 extracted = self.extract_relation_via_template(template, token)
                 if extracted is not None:
                     Logger.log_information_extraction_basic_example(str(extracted))
+                    # extracted.first_token = self.convert_noun_to_entities(subjects, ents, extracted.first_token)
+                    # extracted.second_token = self.convert_noun_to_entities(subjects, ents, extracted.second_token)
+                    # Logger.log_information_extraction_basic_example(str(extracted))
                     relations.append(extracted)
 
         return relations
@@ -552,6 +593,12 @@ class EizenExtractor(object):
     def extract_event_attribute(self, sentence, event_type_flag=True):
         # If event type flag is True, then the passed sentence has a smaller chance of containing a description type thing.
         # Otherwise, if the flag is False, it is more likely to be a Description event.
+
+        subjects = [chunk for chunk in sentence.noun_chunks]
+        Logger.log_information_extraction_basic("Noun chunks extracted: " + str(subjects))
+
+        ents = [ent for ent in sentence.ents]
+        Logger.log_information_extraction_basic("Entities extracted: " + str(ents))
 
         extraction_manager = DBOExtractionTemplate("extraction_templates")
         relations = []
@@ -571,7 +618,7 @@ class EizenExtractor(object):
 
             Logger.log_information_extraction_basic("Extracted relations:")
             for i in range(len(extraction_templates)):
-                extracted_relations = self.get_relations_from_sentence(EVENT_DESCRIPTION, extraction_templates[i], token)
+                extracted_relations = self.get_relations_from_sentence(EVENT_DESCRIPTION, extraction_templates[i], token, subjects, ents)
                 if extracted_relations is not None:
                     relations.extend(extracted_relations)
 
@@ -619,7 +666,8 @@ class EizenExtractor(object):
         for s in world.sentence_references:
             old_sentence = old_sentence + ' ' + str(s)
 
-        sentence = old_sentence + content
+        old_sentence = old_sentence.strip()
+        sentence = old_sentence + ' ' + content
 
         resolved = InputDecoder.get_instance().coref_resolve(sentence)
 

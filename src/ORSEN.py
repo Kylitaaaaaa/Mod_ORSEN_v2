@@ -1,6 +1,6 @@
 from src.dataprocessor import Annotator
 from src.models import World
-from src.models.elements import Attribute
+from src.models.elements import Attribute, Setting
 from src.models.elements import Object, Character
 from src.textunderstanding import InputDecoder, EizenExtractor
 from src.constants import *
@@ -44,6 +44,7 @@ class ORSEN:
 
     def get_response(self, response):
         Logger.log_dialogue_model(response)
+        Logger.log_dialogue_model("Entering ORSEN.get_response()")
 
         """"
         Check for trigger phrases 
@@ -62,7 +63,6 @@ class ORSEN:
             """" 
             Executing Dialogue Manager 
             """""
-            Logger.log_dialogue_model("Entering ORSEN.get_response()")
             result = ORSEN.perform_dialogue_manager(self)
 
         else:
@@ -78,21 +78,48 @@ class ORSEN:
 
 
     def perform_text_understanding(self, response):
+
         story = response
-
-        # self.world = InputDecoder.get_instance().perform_input_decoding(response, self.world)
-
-        self.annotator.annotate(story)
 
         event_entities, sentence_references = self.extractor.parse_user_input(story, self.world)
 
+        current_event_list = []
+        current_sentence_list = []
+        current_setting_list = []
+
+        prev_sentence = "<START>"
+        curr_sentence = ""
+
         for event_entity, sentence in zip(event_entities, sentence_references):
-            sequence_no = len(self.world.event_chains)
+            if prev_sentence == "<START>":
+                prev_sentence = ""
+                curr_sentence = sentence.text
+            else:
+                prev_sentence = curr_sentence
+                curr_sentence = sentence.text
+
             print("==============================")
-            print("EVENT #: %d" % (sequence_no))
+            print("== !!EVENT FOUND!! ===========")
             print("==============================")
             print("ET     : %s" % event_entity)
             print("SR     : %s" % sentence)
+
+            settings = []
+            # print(prev_sentence + " vs " + curr_sentence)
+            if prev_sentence != curr_sentence:
+                # print("CHECKING FOR SETTINGS")
+                for ent in sentence.ents:
+                    setting = None
+                    if ent.label_ == 'TIME':
+                        setting = Setting(type=SETTING_TIME, value=ent.text)
+                    elif ent.label_ == 'DATE':
+                        setting = Setting(type=SETTING_DATE, value=ent.text)
+                    elif ent.label_ in ['PLACE', 'GPE', 'LOC', 'FAC']:
+                        setting = Setting(type=SETTING_PLACE, value=ent.text)
+
+                    if setting is not None:
+                        print("NEW SETTING:", str(setting))
+                        settings.append(setting)
 
             event = None
 
@@ -100,54 +127,119 @@ class ORSEN:
             event_entity = event_entity[1:]
 
             if event_type == EVENT_CREATION:
-                print(event_entity)
-                new_char = Character.create_character(sentence=sentence, token=event_entity[SUBJECT])
+
+                # Create an object corresponded by this event (NOT CHARACTER)
+                new_char = Object.create_object(sentence=sentence, token=event_entity[SUBJECT])
                 new_char.mention_count += 1
 
-                event = CreationEvent(len(self.world.event_chains),
-                                      subject=new_char)
+                for s in settings:
+                    new_char.add_in_setting(s)
+
+                # Create the creation event and add the new character to the world
                 self.world.add_character(new_char)
+                event = CreationEvent(len(self.world.event_chains), subject=new_char)
+                Logger.log_event(EVENT_CREATION, event.print_basic())
+
+
+            elif event_type == EVENT_DESCRIPTION:
+
+                # Get the whole relation entity object passed from the extractor
+                relation_entity = event_entity[0]
+                print(relation_entity)
+
+                # Convert the relation entity into an attribute entity. Attributes can be used to describe any given object/character
+                attribute_entity = Attribute.create_from_relation(relation_entity)
+
+                # Find the object/entity that will be described. Object may or may not be a character.
+                # If not yet existing, create an instance of the object, and add it to the world.
+                subject = self.world.get_character(relation_entity.first_token.text)
+                if subject == None:
+                    subject = self.world.get_object(relation_entity.first_token.text)
+                    if subject == None:
+                        subject = Object.create_object(sentence=sentence, token=relation_entity.first_token)
+                        self.world.add_object(subject)
+
+                subject.mention_count += 1
+
+                for s in settings:
+                    subject.add_in_setting(s)
+
+                # Create the description event
+                event = DescriptionEvent(len(self.world.event_chains), subject=subject, attributes=attribute_entity)
+                Logger.log_event(EVENT_DESCRIPTION, event.print_basic())
+
 
             elif event_type == EVENT_ACTION:
-                print("Finding actor object with name %s" % (event_entity[ACTOR].text))
+
+                # Find the actor in the world characters.
+                # If existing as an object, convert the object into a character.
+                # If not existing anywhere, create it as a new CHARACTER (not an object)
+                print("Actor entity is now:", event_entity[ACTOR].text)
                 actor = self.world.get_character(event_entity[ACTOR].text)
+                print("Actor entity after world.get_character():", str(actor))
                 if actor == None:
-                    print("START CREATION FROM EVENT_ACTION")
-                    print(event_entity[ACTOR])
-                    print(type(event_entity[ACTOR]))
-                    actor = Character.create_character(sentence=sentence, token=event_entity[ACTOR])
-                    print("FINISH CREATION FROM EVENT_ACTION")
+                    actor = self.world.get_object(event_entity[ACTOR].text)
+                    print("Actor entity after world.get_object():", str(actor))
+                    if actor == None:
+                        print("Actor entity not found. Creating one now via create_character():", str(actor))
+                        actor = Character.create_character(sentence=sentence, token=event_entity[ACTOR])
+                        self.world.add_character(actor)
+                    else:
+                        print("Actor entity object found. Remove from objects and add to characters", str(actor))
+                        actor = Character.create_character(sentence=sentence, token=self.world.remove_object(actor))
+                        self.world.add_character(actor)
 
                 actor.mention_count += 1
+                print(str(actor))
 
-                print("Actor  :", actor)
+                for s in settings:
+                    print("ADDING %S IN CHARACTER", str(s))
+                    actor.add_in_setting(s)
+
+                # Almost the same as the one above, except this is for the direct objects and not for the actors
+                direct_object = None
+                if event_entity[DIRECT_OBJECT] is not None:
+                    direct_object = self.world.get_character(event_entity[DIRECT_OBJECT].text)
+                    if direct_object == None:
+                        direct_object = self.world.get_object(event_entity[DIRECT_OBJECT].text)
+                        if direct_object == None:
+                            direct_object = Object.create_object(sentence=sentence, token=event_entity[DIRECT_OBJECT])
+                            self.world.add_object(direct_object)
+                        else:
+                            direct_object = Object.create_object(sentence=sentence,
+                                                                 token=self.world.remove_object(direct_object))
+                            self.world.add_object(direct_object)
+                    direct_object.mention_count += 1
+
+                    for s in settings:
+                        direct_object.add_in_setting(s)
+
+                print("Actor        :", actor)
+                print("Direct object:", direct_object)
+
                 event = ActionEvent(len(self.world.event_chains),
                                     subject=actor,
                                     verb=event_entity[ACTION],
-                                    direct_object=event_entity[DIRECT_OBJECT],
+                                    direct_object=direct_object,
                                     adverb=event_entity[ADVERB],
                                     preposition=event_entity[PREPOSITION],
                                     object_of_preposition=event_entity[OBJ_PREPOSITION])
+                print("PRINTING THE BASIC VERSION OF THE EVENT:")
+                print(event.print_basic())
+                print("DONE PRINTING")
+                Logger.log_event(EVENT_ACTION, event.print_basic())
 
-            elif event_type == EVENT_DESCRIPTION:
-                relation_entity = event_entity[0]
-                print(relation_entity)
-                attribute_entity = Attribute.create_from_relation(relation_entity)
+            current_event_list.append(event)
+            current_sentence_list.append(sentence)
 
-                print("Finding actor object with name %s" % (relation_entity.first_token))
-                actor = self.world.get_character(relation_entity.first_token.text)
-                if actor == None:
-                    print("START CREATION FROM EVENT_ACTION")
-                    print(event_entity[ACTOR])
-                    print(type(event_entity[ACTOR]))
-                    actor = Character.create_character(sentence=sentence, token=relation_entity.first_token)
-                    print("FINISH CREATION FROM EVENT_ACTION")
+            current_setting_list.extend(settings)
+            # world.add_event(event, sentence)
 
-                event = DescriptionEvent(len(self.world.event_chains),
-                                         subject=actor,
-                                         attributes=attribute_entity)
+        for i in range(len(current_event_list)):
+            self.world.add_event(current_event_list[i], current_sentence_list[i])
 
-            self.world.add_event(event, sentence)
+        for i in range(len(current_setting_list)):
+            self.world.add_setting(setting)
 
     def perform_dialogue_manager(self, move_to_execute=""):
         # curr_event = None
