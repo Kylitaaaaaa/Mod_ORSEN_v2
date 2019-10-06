@@ -191,3 +191,22 @@ class DBOConcept(ABC):
     @abstractmethod
     def add_concept(self, concept):
         pass
+
+    def get_random_concept(self):
+        q = Query \
+            .from_(self.table_reference) \
+            .select("*") \
+            .orderby('rand()') \
+            .limit(1)
+
+        query = q.get_sql()
+        query = query.replace("\"","")
+        print(query)
+
+        result = SQLExecuter.execute_read_query(query, FETCH_ALL)
+        if result is None: return None
+
+        concepts = []
+        for r in result:
+            concepts.append(self.concept_type(*r))
+        return concepts
