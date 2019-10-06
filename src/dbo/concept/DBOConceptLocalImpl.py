@@ -76,6 +76,20 @@ class DBOConceptLocalImpl(DBOConcept):
 
         return sql_response
 
+    def delete_concept(self, id):
+        q = Query\
+            .from_(self.table_reference)\
+            .delete()\
+            .where(self.table_reference.id == id)
+
+        query = q.get_sql()
+        query = query.replace("\"", "")
+        print(query)
+
+        sql_response = SQLExecuter.execute_write_query(query)
+
+        return sql_response
+
     def migrate_local_to_global(self, id):
         local_concept = self.get_concept_by_id(id)
 

@@ -12,7 +12,7 @@ from src import Logger, UserHandler
 from src.constants import *
 from src.dbo.concept import DBOConceptGlobalImpl, DBOConceptLocalImpl
 from src.dbo.extraction import DBOExtractionTemplate
-from src.models.concept import LocalConcept
+from src.models.concept import LocalConcept, GlobalConcept
 from src.models.nlp import ExtractionTemplate, Relation
 from src.models.user import User
 from src.textunderstanding import InputDecoder
@@ -603,17 +603,28 @@ class EizenExtractor(object):
             concept = local_concept_manager.get_specific_concept(first=str(relation.first_token),
                                                                  relation=str(relation.relation),
                                                                  second=str(relation.second_token))
+            user = UserHandler.get_instance().curr_user
             if concept is None:
-                user = UserHandler.get_instance().curr_user
                 # user = User(id=-1, name='Wisner', code='testing')
                 new_concept = LocalConcept.create_local_concept_from_relation(relation=relation,
-                                                                              # user=UserHandler.get_instance().curr_user)
                                                                               user=user)
                 local_concept_manager.add_concept(new_concept)
                 Logger.log_information_extraction_basic("Adding new concept from "
                                                         + str(user.id)
                                                         + "(" + str(user.name) + "): "
                                                         + new_concept.one_line_print())
+            else:
+                if str(concept.user_id) != str(user.id):
+                    if concept.score >= MIGRATION_SCORE_THRESHOLD - 1:
+                        # pass
+                        concept_to_migrate = GlobalConcept.convert_local_to_global(concept)
+                        local_concept_manager.delete_concept(concept.id)
+                        global_concept_manager.add_concept(concept_to_migrate)
+                        Logger.log_information_extraction_basic("Transferring the concept " + concept.one_line_print() + " from local to global.")
+                    else:
+                        local_concept_manager.update_score(concept.id, concept.score+1)
+                        Logger.log_information_extraction_basic("Increasing the score of " + concept.one_line_print() + " from " + str(concept.score) + " to " + str(concept.score+1))
+
 
 
     def extract_event_attribute(self, sentence, event_type_flag=True):

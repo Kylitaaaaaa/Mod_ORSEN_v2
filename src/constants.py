@@ -129,3 +129,6 @@ PUMPING_TRIGGER = ["give me an idea.", "what should i talk about?", "help me.", 
 HINTING_TRIGGER = ["what's next?", "give me a hint.",
                    "what's next", "give me a hint",
                    "orsen + hint"]
+
+""" KNOWLEDGE ACQUISITION RELATED """
+MIGRATION_SCORE_THRESHOLD = 5
