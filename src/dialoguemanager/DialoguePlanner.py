@@ -68,7 +68,7 @@ class DialoguePlanner:
             Logger.log_dialogue_model_basic_example(self.frequency_count)
 
             self.chosen_move_index = self.choose_dialogue()
-            Logger.log_dialogue_model_basic("Chosed dialogue index: " + self.chosen_move_index)
+            Logger.log_dialogue_model_basic("Chosed dialogue index: " + str(self.chosen_move_index))
 
             self.chosen_dialogue_move = DIALOGUE_LIST[self.chosen_move_index].get_type()
             self.chosen_dialogue_template = self.usable_templates[self.chosen_move_index]
@@ -131,7 +131,7 @@ class DialoguePlanner:
         weights_to_use = self.frequency_count
 
         probability = np.repeat(1 / len(weights_to_use), len(weights_to_use))
-        if np.count_nonzero(probability) > 0:
+        if np.count_nonzero(weights_to_use) > 0:
             max_value = np.max(weights_to_use)
             max_value_list = np.repeat(max_value, len(weights_to_use))
 
@@ -150,7 +150,7 @@ class DialoguePlanner:
         np.random.seed(int(self.seed_time))
         choice = np.random.choice(candidates)
 
-        print(choice)
+        return choice
 
     # def get_weights(self):
     #

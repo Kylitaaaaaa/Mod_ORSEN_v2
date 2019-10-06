@@ -67,8 +67,13 @@ from src import DialogueTemplateBuilder
 # a = DialogueTemplateBuilder.build(-1, 'a', 'a', 'a', 'a', 'a')
 # print(a)
 
-from src.dbo.extraction import DBOExtractionTemplate
-extraction_template = DBOExtractionTemplate("extraction_templates")
-templates = extraction_template.get_all_extraction_templates()
-for t in templates:
-    print(t)
+# from src.dbo.extraction import DBOExtractionTemplate
+# # extraction_template = DBOExtractionTemplate("extraction_templates")
+# # templates = extraction_template.get_all_extraction_templates()
+# # for t in templates:
+# #     print(t)
+
+concept_manager = DBOConceptGlobalImpl()
+concepts = concept_manager.get_random_concept()
+for concept in concepts:
+    print(concept)
