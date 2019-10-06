@@ -48,8 +48,11 @@ class ORSEN:
         """"
         Check for trigger phrases 
         """""
-        triggered_move = self.dialogue_planner.check_trigger_phrases(response)
+        triggered_move = self.dialogue_planner.check_trigger_phrases(response, self.world.event_chains)
+
+
         if triggered_move is None:
+            #if not pump
             """"
             Executes text understanding part. This includes the extraction of important information in the text input 
             (using previous sentences as context). This also including breaking the sentences into different event entities.  
@@ -60,10 +63,13 @@ class ORSEN:
             Executing Dialogue Manager 
             """""
             Logger.log_dialogue_model("Entering ORSEN.get_response()")
-            # result = ORSEN.perform_dialogue_manager(self, response)
             result = ORSEN.perform_dialogue_manager(self)
 
         else:
+            if triggered_move == DIALOGUE_TYPE_PUMPING_SPECIFIC:
+                self.world.curr_event = self.world.event_chains[len(self.world.event_chains)-1]
+
+            #if prompt
             result = ORSEN.perform_dialogue_manager(self, triggered_move)
 
         self.dialogue_planner.reset_state()
@@ -146,6 +152,8 @@ class ORSEN:
     def perform_dialogue_manager(self, move_to_execute=""):
         # curr_event = None
         curr_event = self.world.curr_event
+        print("THIS IS THE CURRENT EVENT")
+        print(curr_event)
         self.dialogue_planner.set_event(curr_event)
 
         if move_to_execute == "":
@@ -153,22 +161,13 @@ class ORSEN:
         else:
             self.dialogue_planner.perform_dialogue_planner(move_to_execute)
 
-
-        # choose dialogue move
-
-        # # self.dialogue_planner.perform_dialogue_planner()
-        # move_to_execute = 'specific'  # TODO Delete this after finishing the testing of this particular dialogue move.
-        # self.dialogue_planner.test_perform_dialogue_planner(move_to_execute) # TODO: Delete after testing
-        # move_to_execute = self.dialogue_planner.chosen_dialogue_move
         available_templates = self.dialogue_planner.chosen_dialogue_template
 
-        
         # send current event to ContentDetermination
         self.content_determination.set_state(move_to_execute, curr_event, available_templates)
         response = self.content_determination.perform_content_determination()
 
         return response
-
 
     def repeat_story(self):
         response = ""

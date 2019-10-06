@@ -27,41 +27,6 @@ class DialogueTemplate(ABC):
         my_string = my_string + "DEP NODE: " + str(self.dependent_nodes)
 
         return my_string
-#    def fill_blanks(self, event):
-#        #if it does not require any details
-#        print("relations are: ")
-#        print(self.relation)
-#        if self.relation[0][0] is None:
-#            return self.template
-#
-#        print("subject name: ", event.subject.name)
-#        print("subject: ", event.subject)
-#        response = self.template
-#        for i in range (len(self.nodes)):
-#            to_insert = ""
-#            curr_index = response.index(self.nodes[i])
-#            if self.blanks[i] == 'Character':
-#                to_insert = event.get_characters_involved()[0].name
-#            elif self.blanks[i] == 'Object':
-#                to_insert = event.get_objects_involved()[0].name
-#            elif self.blanks[i] == 'Event':
-#                to_insert = event.subject.name + " " + event.verb + " " +  event.direct_object.name + " " +  event.adverb + " " +  event.preposition + " " +  event.object_of_preposition
-#            elif self.blanks[i] == 'Repeat':
-#                if event.get_type() == EVENT_ACTION:
-#                    to_insert = event.subject.name + " " + event.verb + " " +  event.direct_object.name + " " +  event.adverb + " " +  event.preposition + " " +  event.object_of_preposition
-#                elif event.get_type() == EVENT_CREATION:
-#                    to_insert = event.subject.name
-#                elif event.get_type() == EVENT_DESCRIPTION:
-#                    to_insert = event.subject.name + " is "
-#                    # for j in range (len(event.get_attributes())):
-#                    #     if j == len(event.get_attributes()) - 1:
-#                    #         to_insert = to_insert
-#                    #     else:
-#                    #         to_insert = to_insert + " and "
-#
-#            response[curr_index] = to_insert
-#
-#        return response
 
     def fill_blanks(self, event):
         pass
@@ -79,11 +44,6 @@ class DialogueTemplate(ABC):
 
 
     def is_usable(self, curr_event):
-        # print('CHECKING IS USABLE: ', self.relation[0][1])
-
-
-        #TODO: UNCOMMENT
-
         decision = False
         if self.relation[0][0] == 'None':
             decision = True
@@ -97,17 +57,11 @@ class DialogueTemplate(ABC):
         self.is_move_usable = decision
         return decision
 
-        ###TODO remove
-        # if self.relation[0][0] == 'None':
-        #     return False
-        # return True
-
     def is_usable_1_relation(self, relation, curr_event):
         if relation == 'Repeat' or relation == 'Prompt':
             return True
         elif relation == 'Character':
             #check if character exists
-            # print("NUM ACTION: ", curr_event.get_characters_involved())
             if len(curr_event.get_characters_involved()) > 0:
                 return True
             return False
@@ -118,7 +72,6 @@ class DialogueTemplate(ABC):
             return False
         elif relation == 'Object' or relation == 'Item':
             #check if object exists
-            # print("NUM OBJECTS: ", curr_event.get_objects_involved())
             if len(curr_event.get_objects_involved()) > 0:
                 return True
             return False

@@ -9,8 +9,6 @@ class PumpingSpecificDialogueTemplate(DialogueTemplate):
 
     def fill_blanks(self, event):
 
-        print("subject name: ", event.subject.name)
-        print("subject: ", event.subject)
         response = self.template
         for i in range (len(self.nodes)):
             to_insert = ""
