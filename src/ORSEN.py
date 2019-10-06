@@ -49,7 +49,10 @@ class ORSEN:
         Check for trigger phrases 
         """""
         triggered_move = self.dialogue_planner.check_trigger_phrases(response, self.world.event_chains)
+
+
         if triggered_move is None:
+            #if not pump
             """"
             Executes text understanding part. This includes the extraction of important information in the text input 
             (using previous sentences as context). This also including breaking the sentences into different event entities.  
@@ -64,6 +67,12 @@ class ORSEN:
             result = ORSEN.perform_dialogue_manager(self)
 
         else:
+            if triggered_move == DIALOGUE_TYPE_PUMPING_SPECIFIC:
+                self.world.curr_event = self.world.event_chains[len(self.world.event_chains)-1]
+                print("CURR EVENT IS")
+                print(self.world.curr_event)
+
+            #if prompt
             result = ORSEN.perform_dialogue_manager(self, triggered_move)
 
         self.dialogue_planner.reset_state()
