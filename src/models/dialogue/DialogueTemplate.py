@@ -107,7 +107,7 @@ class DialogueTemplate(ABC):
             return True
         elif relation == 'Character':
             #check if character exists
-            print("NUM ACTION: ", curr_event.get_characters_involved())
+            # print("NUM ACTION: ", curr_event.get_characters_involved())
             if len(curr_event.get_characters_involved()) > 0:
                 return True
             return False
@@ -118,7 +118,7 @@ class DialogueTemplate(ABC):
             return False
         elif relation == 'Object' or relation == 'Item':
             #check if object exists
-            print("NUM OBJECTS: ", curr_event.get_objects_involved())
+            # print("NUM OBJECTS: ", curr_event.get_objects_involved())
             if len(curr_event.get_objects_involved()) > 0:
                 return True
             return False

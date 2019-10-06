@@ -6,8 +6,8 @@ from src.dbo.dialogue.DBODialogueTemplate import DBODialogueTemplate, PUMPING_TR
     DIALOGUE_TYPE_PUMPING_SPECIFIC, DIALOGUE_TYPE_PROMPT, IS_END, THE_END
 
 import time
-timeout = time.time() + 5
-fallback_dialogue_move = 0 #feedback
+
+fallback_dialogue_move = 3 #general pumping
 
 class DialoguePlanner:
 
@@ -15,7 +15,7 @@ class DialoguePlanner:
     def __init__(self):
         super().__init__()
         self.weights = np.zeros(len(DIALOGUE_LIST))
-        self.is_usable = [False] * len(DIALOGUE_LIST)
+        self.is_usable = []
         self.move_index = -1
 
         self.dialogue_history = []
@@ -31,9 +31,16 @@ class DialoguePlanner:
 
     #TODO Handle triggered
 
+    def reset_state(self):
+        self.chosen_dialogue_move = None
+        self.chosen_dialogue_template = []
+        self.chosen_move_index = -1
+        self.move_index = -1
+        self.is_usable = []
+        self.curr_event = None
+
     def perform_dialogue_planner(self, dialogue_move = ""):
         if dialogue_move == "":
-            print("Dialogue_list: ", len(DIALOGUE_LIST))
             for i in range(len(DIALOGUE_LIST)):
 
                 to_check = DIALOGUE_LIST[i]
@@ -50,7 +57,7 @@ class DialoguePlanner:
 
 
                 # check if dialogue can be repeated (Only up to 3 times)
-                self.is_usable[i] = self.is_dialogue_usable(DIALOGUE_LIST[i].get_type(), curr_usable_templates)
+                self.is_usable.append(self.is_dialogue_usable(DIALOGUE_LIST[i].get_type(), curr_usable_templates))
 
                 # gets number of occurences
                 self.weights[i] = self.get_num_usage(DIALOGUE_LIST[i].get_type())
@@ -63,17 +70,23 @@ class DialoguePlanner:
             self.dialogue_history.append(self.chosen_dialogue_move)
             print("\n\nCHOSEN DIALOGUE MOVE: ", self.chosen_dialogue_move)
 
+            print("move", "\t", "num_temp", "\t", "is_usable", "\t", "weight")
+            for i in range(len(DIALOGUE_LIST)):
+                print(DIALOGUE_LIST[i], "\t", len(self.usable_templates[i]), "\t", self.is_usable[i], "\t", self.weights[i])
+
+
+
         else:
             self.chosen_dialogue_move = dialogue_move
             self.chosen_dialogue_template = self.get_usable_templates(dialogue_move)
 
         return self.chosen_dialogue_move
 
-    def test_perform_dialogue_planner(self, dialogue_move):
-        self.chosen_dialogue_move = dialogue_move
-        self.chosen_dialogue_template = self.get_usable_templates(dialogue_move)
-
-        return self.chosen_dialogue_move
+    # def test_perform_dialogue_planner(self, dialogue_move):
+    #     self.chosen_dialogue_move = dialogue_move
+    #     self.chosen_dialogue_template = self.get_usable_templates(dialogue_move)
+    #
+    #     return self.chosen_dialogue_move
 
     def is_dialogue_usable(self, dialogue_type, curr_usable_templates):
         if len(curr_usable_templates) == 0:
@@ -82,9 +95,9 @@ class DialoguePlanner:
         #can be repeated 3 times only
         if len(self.dialogue_history) >= 3:
             len_dialogue = len(self.dialogue_history)
-            if self.dialogue_history[len_dialogue-2] == dialogue_type and \
-                    self.dialogue_history[len_dialogue-1] == dialogue_type and \
-                    self.dialogue_history[len_dialogue] == dialogue_type:
+            if self.dialogue_history[len_dialogue-3] == dialogue_type and \
+                    self.dialogue_history[len_dialogue-2] == dialogue_type and \
+                    self.dialogue_history[len_dialogue-1] == dialogue_type:
                 return False
         return True
 
@@ -97,20 +110,8 @@ class DialoguePlanner:
 
         # check which template is usable
         for X in template_list:
-            print("==============================")
-            print("TEMPLATE: ", X)
-            print("==============================")
-            print("Relation: ", X.relation)
-            print("Template: ", X.template)
-            print("Relations: ", X.relation)
-            print("Blanks: ", X.blanks)
-            print("Nodes: ", X.nodes)
-            print("Dependent Nodes: ", X.dependent_nodes)
-            result = X.is_usable(self.curr_event)
-            print("Is it usable? ", result)
             if X.is_usable(self.curr_event):
                 usable_template_list.append(X)
-            print("\n")
 
         return usable_template_list
 
