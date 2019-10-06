@@ -1,23 +1,19 @@
 import numpy as np
+import time
 
 from src import Logger
 from src.models.dialogue.constants import *
 from src.dbo.dialogue.DBODialogueTemplate import DBODialogueTemplate, PUMPING_TRIGGER, PROMPT_TRIGGER, \
     DIALOGUE_TYPE_PUMPING_SPECIFIC, DIALOGUE_TYPE_PROMPT, IS_END, THE_END
 
-import time
-
-timeout = time.time() + 5000
-fallback_dialogue_move = 0 #feedback
-
-fallback_dialogue_move = 3 #general pumping
-
+FALLBACK_DIALOGUE_MOVE = 3 # GENERAL DIALOGUE TEMPLATE
+MAX_WAITING_TIME = 7000 # 7 SECONDS
 class DialoguePlanner:
 
 
     def __init__(self):
         super().__init__()
-        self.weights = np.zeros(len(DIALOGUE_LIST))
+        self.frequency_count = np.zeros(len(DIALOGUE_LIST))
         self.is_usable = []
         self.move_index = -1
 
@@ -32,6 +28,7 @@ class DialoguePlanner:
         self.chosen_dialogue_move = None
         self.chosen_dialogue_template = []
 
+        self.seed_time = time.time()
     #TODO Handle triggered
 
     def reset_state(self):
@@ -63,12 +60,12 @@ class DialoguePlanner:
                 self.is_usable.append(self.is_dialogue_usable(DIALOGUE_LIST[i].get_type(), curr_usable_templates))
 
                 # gets number of occurences
-                self.weights[i] = self.get_num_usage(DIALOGUE_LIST[i].get_type())
+                self.frequency_count[i] = self.get_num_usage(DIALOGUE_LIST[i].get_type())
 
             Logger.log_dialogue_model_basic("Breakdown of values used:")
             Logger.log_dialogue_model_basic_example(DIALOGUE_LIST)
             Logger.log_dialogue_model_basic_example(self.is_usable)
-            Logger.log_dialogue_model_basic_example(self.weights)
+            Logger.log_dialogue_model_basic_example(self.frequency_count)
 
             self.chosen_move_index = self.choose_dialogue()
             Logger.log_dialogue_model_basic("Chosed dialogue index: " + self.chosen_move_index)
@@ -82,7 +79,7 @@ class DialoguePlanner:
 
             print("move", "\t", "num_temp", "\t", "is_usable", "\t", "weight")
             for i in range(len(DIALOGUE_LIST)):
-                print(DIALOGUE_LIST[i], "\t", len(self.usable_templates[i]), "\t", self.is_usable[i], "\t", self.weights[i])
+                print(DIALOGUE_LIST[i], "\t", len(self.usable_templates[i]), "\t", self.is_usable[i], "\t", self.frequency_count[i])
 
 
 
@@ -131,52 +128,82 @@ class DialoguePlanner:
 
 
     def select_dialogue_from_weights(self):
-        max_val = np.max(self.weights)
+        weights_to_use = self.frequency_count
 
-    def get_weights(self):
-        usable = np.ones(len(DIALOGUE_LIST))
+        probability = np.repeat(1 / len(weights_to_use), len(weights_to_use))
+        if np.count_nonzero(probability) > 0:
+            max_value = np.max(weights_to_use)
+            max_value_list = np.repeat(max_value, len(weights_to_use))
 
-        totals = usable * self.weights
-        Logger.log_information_extraction_basic_example(totals)
+            weights_to_use - np.asarray(weights_to_use)
 
-        print("totals: ", sum(totals))
-        percentages = totals / sum(totals)
-        if np.isfinite(percentages).all():
-            percentages = []
-            for i in range(len(DIALOGUE_LIST)):
-                percentages.append(1/len(DIALOGUE_LIST))
+            numerator = max_value_list - weights_to_use
+            print(numerator)
 
-        # if only one highest candidate, only get its index
-        # otherwise, randomize between the list of highest candidates
-        self.move_index = np.argmax(percentages)
-        if self.move_index > 1:
-            self.move_index = np.random.choice(self.move_index)
+            probability = numerator / max_value_list
+            print(probability)
 
-        # increases weight of everything except the one that will be used. It wouldn't make much sense to increase the weight of the most recently used, thus being the reason why it retains the current value it has.
-        self.weights = self.weights + 1
-        self.weights[self.move_index] = self.weights[self.move_index] - 1
-        # print("Here are the weights")
-        # for X in self.weights:
-        #     print(X)
+        candidates = np.argwhere(probability == np.amax(probability))
+        candidates = candidates.flatten().tolist()
+        print(candidates)
 
-        #returning chosen index
-        return self.move_index
+        np.random.seed(int(self.seed_time))
+        choice = np.random.choice(candidates)
+
+        print(choice)
+
+    # def get_weights(self):
+    #
+    #     usable = np.ones(len(DIALOGUE_LIST))
+    #
+    #     totals = usable * self.frequency_count
+    #     Logger.log_information_extraction_basic_example(totals)
+    #
+    #     print("totals: ", sum(totals))
+    #     percentages = totals / sum(totals)
+    #     if np.isfinite(percentages).all():
+    #         percentages = []
+    #         for i in range(len(DIALOGUE_LIST)):
+    #             percentages.append(1/len(DIALOGUE_LIST))
+    #
+    #     # if only one highest candidate, only get its index
+    #     # otherwise, randomize between the list of highest candidates
+    #     self.move_index = np.argmax(percentages)
+    #     if self.move_index > 1:
+    #         self.move_index = np.random.choice(self.move_index)
+    #
+    #     # increases weight of everything except the one that will be used. It wouldn't make much sense to increase the weight of the most recently used, thus being the reason why it retains the current value it has.
+    #     self.frequency_count = self.frequency_count + 1
+    #     self.frequency_count[self.move_index] = self.frequency_count[self.move_index] - 1
+    #     # print("Here are the weights")
+    #     # for X in self.weights:
+    #     #     print(X)
+    #
+    #     #returning chosen index
+    #     return self.move_index
 
     def choose_dialogue(self):
-        is_valid = False
+        dialogue_move_index = -1
 
-        #time out
-        test = 0
-        while not is_valid:
-            if test == 5 or time. () > timeout:
-                curr_index = fallback_dialogue_move
-                break
-            test = test + 1
+        timeout = time.time() + MAX_WAITING_TIME
+        ctr = 0
+        while ctr < 5 and time.time() <= timeout:
 
-            curr_index = self.get_weights()
-            if self.is_usable[curr_index]:
-                is_valid = True
-        return curr_index
+            # if ctr == 5 or time.time() > timeout:
+            #     curr_index = FALLBACK_DIALOGUE_MOVE
+            #     break
+
+            dialogue_move_index = self.select_dialogue_from_weights()
+            if dialogue_move_index > -1:
+                if self.is_usable[dialogue_move_index]:
+                    break
+
+            ctr = ctr + 1
+
+        if dialogue_move_index == -1:
+            dialogue_move_index = FALLBACK_DIALOGUE_MOVE
+
+        return dialogue_move_index
 
     def set_event(self, curr_event):
         self.curr_event = curr_event

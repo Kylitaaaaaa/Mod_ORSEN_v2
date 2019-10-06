@@ -79,6 +79,11 @@ DIALOGUE_TYPE_UNKNOWN = "UNKNOWN"
 VOICE_PASSIVE = "PASSIVE"
 VOICE_ACTIVE = "ACTIVE"
 
+# 23 TOTAL HELPING VERBS
+HELPING_VERBS = ["am", "are", "is", "was", "were", "be", "being", "been", "have", "has", "had", "shall", "will", "do", "does", "did", "may", "must", "might", "can", "could", "would", "should"]
+RELATIVE_PRONOUNS = ["who", " whom", " whose", " which", " that", " whoever", " what", " whomever", " whatever", " whichever"]
+
+
 """ RELATIONS """
 
 IS_A = "IsA"
@@ -99,12 +104,6 @@ LOCATED_NEAR = "LocatedNear"
 RELATIONS = [IS_A, PART_OF, AT_LOCATION, HAS_PREREQ, CREATED_BY, USED_FOR, CAUSES, DESIRES, CAPABLE_OF, HAS_PROPERTY,
              HAS_A, RECEIVES_ACTION]
 
-
-# 23 TOTAL HELPING VERBS
-HELPING_VERBS = ["am", "are", "is", "was", "were", "be", "being", "been", "have", "has", "had", "shall", "will", "do", "does", "did", "may", "must", "might", "can", "could", "would", "should"]
-RELATIVE_PRONOUNS = ["who", " whom", " whose", " which", " that", " whoever", " what", " whomever", " whatever", " whichever"]
-
-
 """ QUOTES """
 
 OPENING_QUOTES_STANDARD = "\""
@@ -123,4 +122,3 @@ CLOSING_QUOTES = CLOSING_QUOTES_STANDARD
 
 PROMPT_TRIGGER = ["help me start"]
 PUMPING_TRIGGER = ["give me an idea", "what should i talk about?", "help me", "i'm stuck"]
-
