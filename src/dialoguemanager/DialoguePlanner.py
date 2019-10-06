@@ -7,6 +7,9 @@ from src.dbo.dialogue.DBODialogueTemplate import DBODialogueTemplate, PUMPING_TR
 
 import time
 
+timeout = time.time() + 5000
+fallback_dialogue_move = 0 #feedback
+
 fallback_dialogue_move = 3 #general pumping
 
 class DialoguePlanner:
@@ -62,7 +65,14 @@ class DialoguePlanner:
                 # gets number of occurences
                 self.weights[i] = self.get_num_usage(DIALOGUE_LIST[i].get_type())
 
+            Logger.log_dialogue_model_basic("Breakdown of values used:")
+            Logger.log_dialogue_model_basic_example(DIALOGUE_LIST)
+            Logger.log_dialogue_model_basic_example(self.is_usable)
+            Logger.log_dialogue_model_basic_example(self.weights)
+
             self.chosen_move_index = self.choose_dialogue()
+            Logger.log_dialogue_model_basic("Chosed dialogue index: " + self.chosen_move_index)
+
             self.chosen_dialogue_move = DIALOGUE_LIST[self.chosen_move_index].get_type()
             self.chosen_dialogue_template = self.usable_templates[self.chosen_move_index]
 
@@ -119,6 +129,10 @@ class DialoguePlanner:
         #returns number of times it has been used
         return self.dialogue_history.count(dialogue_type)
 
+
+    def select_dialogue_from_weights(self):
+        max_val = np.max(self.weights)
+
     def get_weights(self):
         usable = np.ones(len(DIALOGUE_LIST))
 
@@ -150,13 +164,14 @@ class DialoguePlanner:
 
     def choose_dialogue(self):
         is_valid = False
+
+        #time out
+        test = 0
         while not is_valid:
-            #time out
-            test = 0
-            if test == 5 or time.time() > timeout:
+            if test == 5 or time. () > timeout:
                 curr_index = fallback_dialogue_move
                 break
-            test = test - 1
+            test = test + 1
 
             curr_index = self.get_weights()
             if self.is_usable[curr_index]:

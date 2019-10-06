@@ -58,6 +58,11 @@ class Logger:
         logger.info("  >> " + str(content))
 
     @staticmethod
+    def log_dialogue_model_basic_example(content):
+        logger = logging.getLogger(DIALOGUE_MODEL_LOG)
+        logger.info("        " + str(content))
+
+    @staticmethod
     def log_information_extraction(content):
         logger = logging.getLogger(INFORMATION_EXTRACTION_LOG)
         logger.info(content)
