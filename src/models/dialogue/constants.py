@@ -4,8 +4,12 @@ from . import FeedbackDialogueTemplate, HintingDialogueTemplate, PromptDialogueT
 
 
 #list of all dialogue moves
+# DIALOGUE_LIST = [FeedbackDialogueTemplate(),
+#                  PromptDialogueTemplate(),
+#                  PumpingGeneralDialogueTemplate(),
+#                  PumpingSpecificDialogueTemplate()]
+
 DIALOGUE_LIST = [FeedbackDialogueTemplate(),
-                 HintingDialogueTemplate(),
-                 PromptDialogueTemplate(),
+                 # PromptDialogueTemplate(),
                  PumpingGeneralDialogueTemplate(),
                  PumpingSpecificDialogueTemplate()]

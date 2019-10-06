@@ -6,7 +6,7 @@ from src.models.dialogue.constants import *
 from src.dbo.dialogue.DBODialogueTemplate import DBODialogueTemplate, PUMPING_TRIGGER, PROMPT_TRIGGER, \
     DIALOGUE_TYPE_PUMPING_SPECIFIC, DIALOGUE_TYPE_PROMPT, IS_END, THE_END
 
-FALLBACK_DIALOGUE_MOVE = 3 # GENERAL DIALOGUE TEMPLATE
+FALLBACK_DIALOGUE_MOVE = 2 # GENERAL DIALOGUE TEMPLATE
 MAX_WAITING_TIME = 7000 # 7 SECONDS
 class DialoguePlanner:
 
@@ -42,22 +42,27 @@ class DialoguePlanner:
     def perform_dialogue_planner(self, dialogue_move = ""):
         if dialogue_move == "":
             for i in range(len(DIALOGUE_LIST)):
+                if DIALOGUE_LIST[i].get_type() == DIALOGUE_TYPE_PROMPT:
+                    print("IT'S A PROMPT")
+                    self.usable_templates.append([])
+                    self.is_usable.append(False)
+                else:
+                    print("IT'S NOT A PROMPT")
+                    to_check = DIALOGUE_LIST[i]
+                    Logger.log_dialogue_model_basic(to_check)
 
-                to_check = DIALOGUE_LIST[i]
-                Logger.log_dialogue_model_basic(to_check)
+                    # feedback[d1, d4, d5]
+                    # general[d7, d9, 10]
+                    # pumping[d11, d12, d15]
+                    # list.append() --> [[],[],[]]]
 
-                # feedback[d1, d4, d5]
-                # general[d7, d9, 10]
-                # pumping[d11, d12, d15]
-                # list.append() --> [[],[],[]]]
-
-                # check if dialogue has templates
-                curr_usable_templates = self.get_usable_templates(DIALOGUE_LIST[i].get_type())
-                self.usable_templates.append(curr_usable_templates)
+                    # check if dialogue has templates
+                    curr_usable_templates = self.get_usable_templates(DIALOGUE_LIST[i].get_type())
+                    self.usable_templates.append(curr_usable_templates)
 
 
-                # check if dialogue can be repeated (Only up to 3 times)
-                self.is_usable.append(self.is_dialogue_usable(DIALOGUE_LIST[i].get_type(), curr_usable_templates))
+                    # check if dialogue can be repeated (Only up to 3 times)
+                    self.is_usable.append(self.is_dialogue_usable(DIALOGUE_LIST[i].get_type(), curr_usable_templates))
 
                 # gets number of occurences
                 self.frequency_count[i] = self.get_num_usage(DIALOGUE_LIST[i].get_type())
@@ -201,6 +206,7 @@ class DialoguePlanner:
             ctr = ctr + 1
 
         if dialogue_move_index == -1:
+            print("USING THE FALLBACK: ", DIALOGUE_LIST[FALLBACK_DIALOGUE_MOVE].get_type())
             dialogue_move_index = FALLBACK_DIALOGUE_MOVE
 
         return dialogue_move_index

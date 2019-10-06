@@ -103,7 +103,7 @@ class DialogueTemplate(ABC):
         # return True
 
     def is_usable_1_relation(self, relation, curr_event):
-        if relation == 'Repeat':
+        if relation == 'Repeat' or relation == 'Prompt':
             return True
         elif relation == 'Character':
             #check if character exists
