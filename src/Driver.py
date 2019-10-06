@@ -114,7 +114,7 @@ def start_storytelling():
         else:
             print("Thank you for the story! Do you want to hear it again?")
             user_input = get_input()
-            if user_input in IS_AFFIRM:
+            if user_input.lower() in IS_AFFIRM:
                 print(orsen.repeat_story())
 
 
@@ -141,11 +141,12 @@ orsen = ORSEN()
 #for repeating the story
 is_engaged = True
 while is_engaged:
+    orsen.initialize_story_prerequisites()
     print("Let's make another story! You go first")
     start_storytelling()
     print("Do you want to make another story?")
     user_input = get_input()
-    if user_input in IS_DENY:
+    if user_input.lower() in IS_DENY:
         is_engaged = False
 
 

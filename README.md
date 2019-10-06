@@ -4,10 +4,11 @@ Recent Innovative practices in man-machine interaction can be achieved through i
 
 ## Current Agendas
 - [x] ```Relation``` and ```Concept``` utilization on level similar to previous level 
-- [ ] ```Relation``` and ```Concept``` utilization dependent on extracted event type from input and expected event type for output
+- [ ] ```Relation``` and ```Concept``` utilization dependent on extracted event type from input and expected event type for output (```Suggesting```)
 - [x] ```EventExtractor``` using a different approach based on ```EVENT_TYPE```
 - [x] Basic ```DialoguePlanner```
 - [ ] Follow-up ```DialoguePlanner```
+- [ ] ```LinguisticRealization```
 
 
 

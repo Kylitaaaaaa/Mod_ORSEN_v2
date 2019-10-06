@@ -20,7 +20,9 @@ class ORSEN:
 
         self.dialogue_planner = DialoguePlanner()
         self.content_determination = ContentDetermination()
+        self.initialize_story_prerequisites()
 
+    def initialize_story_prerequisites(self):
         self.world = World()
         self.turn_count = 1
         self.prereqs = []
