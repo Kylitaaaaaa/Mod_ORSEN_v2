@@ -1,6 +1,10 @@
 from . import DialogueTemplate
 from src.constants import DIALOGUE_TYPE_PROMPT
 
+from src.dbo.concept import DBOConcept
+import copy
+
+
 
 class PromptDialogueTemplate(DialogueTemplate):
 
@@ -8,13 +12,19 @@ class PromptDialogueTemplate(DialogueTemplate):
         DialogueTemplate.__init__(self, id, DIALOGUE_TYPE_PROMPT, template, relation, blanks, nodes, dependent_nodes);
 
     def fill_blank(self, fill):
-        # TODO fix fill_blank implementation
+        dBOConcept = DBOConcept()
+        print("CHOSEN CONCEPT")
+        print(dBOConcept)
 
-        for i in range(len(self.template)):
-            for j in range(len(self.nodes)):
-                if self.template[i] == self.node[j]:
-                    self.template[i] = fill
-                    break
+        rand_concept = dBOConcept.get_random_concept()
+
+        response = copy.deepcopy(self.template)
+        for i in range (len(self.nodes)):
+            to_insert = "text input"
+            curr_index = response.index(self.nodes[i])
+            response[curr_index] = to_insert
+
+        return response
 
     def get_template_to_use(self):
         # check if it has usable templates
