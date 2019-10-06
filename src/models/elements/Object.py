@@ -43,7 +43,7 @@ class Object:
         entities = sentence.ents
 
         for ent in entities:
-            print(token.text, "vs", ent)
+            print(str(token), "vs", ent)
             print("Ent range:", ent.start, "to", ent.end)
             if type(ent) == type(token):
                 print("Entity range:", token.start, "to", token.end)

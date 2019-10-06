@@ -195,15 +195,15 @@ class EizenExtractor(object):
         except:
             subject_index = subject.start
 
-        for noun_chunk in noun_chunks:
-            if noun_chunk.start <= subject_index <= noun_chunk.end:
-                # subject = noun_chunk
-                return noun_chunk
-
         for entity in entities:
             if entity.start <= subject_index <= entity.end:
                 # subject = entity
                 return entity
+
+        for noun_chunk in noun_chunks:
+            if noun_chunk.start <= subject_index <= noun_chunk.end:
+                # subject = noun_chunk
+                return noun_chunk
 
         return subject
         # for j in range(len(subjects)):
@@ -578,17 +578,22 @@ class EizenExtractor(object):
 
     def get_relations_from_sentence(self, event_type, template, token, subjects, ents):
         relations = []
-        if event_type == EVENT_DESCRIPTION:
-            if template.relation in [IS_A, HAS_PROPERTY, HAS_A, CAPABLE_OF]:
-                extracted = self.extract_relation_via_template(template, token)
-                if extracted is not None:
-                    Logger.log_information_extraction_basic_example(str(extracted))
-                    # extracted.first_token = self.convert_noun_to_entities(subjects, ents, extracted.first_token)
-                    # extracted.second_token = self.convert_noun_to_entities(subjects, ents, extracted.second_token)
-                    # Logger.log_information_extraction_basic_example(str(extracted))
-                    self.add_relation_to_concepts_if_not_existing(extracted)
+        extracted = self.extract_relation_via_template(template, token)
+        if extracted is not None:
+            relations.append(extracted)
 
-                    relations.append(extracted)
+        # if event_type == EVENT_DESCRIPTION:
+        #     print(template.relation)
+        #     if template.relation in [IS_A, HAS_PROPERTY, HAS_A, CAPABLE_OF]:
+        #         extracted = self.extract_relation_via_template(template, token)
+        #         if extracted is not None:
+        #             # Logger.log_information_extraction_basic_example(str(extracted))
+        #             # extracted.first_token = self.convert_noun_to_entities(subjects, ents, extracted.first_token)
+        #             # extracted.second_token = self.convert_noun_to_entities(subjects, ents, extracted.second_token)
+        #             # Logger.log_information_extraction_basic_example(str(extracted))
+        #             # self.add_relation_to_concepts_if_not_existing(extracted)
+        #
+        #             relations.append(extracted)
 
         return relations
 
@@ -706,9 +711,13 @@ class EizenExtractor(object):
         old_sentence = old_sentence.strip()
         sentence = old_sentence + ' ' + content
 
-        resolved = InputDecoder.get_instance().coref_resolve(sentence)
+        old_sentence_resolved = InputDecoder.get_instance().coref_resolve(old_sentence)
+        old_sentence_resolved = old_sentence_resolved._.coref_resolved
 
-        resolved = resolved.replace(old_sentence, "")
+        resolved = InputDecoder.get_instance().coref_resolve(sentence)
+        resolved = resolved._.coref_resolved
+
+        resolved = resolved.replace(old_sentence_resolved, "")
         resolved = resolved.strip()
 
         Logger.log_information_extraction_basic("Sentence after coreference resolution via coref_resolve():")
