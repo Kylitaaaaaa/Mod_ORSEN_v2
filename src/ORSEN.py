@@ -63,7 +63,9 @@ class ORSEN:
             result = ORSEN.perform_dialogue_manager(self, response)
 
         else:
-            result = ORSEN.perform_dialogue_manager(self, response, triggered_move)
+            result = ORSEN.perform_dialogue_manager(self, triggered_move)
+
+        self.dialogue_planner.reset_state()
 
         return result
 
@@ -140,7 +142,7 @@ class ORSEN:
 
             self.world.add_event(event, sentence)
 
-    def perform_dialogue_manager(self, response, move_to_execute=""):
+    def perform_dialogue_manager(self, move_to_execute=""):
         # curr_event = None
         curr_event = self.world.curr_event
         self.dialogue_planner.set_event(curr_event)
@@ -148,7 +150,7 @@ class ORSEN:
         if move_to_execute == "":
             move_to_execute = self.dialogue_planner.perform_dialogue_planner()
         else:
-            self.dialogue_planner.test_perform_dialogue_planner(move_to_execute)
+            self.dialogue_planner.perform_dialogue_planner(move_to_execute)
 
 
         # choose dialogue move

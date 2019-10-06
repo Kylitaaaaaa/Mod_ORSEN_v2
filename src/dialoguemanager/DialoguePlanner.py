@@ -31,7 +31,14 @@ class DialoguePlanner:
 
     #TODO Handle triggered
 
+    def reset_state(self):
+        self.chosen_dialogue_move = None
+        self.chosen_dialogue_template = []
+        self.chosen_move_index = -1
+        self.move_index = -1
+
     def perform_dialogue_planner(self, dialogue_move = ""):
+        print("CURRENT DIALOGUE MOVE IS: ", dialogue_move)
         if dialogue_move == "":
             print("Dialogue_list: ", len(DIALOGUE_LIST))
             for i in range(len(DIALOGUE_LIST)):
@@ -69,11 +76,11 @@ class DialoguePlanner:
 
         return self.chosen_dialogue_move
 
-    def test_perform_dialogue_planner(self, dialogue_move):
-        self.chosen_dialogue_move = dialogue_move
-        self.chosen_dialogue_template = self.get_usable_templates(dialogue_move)
-
-        return self.chosen_dialogue_move
+    # def test_perform_dialogue_planner(self, dialogue_move):
+    #     self.chosen_dialogue_move = dialogue_move
+    #     self.chosen_dialogue_template = self.get_usable_templates(dialogue_move)
+    #
+    #     return self.chosen_dialogue_move
 
     def is_dialogue_usable(self, dialogue_type, curr_usable_templates):
         if len(curr_usable_templates) == 0:
@@ -97,20 +104,20 @@ class DialoguePlanner:
 
         # check which template is usable
         for X in template_list:
-            print("==============================")
-            print("TEMPLATE: ", X)
-            print("==============================")
-            print("Relation: ", X.relation)
-            print("Template: ", X.template)
-            print("Relations: ", X.relation)
-            print("Blanks: ", X.blanks)
-            print("Nodes: ", X.nodes)
-            print("Dependent Nodes: ", X.dependent_nodes)
+            # print("==============================")
+            # print("TEMPLATE: ", X)
+            # print("==============================")
+            # print("Relation: ", X.relation)
+            # print("Template: ", X.template)
+            # print("Relations: ", X.relation)
+            # print("Blanks: ", X.blanks)
+            # print("Nodes: ", X.nodes)
+            # print("Dependent Nodes: ", X.dependent_nodes)
             result = X.is_usable(self.curr_event)
-            print("Is it usable? ", result)
+            # print("Is it usable? ", result)
             if X.is_usable(self.curr_event):
                 usable_template_list.append(X)
-            print("\n")
+            # print("\n")
 
         return usable_template_list
 
