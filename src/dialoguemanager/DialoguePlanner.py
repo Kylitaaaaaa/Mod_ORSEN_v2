@@ -214,13 +214,18 @@ class DialoguePlanner:
     def set_event(self, curr_event):
         self.curr_event = curr_event
 
-    def check_trigger_phrases(self, response):
+    def check_trigger_phrases(self, response, event_chain):
         response = response.lower()
         if response in PUMPING_TRIGGER:
-            return DIALOGUE_TYPE_PUMPING_SPECIFIC
-        elif response in PROMPT_TRIGGER:
+            if len(event_chain) > 0:
+                print("TRIGGERED PUMP")
+                return DIALOGUE_TYPE_PUMPING_SPECIFIC
+            print("TRIGGERED PROMPT")
             return DIALOGUE_TYPE_PROMPT
-
+        elif response in PROMPT_TRIGGER:
+            print("TRIGGERED PROMPT")
+            return DIALOGUE_TYPE_PROMPT
+        print("TRIGGERED NOTHING")
         return None
 
 

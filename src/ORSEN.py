@@ -48,7 +48,7 @@ class ORSEN:
         """"
         Check for trigger phrases 
         """""
-        triggered_move = self.dialogue_planner.check_trigger_phrases(response)
+        triggered_move = self.dialogue_planner.check_trigger_phrases(response, self.world.event_chains)
         if triggered_move is None:
             """"
             Executes text understanding part. This includes the extraction of important information in the text input 
