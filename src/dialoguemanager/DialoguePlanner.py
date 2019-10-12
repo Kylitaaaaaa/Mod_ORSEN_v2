@@ -1,7 +1,9 @@
+import random
+
 import numpy as np
 import time
 
-from src import Logger, DIALOGUE_TYPE_FEEDBACK, DIALOGUE_TYPE_PUMPING_GENERAL, DIALOGUE_TYPE_HINTING
+from src import Logger, DIALOGUE_TYPE_FEEDBACK, DIALOGUE_TYPE_PUMPING_GENERAL, DIALOGUE_TYPE_HINTING, DEFAULT_SEED
 from src.models.dialogue import DialogueHistoryTemplate
 from src.models.dialogue.constants import *
 from src.dbo.dialogue.DBODialogueTemplate import DBODialogueTemplate, PUMPING_TRIGGER, PROMPT_TRIGGER, \
@@ -32,7 +34,8 @@ class DialoguePlanner:
 
         self.seed_time = time.time()
         self.num_action_events = 0
-        # TODO Handle triggered
+        # TODO seed(Handle triggered
+        np.random.seed(DEFAULT_SEED)
 
     def set_state(self, curr_event, num_action_events):
         self.curr_event = curr_event
@@ -181,7 +184,7 @@ class DialoguePlanner:
         candidates = candidates.flatten().tolist()
         print(candidates)
 
-        np.random.seed(int(self.seed_time))
+        # np.random.seed(int(self.seed_time))
         choice = np.random.choice(candidates)
 
         return choice

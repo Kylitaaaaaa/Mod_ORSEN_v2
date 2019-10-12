@@ -1,4 +1,7 @@
-import random
+import numpy as np
+
+from src import DEFAULT_SEED
+
 
 class ContentDetermination:
 
@@ -6,6 +9,7 @@ class ContentDetermination:
         super().__init__()
         self.move_to_execute = ""
         self.curr_event = []
+        np.random.seed(DEFAULT_SEED)
 
     def set_state(self, move_to_execute, curr_event, usable_template_list):
         self.move_to_execute = move_to_execute
@@ -45,7 +49,7 @@ class ContentDetermination:
     def choose_template(self):
         print("templates:")
         print(self.usable_template_list)
-        return random.choice(self.usable_template_list)
+        return np.random.choice(self.usable_template_list)
 
 
 
