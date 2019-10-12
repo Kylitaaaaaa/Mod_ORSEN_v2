@@ -40,7 +40,7 @@ class ContentDetermination:
         print("RESPONSE IS: ", str_response)
 
         self.reset_state()
-        return str_response
+        return str_response, chosen_template
 
     def choose_template(self):
         print("templates:")

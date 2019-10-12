@@ -51,8 +51,8 @@ class ORSEN:
         """"
         Check for trigger phrases 
         """""
-        triggered_move = self.dialogue_planner.check_trigger_phrases(response, self.world.event_chains)
-
+        triggered_move = self.dialogue_planner.check_trigger_phrases(response, self.world.event_chains) #TODO: REMOVE AFTER TESTING
+        # triggered_move = DIALOGUE_TYPE_HINTING
 
         if triggered_move is None:
             #if not pump
@@ -250,6 +250,7 @@ class ORSEN:
         print(curr_event)
         self.dialogue_planner.set_state(curr_event, self.world.get_num_action_events())
 
+        # move_to_execute == DIALOGUE_TYPE_HINTING #TODO remove if done
         if move_to_execute == "":
             move_to_execute = self.dialogue_planner.perform_dialogue_planner()
         else:
@@ -259,7 +260,11 @@ class ORSEN:
 
         # send current event to ContentDetermination
         self.content_determination.set_state(move_to_execute, curr_event, available_templates)
-        response = self.content_determination.perform_content_determination()
+        response, chosen_template = self.content_determination.perform_content_determination()
+
+        #setting template details
+        self.dialogue_planner.set_template_details_history(chosen_template)
+
 
         return response
 
