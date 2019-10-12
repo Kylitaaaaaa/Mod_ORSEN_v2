@@ -207,10 +207,6 @@ class ORSEN:
                         if direct_object == None:
                             direct_object = Object.create_object(sentence=sentence, token=event_entity[DIRECT_OBJECT])
                             self.world.add_object(direct_object)
-                        else:
-                            direct_object = Object.create_object(sentence=sentence,
-                                                                 token=self.world.remove_object(direct_object))
-                            self.world.add_object(direct_object)
                     direct_object.mention_count += 1
 
                     for s in settings:
