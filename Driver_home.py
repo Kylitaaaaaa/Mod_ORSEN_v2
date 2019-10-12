@@ -128,8 +128,9 @@ def driver():
             is_end_story = is_end_story_func(user_input)
 
             if not is_end_story:
+                # TODO Connect to back end, get the response
                 # orsen_response = orsen.get_response(user_input)
-                orsen_response += "STORY TIME"
+                orsen_response = "STORY TIME"
                 Logger.log_conversation("ORSEN: " + str(orsen_response))
             else:
                 orsen_response = "Thank you for the story! Do you want to hear it again?"
@@ -138,6 +139,7 @@ def driver():
         elif status == "repeat_story":
             orsen_response = ""
             if user_input.lower() in IS_AFFIRM:
+                 # TODO Connect to back end, get repetition 
                 # orsen_response = orsen.repeat_story()
                 orsen_response = "Repeating Story..."
             orsen_response += " Do you want to create another story?"
