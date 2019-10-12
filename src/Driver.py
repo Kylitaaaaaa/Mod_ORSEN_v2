@@ -91,7 +91,8 @@ def clean_user_input(response):
 def start_storytelling():
     is_end_story = False
     while not is_end_story:
-        user_input = get_input()
+        user_input = get_input() #TODO: Uncomment after testing
+        # user_input = "John kicked the love"
         user_input = clean_user_input(user_input)
 
         if UserHandler.get_instance().curr_user is None:
@@ -118,8 +119,8 @@ Logger.setup_loggers()
 
 #Retrieve User Details --- User objects
 print("---------Retrieving User Details---------")
-# login_signup()
-# print("done")
+login_signup()
+print("done")
 
 
 print("---------Launching ORSEN---------")
@@ -131,6 +132,9 @@ orsen = ORSEN()
 # test_sentence = "John the mighty is a brave, strong warrior"
 # test_sentence = "Once there was a boy"
 
+# orsen_response = orsen.get_response(test_sentence)
+
+#TODO: uncomment after testing
 #for repeating the story
 is_engaged = True
 while is_engaged:

@@ -1,3 +1,4 @@
+from src.knowledgeacquisition.followup.SuggestingDialogueTemplate import SuggestingDialogueTemplate
 from src.models.dialogue import *
 from src.constants import *
 
@@ -16,6 +17,7 @@ class DialogueTemplateBuilder:
       dependent_nodes = str(dependent_nodes_string).split(",")
 
 
+
       if dialogue_type == DIALOGUE_TYPE_PROMPT:
          return PromptDialogueTemplate(id, templates, relations, blanks, nodes, dependent_nodes)
       elif dialogue_type == DIALOGUE_TYPE_PUMPING_GENERAL:
@@ -26,6 +28,9 @@ class DialogueTemplateBuilder:
 
       elif dialogue_type == DIALOGUE_TYPE_HINTING:
          return HintingDialogueTemplate(id, templates, relations, blanks, nodes, dependent_nodes)
+
+      elif dialogue_type == DIALOGUE_TYPE_SUGGESTING:
+         return SuggestingDialogueTemplate(id, templates, relations, blanks, nodes, dependent_nodes)
 
       elif dialogue_type == DIALOGUE_TYPE_PUMPING_SPECIFIC:
          return PumpingSpecificDialogueTemplate(id, templates, relations, blanks, nodes, dependent_nodes)

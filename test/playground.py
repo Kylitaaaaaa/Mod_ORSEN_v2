@@ -237,9 +237,10 @@ def display_tokens(doc):
 # story = "The sweet girl is happy."
 # story = "happy is the sweet girl."
 # story = "Mark is a knight."
-story = "My mother's name is Sasha. My mother likes dogs."
+# story = "My mother's name is Sasha. My mother likes dogs."
 # story = "I will go there at 5pm."
 #story = "Today I don't feel like doing anything in the Philippines"
+story = "I heard Jim having a tough time in his new job"
 
 # start here
 # Initialize loggers

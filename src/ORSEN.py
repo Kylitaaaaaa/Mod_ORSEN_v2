@@ -51,8 +51,7 @@ class ORSEN:
         """"
         Check for trigger phrases 
         """""
-        triggered_move = self.dialogue_planner.check_trigger_phrases(response, self.world.event_chains)
-
+        triggered_move = self.dialogue_planner.check_trigger_phrases(response, self.world.event_chains) #TODO: REMOVE AFTER TESTING
 
         if triggered_move is None:
             #if not pump
@@ -68,7 +67,29 @@ class ORSEN:
             result = ORSEN.perform_dialogue_manager(self)
 
         else:
-            if triggered_move == DIALOGUE_TYPE_PUMPING_SPECIFIC:
+            #TODO: insert KA stuff here
+            if triggered_move == DIALOGUE_TYPE_SUGGESTING_AFFIRM:
+                #add score then general pumping
+                last_dialogue = self.dialogue_planner.get_last_dialogue_move()
+                if last_dialogue is not None:
+                    for X in last_dialogue.word_relation:
+                        self.extractor.add_relation_to_concepts_if_not_existing(X)
+                triggered_move = DIALOGUE_TYPE_PUMPING_GENERAL
+                pass
+            elif triggered_move == DIALOGUE_TYPE_FOLLOW_UP:
+                # Why dont u like it or is it wrong -- called from database
+                pass
+            elif triggered_move == DIALOGUE_TYPE_FOLLOW_UP_DONT_LIKE:
+                triggered_move = DIALOGUE_TYPE_PUMPING_GENERAL
+            elif triggered_move == DIALOGUE_TYPE_FOLLOW_UP_WRONG:
+                #deduct score then general pumping
+                last_dialogue = self.dialogue_planner.get_last_dialogue_move()
+                if last_dialogue is not None:
+                    for X in last_dialogue.word_relation:
+                        self.extractor.remove_relation_to_concepts_if_not_valid(X)
+                triggered_move = DIALOGUE_TYPE_PUMPING_GENERAL
+
+            elif triggered_move == DIALOGUE_TYPE_PUMPING_SPECIFIC:
                 self.world.curr_event = self.world.event_chains[len(self.world.event_chains)-1]
 
             #if prompt
@@ -207,10 +228,6 @@ class ORSEN:
                         if direct_object == None:
                             direct_object = Object.create_object(sentence=sentence, token=event_entity[DIRECT_OBJECT])
                             self.world.add_object(direct_object)
-                        else:
-                            direct_object = Object.create_object(sentence=sentence,
-                                                                 token=self.world.remove_object(direct_object))
-                            self.world.add_object(direct_object)
                     direct_object.mention_count += 1
 
                     for s in settings:
@@ -250,6 +267,7 @@ class ORSEN:
         print(curr_event)
         self.dialogue_planner.set_state(curr_event, self.world.get_num_action_events())
 
+        # move_to_execute == DIALOGUE_TYPE_HINTING #TODO remove if done
         if move_to_execute == "":
             move_to_execute = self.dialogue_planner.perform_dialogue_planner()
         else:
@@ -259,7 +277,14 @@ class ORSEN:
 
         # send current event to ContentDetermination
         self.content_determination.set_state(move_to_execute, curr_event, available_templates)
-        response = self.content_determination.perform_content_determination()
+        response, chosen_template = self.content_determination.perform_content_determination()
+
+        #setting template details
+        print("CHOSEN TEMPLATE: ", type(chosen_template))
+        print(chosen_template)
+
+        self.dialogue_planner.set_template_details_history(chosen_template)
+
 
         return response
 

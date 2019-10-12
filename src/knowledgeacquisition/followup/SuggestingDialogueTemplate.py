@@ -1,12 +1,12 @@
-from . import DialogueTemplate
-from src.constants import DIALOGUE_TYPE_HINTING
+from src.models.dialogue import DialogueTemplate
+from src.constants import DIALOGUE_TYPE_SUGGESTING
 import copy
 
 
-class HintingDialogueTemplate(DialogueTemplate):
+class SuggestingDialogueTemplate(DialogueTemplate):
 
     def __init__(self, id=-1, template=[], relation=[], blanks=[], nodes=[], dependent_nodes=[]):
-        DialogueTemplate.__init__(self, id, DIALOGUE_TYPE_HINTING, template, relation, blanks, nodes, dependent_nodes);
+        DialogueTemplate.__init__(self, id, DIALOGUE_TYPE_SUGGESTING, template, relation, blanks, nodes, dependent_nodes);
 
     def fill_blank(self, fill):
         response = copy.deepcopy(self.template)
@@ -21,7 +21,12 @@ class HintingDialogueTemplate(DialogueTemplate):
                     to_insert = self.relations_blanks[i].first
 
                 response[curr_index] = to_insert
+        response.insert(0, "What if ")
         return response
+
+    def is_usable(self, to_check=[]):
+        # TODO fix fill_blank implementation
+        pass
 
     def get_template_to_use(self):
         # check if it has usable templates

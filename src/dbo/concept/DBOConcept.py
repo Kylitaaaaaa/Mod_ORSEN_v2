@@ -1,5 +1,5 @@
 from src.db import SQLExecuter
-from src.constants import  *
+from src.constants import *
 
 from pypika import Query, Table, Criterion, Field
 import abc
@@ -19,6 +19,8 @@ import sys
         second - the second word 
         etc* - other elements defined in their specific implementations
 """
+
+
 class DBOConcept(ABC):
     __metaclass__ = abc.ABCMeta
 
@@ -27,6 +29,7 @@ class DBOConcept(ABC):
         concept_type - type of concept (e.g. global, local) that will be used. Takes the class type to be used for 
         initialization of concept objects in latter parts of the code
     """
+
     def __init__(self, table_reference, concept_type):
         super().__init__()
         self.table_reference = Table(table_reference)
@@ -39,12 +42,13 @@ class DBOConcept(ABC):
         Input:  N/A
         Output: LIST of concept object based on concept_type
     """
+
     def get_all_concepts(self):
-        q = Query\
+        q = Query \
             .from_(self.table_reference).select("*")
 
         query = q.get_sql()
-        query = query.replace("\"","")
+        query = query.replace("\"", "")
         print(query)
 
         result = SQLExecuter.execute_read_query(query, FETCH_ALL)
@@ -61,13 +65,14 @@ class DBOConcept(ABC):
         Input:  first word, relation, second word
         Output: Concept object based on concept type
     """
+
     def get_specific_concept(self, first, relation, second):
         q = Query \
             .from_(self.table_reference) \
             .select("*") \
             .where(
             (self.table_reference.first == first) & (self.table_reference.relation == relation) & (
-                        self.table_reference.second == second)
+                    self.table_reference.second == second)
         )
 
         query = q.get_sql()
@@ -89,16 +94,17 @@ class DBOConcept(ABC):
         Input:  concept_id
         Output: Concept object based on concept_type
     """
+
     def get_concept_by_id(self, id):
-        q = Query\
-            .from_(self.table_reference)\
-            .select("*")\
+        q = Query \
+            .from_(self.table_reference) \
+            .select("*") \
             .where(
-                self.table_reference.id == id
-            )
+            self.table_reference.id == id
+        )
 
         query = q.get_sql()
-        query = query.replace("\"","")
+        query = query.replace("\"", "")
         print(query)
 
         result = SQLExecuter.execute_read_query(query, FETCH_ONE)
@@ -114,16 +120,17 @@ class DBOConcept(ABC):
         Input:  word
         Output: LIST of concept object based on concept_type
     """
+
     def get_concept_by_word(self, word):
-        q = Query\
-            .from_(self.table_reference)\
-            .select("*")\
+        q = Query \
+            .from_(self.table_reference) \
+            .select("*") \
             .where(
-                (self.table_reference.first == word) | (self.table_reference.second == word)
-            )
+            (self.table_reference.first == word) | (self.table_reference.second == word)
+        )
 
         query = q.get_sql()
-        query = query.replace("\"","")
+        query = query.replace("\"", "")
         print(query)
 
         result = SQLExecuter.execute_read_query(query, FETCH_ALL)
@@ -140,16 +147,46 @@ class DBOConcept(ABC):
         Input:  relation
         Output: LIST of concept object based on concept type
     """
+
     def get_concept_by_relation(self, word, relation):
-        q = Query\
-            .from_(self.table_reference)\
-            .select("*")\
+        q = Query \
+            .from_(self.table_reference) \
+            .select("*") \
             .where(
-                ((self.table_reference.first == word) | (self.table_reference.second == word)) & (self.table_reference.relation == relation)
-            )
+            ((self.table_reference.first == word) | (self.table_reference.second == word)) & (
+                        self.table_reference.relation == relation)
+        )
 
         query = q.get_sql()
-        query = query.replace("\"","")
+        query = query.replace("\"", "")
+        print(query)
+
+        result = SQLExecuter.execute_read_query(query, FETCH_ALL)
+        if result is None: return None
+
+        concepts = []
+        for r in result:
+            concepts.append(self.concept_type(*r))
+        return concepts
+
+    """
+            General code to get a concept based on a second word and relation (e.g. isA, capableOf)
+
+            Input:  second, relation
+            Output: LIST of concept object based on concept type
+        """
+
+    def get_concept_by_second_relation(self, relation, second):
+        q = Query \
+            .from_(self.table_reference) \
+            .select("*") \
+            .where(
+            ((self.table_reference.second == second)) & (
+                    self.table_reference.relation == relation)
+        )
+
+        query = q.get_sql()
+        query = query.replace("\"", "")
         print(query)
 
         result = SQLExecuter.execute_read_query(query, FETCH_ALL)
@@ -168,17 +205,18 @@ class DBOConcept(ABC):
                 * - optional values
         Output: LIST of concept object based on concept type
     """
+
     def get_similar_concept(self, relation, first="", second=""):
-        q = Query\
-            .from_(self.table_reference)\
-            .select("*")\
+        q = Query \
+            .from_(self.table_reference) \
+            .select("*") \
             .where(
-                ( self.table_reference.first.like('%' + first + '%') ) &
-                ( self.table_reference.second.like('%' + second + '%') ) &
-                ( self.table_reference.relation == relation )
-            )
+            (self.table_reference.first.like('%' + first + '%')) &
+            (self.table_reference.second.like('%' + second + '%')) &
+            (self.table_reference.relation == relation)
+        )
         query = q.get_sql()
-        query = query.replace("\"","")
+        query = query.replace("\"", "")
         print(query)
 
         result = SQLExecuter.execute_read_query(query, FETCH_ALL)
@@ -201,7 +239,7 @@ class DBOConcept(ABC):
             .limit(1)
 
         query = q.get_sql()
-        query = query.replace("\"","")
+        query = query.replace("\"", "")
         print(query)
 
         result = SQLExecuter.execute_read_query(query, FETCH_ONE)
