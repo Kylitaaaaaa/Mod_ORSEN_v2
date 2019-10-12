@@ -10,7 +10,6 @@ from .InputMisheardDialogueTemplate import InputMisheardDialogueTemplate
 from .PromptDialogueTemplate import PromptDialogueTemplate
 from .PumpingGeneralDialogueTemplate import PumpingGeneralDialogueTemplate
 from .PumpingSpecificDialogueTemplate import PumpingSpecificDialogueTemplate
-from .SuggestingDialogueTemplate import SuggestingDialogueTemplate
 
 from .DialogueHistoryTemplate import DialogueHistoryTemplate
 

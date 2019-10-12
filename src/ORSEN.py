@@ -52,7 +52,6 @@ class ORSEN:
         Check for trigger phrases 
         """""
         triggered_move = self.dialogue_planner.check_trigger_phrases(response, self.world.event_chains) #TODO: REMOVE AFTER TESTING
-        # triggered_move = DIALOGUE_TYPE_HINTING
 
         if triggered_move is None:
             #if not pump
@@ -68,7 +67,17 @@ class ORSEN:
             result = ORSEN.perform_dialogue_manager(self)
 
         else:
-            if triggered_move == DIALOGUE_TYPE_PUMPING_SPECIFIC:
+            #TODO: insert KA stuff here
+            if triggered_move == DIALOGUE_TYPE_SUGGESTING_AFFIRM:
+                pass
+            elif triggered_move == DIALOGUE_TYPE_FOLLOW_UP:
+                pass
+            elif triggered_move == DIALOGUE_TYPE_FOLLOW_UP_DONT_LIKE:
+                pass
+            elif triggered_move == DIALOGUE_TYPE_FOLLOW_UP_WRONG:
+                pass
+
+            elif triggered_move == DIALOGUE_TYPE_PUMPING_SPECIFIC:
                 self.world.curr_event = self.world.event_chains[len(self.world.event_chains)-1]
 
             #if prompt

@@ -24,6 +24,10 @@ IS_AFFIRM = ['yes', 'yes.', 'yeah', 'yeah.', 'sure', 'sure.', 'yup', 'yup.']
 IS_DENY = ['no', 'no.', 'nope', 'nope.']
 IS_END = ['bye', 'bye.', 'the end', 'the end.']
 
+"""ORSEN2 RESPONSES"""
+IS_DONT_LIKE = ['dont like']
+IS_WRONG = ['wrong']
+
 """ CONSTANT VALUES CONTROL """
 
 # EVENT TYPES #
@@ -67,10 +71,14 @@ DIALOGUE_TYPE_PUMPING_SPECIFIC = "specific"
 THE_END = "end"
 
 #JUVEYANCE
-DIALOGUE_TYPE_FOLLOW_UP_CONFIRM = "FOLLOW_UP_CONFIRM"
-DIALOGUE_TYPE_FOLLOW_UP_ASK = "FOLLOW_UP_ASK"
-DIALOGUE_TYPE_FOLLOW_UP_UNKNOWN = "FOLLOW_UP_???"
-DIALOGUE_TYPE_SUGGESTING = "SUGGESTING"
+DIALOGUE_TYPE_SUGGESTING = "suggesting"
+
+DIALOGUE_TYPE_SUGGESTING_AFFIRM = "suggesting_affirm"
+DIALOGUE_TYPE_FOLLOW_UP = "follow_up"
+
+DIALOGUE_TYPE_FOLLOW_UP_DONT_LIKE = "follow_up_dont_like"
+DIALOGUE_TYPE_FOLLOW_UP_WRONG = "follow_up_wrong"
+
 
 DIALOGUE_TYPE_INPUT_MISHEARD = "INPUT_MISHEARD"
 DIALOGUE_TYPE_UNKNOWN = "UNKNOWN"

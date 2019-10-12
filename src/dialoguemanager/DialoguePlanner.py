@@ -3,7 +3,9 @@ import random
 import numpy as np
 import time
 
-from src import Logger, DIALOGUE_TYPE_FEEDBACK, DIALOGUE_TYPE_PUMPING_GENERAL, DIALOGUE_TYPE_HINTING, DEFAULT_SEED
+from src import Logger, DIALOGUE_TYPE_FEEDBACK, DIALOGUE_TYPE_PUMPING_GENERAL, DIALOGUE_TYPE_HINTING, DEFAULT_SEED, \
+    DIALOGUE_TYPE_SUGGESTING, DIALOGUE_TYPE_FOLLOW_UP, IS_AFFIRM, IS_DONT_LIKE, IS_WRONG, \
+    DIALOGUE_TYPE_FOLLOW_UP_DONT_LIKE, DIALOGUE_TYPE_FOLLOW_UP_WRONG, IS_DENY, DIALOGUE_TYPE_SUGGESTING_AFFIRM
 from src.models.dialogue import DialogueHistoryTemplate
 from src.models.dialogue.constants import *
 from src.dbo.dialogue.DBODialogueTemplate import DBODialogueTemplate, PUMPING_TRIGGER, PROMPT_TRIGGER, \
@@ -243,6 +245,23 @@ class DialoguePlanner:
 
     def check_trigger_phrases(self, response, event_chain):
         response = response.lower()
+
+        #get latest dialogue move
+        last_move = self.get_last_dialogue_move()
+        if last_move is not None:
+            # check if prev move is suggestion
+            if last_move.dialogue_type == DIALOGUE_TYPE_SUGGESTING:
+                if response in IS_AFFIRM:
+                    return DIALOGUE_TYPE_SUGGESTING_AFFIRM
+                elif response in IS_DENY:
+                    return DIALOGUE_TYPE_FOLLOW_UP
+            #check if prev move is follow up
+            elif last_move.dialogue_type == DIALOGUE_TYPE_FOLLOW_UP:
+                if response in IS_DONT_LIKE:
+                    return DIALOGUE_TYPE_FOLLOW_UP_DONT_LIKE
+                if response in IS_WRONG:
+                    return DIALOGUE_TYPE_FOLLOW_UP_WRONG
+
         if response in PUMPING_TRIGGER:
             if len(event_chain) > 0:
                 return DIALOGUE_TYPE_PUMPING_SPECIFIC
@@ -265,3 +284,8 @@ class DialoguePlanner:
         print("move", "\t", "is_usable")
         for i in range(len(DIALOGUE_LIST)):
             print(DIALOGUE_LIST[i], "\t", self.is_usable[i])
+
+    def get_last_dialogue_move(self):
+        if len(self.dialogue_history) ==0:
+            return None
+        return self.dialogue_history[len(self.dialogue_history)-1]
