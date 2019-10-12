@@ -91,8 +91,8 @@ def clean_user_input(response):
 def start_storytelling():
     is_end_story = False
     while not is_end_story:
-        # user_input = get_input() #TODO: Uncomment after testing
-        user_input = "John kicked the love"
+        user_input = get_input() #TODO: Uncomment after testing
+        # user_input = "John kicked the love"
         user_input = clean_user_input(user_input)
 
         if UserHandler.get_instance().curr_user is None:

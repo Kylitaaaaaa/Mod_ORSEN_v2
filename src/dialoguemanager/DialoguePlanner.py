@@ -91,48 +91,31 @@ class DialoguePlanner:
             # gets number of occurences
             self.frequency_count[i] = self.get_num_usage(DIALOGUE_LIST[i].get_type())
 
-        #recheck dialogue moves given templates
+        # recheck dialogue moves given templates
         for i in range(len(DIALOGUE_LIST)):
             self.is_usable[i] = self.is_dialogue_usable(DIALOGUE_LIST[i].get_type(), self.usable_templates[i])
-
-        # check which dialogue moves are usable
-        set_to_true = []
-        if self.num_action_events <= 3:
-            print("AT NUME ACTION EVENTS")
-            set_to_true.append(DIALOGUE_TYPE_FEEDBACK)
-            set_to_true.append(DIALOGUE_TYPE_PUMPING_GENERAL)
-            self.set_dialogue_list_true(set_to_true)
-
-        elif self.get_num_usage(DIALOGUE_TYPE_FEEDBACK) == 3 or self.get_num_usage(DIALOGUE_TYPE_PUMPING_GENERAL) == 3:
-            print("AT 2ND IF")
-            set_to_true.append(DIALOGUE_TYPE_PUMPING_SPECIFIC)
-            self.set_dialogue_list_true(set_to_true)
-
-        else:
-            for i in range(len(DIALOGUE_LIST)):
-                self.is_usable[i] = self.is_dialogue_usable(DIALOGUE_LIST[i].get_type(), self.usable_templates[i])
 
         print("SETUP TEMPLATE")
         self.print_dialogue_list()
 
-        # TODO check suggestion
 
     def init_set_dialogue_moves_usable(self):
         # check which dialogue moves are usable
         set_to_true = []
-        set_to_true.append(DIALOGUE_TYPE_HINTING) #TODO: uncomment when done
+        # set_to_true.append(DIALOGUE_TYPE_HINTING) #TODO: uncomment when done
 
-        # if self.num_action_events <= 3:
-        #     print("AT NUME ACTION EVENTS")
-        #     set_to_true.append(DIALOGUE_TYPE_FEEDBACK)
-        #     set_to_true.append(DIALOGUE_TYPE_PUMPING_GENERAL)
-        #
-        # elif self.get_num_usage(DIALOGUE_TYPE_FEEDBACK) == 3 or self.get_num_usage(DIALOGUE_TYPE_PUMPING_GENERAL) == 3:
-        #     print("AT 2ND IF")
-        #     set_to_true.append(DIALOGUE_TYPE_PUMPING_SPECIFIC)
-        #
-        # else:
-        #     set_to_true = [True for i in range(len(DIALOGUE_LIST))]
+        if self.num_action_events <= 3:
+            print("AT NUME ACTION EVENTS")
+            set_to_true.append(DIALOGUE_TYPE_FEEDBACK)
+            set_to_true.append(DIALOGUE_TYPE_PUMPING_GENERAL)
+
+        elif self.get_num_usage(DIALOGUE_TYPE_FEEDBACK) == 3 or self.get_num_usage(DIALOGUE_TYPE_PUMPING_GENERAL) == 3:
+            print("AT 2ND IF")
+            set_to_true.append(DIALOGUE_TYPE_PUMPING_SPECIFIC)
+            set_to_true.append(DIALOGUE_TYPE_PUMPING_GENERAL)
+
+        else:
+            set_to_true = [True for i in range(len(DIALOGUE_LIST))]
         self.set_dialogue_list_true(set_to_true)
 
     def set_dialogue_list_true(self, set_to_true):

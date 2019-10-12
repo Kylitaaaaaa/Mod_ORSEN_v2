@@ -57,6 +57,7 @@ class World:
         return None
 
     def remove_object(self, object):
+
         return self.objects.remove(object)
 
     def add_setting(self, setting):
