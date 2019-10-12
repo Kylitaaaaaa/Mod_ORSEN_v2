@@ -34,8 +34,6 @@ class ContentDetermination:
         else:
             response = chosen_template.fill_blanks(self.curr_event)
 
-        print("RESPONSE IS")
-        print(response)
         if type(response) is not type("dump"):
             str_response = ' '.join(response)
             # TODO replace multiple occurences of spaces with only one space.

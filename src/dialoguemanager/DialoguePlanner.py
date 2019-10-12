@@ -69,9 +69,6 @@ class DialoguePlanner:
             self.chosen_dialogue_move = DIALOGUE_LIST[self.chosen_move_index].get_type()
             self.chosen_dialogue_template = self.usable_templates[self.chosen_move_index]
 
-            # add chosen dialogue move to dialogue history TODO call DialogueTemplateBuilder
-            print("CHOSEN DIALOGUE TEMPLATE: ", type(self.chosen_dialogue_template))
-            print(self.chosen_dialogue_template)
             self.dialogue_history.append(DialogueHistoryTemplate(dialogue_type=self.chosen_dialogue_move))
             self.print_dialogue_list()
 
@@ -104,22 +101,16 @@ class DialoguePlanner:
         for i in range(len(DIALOGUE_LIST)):
             self.is_usable[i] = self.is_dialogue_usable(DIALOGUE_LIST[i].get_type(), self.usable_templates[i])
 
-        print("SETUP TEMPLATE")
-        self.print_dialogue_list()
-
 
     def init_set_dialogue_moves_usable(self):
         # check which dialogue moves are usable
         set_to_true = []
-        # set_to_true.append(DIALOGUE_TYPE_HINTING) #TODO: uncomment when done
 
         if self.num_action_events <= 3:
-            print("AT NUME ACTION EVENTS")
             set_to_true.append(DIALOGUE_TYPE_FEEDBACK)
             set_to_true.append(DIALOGUE_TYPE_PUMPING_GENERAL)
 
         elif self.get_num_usage(DIALOGUE_TYPE_FEEDBACK) == 3 or self.get_num_usage(DIALOGUE_TYPE_PUMPING_GENERAL) == 3:
-            print("AT 2ND IF")
             set_to_true.append(DIALOGUE_TYPE_PUMPING_SPECIFIC)
             set_to_true.append(DIALOGUE_TYPE_PUMPING_GENERAL)
 
@@ -133,7 +124,6 @@ class DialoguePlanner:
                 if DIALOGUE_LIST[j].get_type() == set_to_true[i]:
                     self.is_usable[j] = True
 
-        print("TRYING TO MAKE THEM TRUE")
         self.print_dialogue_list()
 
     def is_dialogue_usable(self, dialogue_type, curr_usable_templates):
@@ -201,38 +191,8 @@ class DialoguePlanner:
         weights_to_eval = self.get_weights_from_index(moves_to_eval)
 
         dialogue_move_index = self.select_dialogue_from_weights(weights_to_eval)
-        print("moves to eval: ", moves_to_eval)
-        print("weights to eval: ", weights_to_eval)
-        print("CHOSEN DIALOGE INDEX: ", dialogue_move_index)
 
         return moves_to_eval[dialogue_move_index]
-
-        # print("CHOOSING THE DIALOGUE")
-        #
-        # self.print_dialogue_list()
-        # dialogue_move_index = -1
-        #
-        #
-        # timeout = time.time() + MAX_WAITING_TIME
-        # ctr = 0
-        # while ctr < 5 and time.time() <= timeout:
-        #
-        #     dialogue_move_index = self.select_dialogue_from_weights(weights_to_eval)
-        #     print("I CHOSE: ", dialogue_move_index)
-        #     if dialogue_move_index > -1:
-        #
-        #         if self.is_usable[dialogue_move_index]:
-        #             break
-        #         else:
-        #             dialogue_move_index = -1
-        #
-        #     ctr = ctr + 1
-        #
-        # if dialogue_move_index == -1:
-        #     print("USING THE FALLBACK: ", DIALOGUE_LIST[FALLBACK_DIALOGUE_MOVE].get_type())
-        #     dialogue_move_index = FALLBACK_DIALOGUE_MOVE
-        #
-        # return dialogue_move_index
 
     def get_weights_from_index(self, indexes):
         weights = []
@@ -279,11 +239,6 @@ class DialoguePlanner:
 
     def print_dialogue_list(self):
         print("\n\nCHOSEN DIALOGUE MOVE: ", self.chosen_dialogue_move)
-
-        # print("move", "\t", "num_temp", "\t", "is_usable", "\t", "weight")
-        # for i in range(len(DIALOGUE_LIST)):
-        #     print(DIALOGUE_LIST[i], "\t", len(self.usable_templates[i]), "\t", self.is_usable[i], "\t",
-        #           self.frequency_count[i])
 
         print("move", "\t", "is_usable")
         for i in range(len(DIALOGUE_LIST)):

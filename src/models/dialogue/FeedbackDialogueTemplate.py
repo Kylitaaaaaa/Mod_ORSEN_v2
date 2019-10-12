@@ -39,6 +39,3 @@ class FeedbackDialogueTemplate(DialogueTemplate):
     def get_template_to_use(self):
         # check if it has usable templates
         return []
-
-    # def is_usable(self, to_check=[]):
-    #     pass

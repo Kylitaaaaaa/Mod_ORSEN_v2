@@ -25,31 +25,7 @@ class DialogueTemplate(ABC):
             self.dbo_concept = DBOConceptLocalImpl()
         else:
             self.dbo_concept = DBOConceptGlobalImpl()
-            # self.dbo_concept_global = DBOConceptGlobalImpl()
         self.relations_blanks = []
-
-    # def __str__(self):
-    #     my_string = "=====================\n"
-    #     my_string = my_string + "(%s) %s: %s\n" % (self.dialogue_type, self.id, self.template)
-    #     my_string = my_string + "=====================\n"
-    #
-    #     my_string = "RELATIONS"
-    #     for X in self.relation:
-    #         my_string = my_string + "%s \n" % self.relation
-    #
-    #     my_string = "BLANKS"
-    #     for X in self.blanks:
-    #         my_string = my_string + "%s \n" % self.blanks
-    #
-    #     my_string = "NODES"
-    #     for X in self.nodes:
-    #         my_string = my_string + "%s \n" % self.nodes
-    #
-    #     my_string = "DEPENDENT NODES"
-    #     for X in self.blanks:
-    #         my_string = my_string + "%s \n" % self.dependent_nodes
-    #
-    #     return my_string
 
     def full_string(self):
         my_string = "(%s) %s" % (self.dialogue_type, self.get_string_response())
@@ -63,11 +39,9 @@ class DialogueTemplate(ABC):
 
     def fill_blanks(self, event):
         pass
-        
-    
+
     def get_string_response(self):
         return "".join(self.template)
-
 
     def __str__(self):
         str = "(%s) %s" % (self.dialogue_type, self.get_string_response())
@@ -75,7 +49,6 @@ class DialogueTemplate(ABC):
 
     def get_type(self):
         return self.dialogue_type
-
 
     def is_usable(self, curr_event, num_usage):
         decision = False
@@ -89,7 +62,6 @@ class DialogueTemplate(ABC):
                 if len(self.blanks) == 0:
                     return True
                 elif len(self.blanks) == 1:
-                    # if self.is_usable_1_relation(self.relation[0][1], curr_event):
                     if self.is_usable_1_relation(curr_event):
                         decision = True
                 else:
@@ -100,7 +72,7 @@ class DialogueTemplate(ABC):
 
 
     def is_usable_relation(self, curr_event):
-        # putangina 5 hours ko to ginawa
+        # putangina 16 hours ko to ginawa
         blank_list = []
 
         for i in range (len(self.blanks)):
@@ -114,37 +86,18 @@ class DialogueTemplate(ABC):
                 temp_list = self.dbo_concept.get_concept_by_second_relation(self.relation[i][1], self.relation[i][2])
             else:
                 #check <index> <relation> <index>
-                # print("this is the blank_list")
-                # for X in blank_list:
-                #     print(X)
-
-                # print("this is the relation[i]")
-                # print(self.relation[i])
                 temp_list = self.get_rel_list(blank_list, self.relation[i])
 
             if len(temp_list) > 0:
-                # print("ADDING TO blank_list")
-                # print("this is the before blank_list")
-                # for X in blank_list:
-                #     print(X)
-
                 blank_list = self.update_list(blank_list, temp_list)
-
-                # print("this is the after blank_list")
-                # for X in blank_list:
-                #     print(X)
             else:
-                print("NO RELATIONS FOUND IM SORRY")
+                print("NO RELATIONS FOUND")
                 return False
         if len(blank_list) > 0:
             self.relations_blanks = blank_list
-
-            print("I FOUND THE RELATIONS")
-            for X in blank_list:
-                print(X)
-            return  True
+            return True
         else:
-            print("NO RELATIONS FOUND IM SORRY")
+            print("NO RELATIONS FOUND")
         return False
 
     def update_list(self, init_list, to_add_list):
@@ -189,7 +142,6 @@ class DialogueTemplate(ABC):
             if len(X) > int(relation[0]) - 1:
                 print("X len is: ", len(X))
                 curr_refer = X[int(relation[0]) - 1]
-
 
                 if type(curr_refer) == Character or type(curr_refer) == Object:
                     print("testing: ", curr_refer.name)
@@ -247,10 +199,6 @@ class DialogueTemplate(ABC):
                     word_rel.append(Relation(first=first_val, relation=X[1], second=second_val))
 
         return word_rel
-
-
-
-
 
     @staticmethod
     @abstractmethod

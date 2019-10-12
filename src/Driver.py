@@ -119,8 +119,8 @@ Logger.setup_loggers()
 
 #Retrieve User Details --- User objects
 print("---------Retrieving User Details---------")
-# login_signup()
-# print("done")
+login_signup()
+print("done")
 
 
 print("---------Launching ORSEN---------")
@@ -129,7 +129,7 @@ orsen = ORSEN()
 # test_sentence = "My mother's name is Sasha, she likes dogs."
 # test_sentence = "John kicked the ball."
 # test_sentence = "The ball was kicked by John."
-test_sentence = "John the mighty is a brave, strong warrior"
+# test_sentence = "John the mighty is a brave, strong warrior"
 # test_sentence = "Once there was a boy"
 
 # orsen_response = orsen.get_response(test_sentence)
