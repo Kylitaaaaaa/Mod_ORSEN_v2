@@ -1,9 +1,10 @@
 import abc
 from abc import ABC, abstractmethod
-from src.dbo.concept import DBOConceptGlobalImpl
+from src.dbo.concept import DBOConceptGlobalImpl, DBOConceptLocalImpl
 
 from src import *
 from src.models.elements import Character, Object
+from src.models.nlp import Relation
 
 
 class DialogueTemplate(ABC):
@@ -19,7 +20,12 @@ class DialogueTemplate(ABC):
         self.dependent_nodes = dependent_nodes
         self.is_move_usable = False
 
-        self.dbo_concept_global = DBOConceptGlobalImpl()
+
+        if dialogue_type == DIALOGUE_TYPE_SUGGESTING:
+            self.dbo_concept = DBOConceptLocalImpl()
+        else:
+            self.dbo_concept = DBOConceptGlobalImpl()
+            # self.dbo_concept_global = DBOConceptGlobalImpl()
         self.relations_blanks = []
 
     # def __str__(self):
@@ -105,7 +111,7 @@ class DialogueTemplate(ABC):
                 temp_list = self.get_element_list(self.blanks[i], curr_event)
             elif self.blanks[i] == 'IsA':
                 # check <index> <isA> weekday
-                temp_list = self.dbo_concept_global.get_concept_by_second_relation(self.relation[i][1], self.relation[i][2])
+                temp_list = self.dbo_concept.get_concept_by_second_relation(self.relation[i][1], self.relation[i][2])
             else:
                 #check <index> <relation> <index>
                 # print("this is the blank_list")
@@ -170,7 +176,7 @@ class DialogueTemplate(ABC):
         updated_list = []
         for X in element_list:
             concept_list = []
-            concept_list = self.dbo_concept_global.get_specific_concept(X.name, 'IsA', element_type)
+            concept_list = self.dbo_concept.get_specific_concept(X.name, 'IsA', element_type)
             if concept_list is not None:
                 updated_list.append(X)
 
@@ -187,10 +193,10 @@ class DialogueTemplate(ABC):
 
                 if type(curr_refer) == Character or type(curr_refer) == Object:
                     print("testing: ", curr_refer.name)
-                    temp_list.append(self.dbo_concept_global.get_concept_by_second_relation(curr_refer.name, relation[1]))
+                    temp_list.append(self.dbo_concept.get_concept_by_second_relation(curr_refer.name, relation[1]))
                 else:
                     print("testing: ", curr_refer.first)
-                    temp_list.append(self.dbo_concept_global.get_concept_by_second_relation(curr_refer.first, relation[1]))
+                    temp_list.append(self.dbo_concept.get_concept_by_second_relation(curr_refer.first, relation[1]))
 
         return temp_list
 
@@ -213,6 +219,35 @@ class DialogueTemplate(ABC):
             if len(curr_event.get_objects_involved()) > 0:
                 return True
             return False
+
+    def get_word_relations(self):
+        word_rel = []
+        if len(self.relations_blanks) > 0:
+            for X in self.relation:
+                #get first val
+                if type(self.relations_blanks[X[0]-1]) == Character or type(self.relations_blanks[X[0]-1]) == Object:
+                    first_val = self.relations_blanks[X[0]-1].name
+                else:
+                    first_val = self.relations_blanks[X[0] - 1].first
+
+                if X[1] == 'Object':
+                    word_rel.append(Relation(first = first_val.name, relation = 'IsA', second = 'object'))
+                elif X[1] == 'Character':
+                    word_rel.append(Relation(first=first_val.name, relation='IsA', second='character'))
+                elif X[1] == 'IsA':
+                    word_rel.append(Relation(first=first_val.first, relation='IsA', second=X[2]))
+                else:
+                    # get second val
+                    if type(self.relations_blanks[X[2] - 1]) == Character or type(
+                            self.relations_blanks[X[2] - 1]) == Object:
+                        second_val = self.relations_blanks[X[2] - 1].name
+                    else:
+                        second_val = self.relations_blanks[X[2] - 1].first
+
+                    word_rel.append(Relation(first=first_val, relation=X[1], second=second_val))
+
+        return word_rel
+
 
 
 

@@ -70,6 +70,8 @@ class DialoguePlanner:
             self.chosen_dialogue_template = self.usable_templates[self.chosen_move_index]
 
             # add chosen dialogue move to dialogue history TODO call DialogueTemplateBuilder
+            print("CHOSEN DIALOGUE TEMPLATE: ", type(self.chosen_dialogue_template))
+            print(self.chosen_dialogue_template)
             self.dialogue_history.append(DialogueHistoryTemplate(dialogue_type=self.chosen_dialogue_move))
             self.print_dialogue_list()
 
@@ -78,6 +80,8 @@ class DialoguePlanner:
             self.chosen_dialogue_template = self.get_usable_templates(dialogue_move)
 
         return self.chosen_dialogue_move
+
+
 
     def setup_templates_is_usable(self):
         self.init_set_dialogue_moves_usable()
@@ -145,7 +149,7 @@ class DialoguePlanner:
                 return False
         return True
 
-    def get_usable_templates(self, move_to_execute):
+    def  get_usable_templates(self, move_to_execute):
         usable_template_list = []
 
         template_list = self.dialogue_template.get_templates_of_type(move_to_execute)

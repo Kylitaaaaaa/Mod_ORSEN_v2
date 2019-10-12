@@ -1,5 +1,6 @@
-from . import DialogueTemplate
+from src.models.dialogue import DialogueTemplate
 from src.constants import DIALOGUE_TYPE_SUGGESTING
+import copy
 
 
 class SuggestingDialogueTemplate(DialogueTemplate):
@@ -8,13 +9,20 @@ class SuggestingDialogueTemplate(DialogueTemplate):
         DialogueTemplate.__init__(self, id, DIALOGUE_TYPE_SUGGESTING, template, relation, blanks, nodes, dependent_nodes);
 
     def fill_blank(self, fill):
-        # TODO fix fill_blank implementation
+        response = copy.deepcopy(self.template)
 
-        for i in range(len(self.template)):
-            for j in range(len(self.nodes)):
-                if self.template[i] == self.node[j]:
-                    self.template[i] = fill
-                    break
+        for i in range(len(self.dependent_nodes)):
+            to_insert = ""
+            if self.dependent_nodes[i] is not None:
+                curr_index = response.index(self.dependent_nodes[i])
+                if self.blanks[i] == 'Object' or 'Character':
+                    to_insert = self.relations_blanks[i].name
+                else:
+                    to_insert = self.relations_blanks[i].first
+
+                response[curr_index] = to_insert
+        response.insert(0, "What if ")
+        return response
 
     def is_usable(self, to_check=[]):
         # TODO fix fill_blank implementation
