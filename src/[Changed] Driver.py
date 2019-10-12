@@ -87,7 +87,6 @@ def clean_user_input(response):
 
     return response
 
-
 def start_storytelling():
     is_end_story = False
     while not is_end_story:

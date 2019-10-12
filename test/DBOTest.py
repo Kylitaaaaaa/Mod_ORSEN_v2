@@ -73,7 +73,7 @@ from src import DialogueTemplateBuilder
 # # for t in templates:
 # #     print(t)
 
-concept_manager = DBOConceptGlobalImpl()
-concepts = concept_manager.get_random_concept()
-for concept in concepts:
-    print(concept)
+# concept_manager = DBOConceptGlobalImpl()
+# concepts = concept_manager.get_random_concept()
+# for concept in concepts:
+#    print(concept)

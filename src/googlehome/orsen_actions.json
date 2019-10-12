@@ -1,0 +1,56 @@
+{
+  "actions": [
+    {
+      "description": "Default Welcome Intent",
+      "name": "MAIN",
+      "fulfillment": {
+        "conversationName": "welcome"
+      },
+      "intent": {
+        "name": "actions.intent.MAIN",
+		"trigger": {
+          "queryPatterns": [
+			"let me talk to Orsen",
+            "talk to Orsen",
+			"call Orsen",
+			"let me talk to Orson",
+            "talk to Orson",
+			"call Orson",
+			"let me talk to Arson",
+            "talk to Arson",
+			"call Arson",
+			"let me talk to Arsen",
+            "talk to Arsen",
+			"call Arsen",
+			"I want to tell a story",
+			"I want to make a story",
+			"I like to make a story",
+			"I like to tell a story"
+          ]
+        }
+      }
+    }
+  ],
+  "conversations": {
+    "welcome": {
+      "name": "welcome",
+      "url": "https://01de5ec0.ngrok.io/orsen",
+      "fulfillmentApiVersion": 2,
+	  "inDialogIntents": [
+      {
+        "name": "actions.intent.NO_INPUT"
+      }
+    ]
+    },
+    "rawInput": {
+      "name": "rawInput",
+      "url": "https://01de5ec0.ngrok.io/orsen",
+      "fulfillmentApiVersion": 2,
+	  "inDialogIntents": [
+      {
+        "name": "actions.intent.NO_INPUT"
+      }
+    ]
+    }
+  }
+}
