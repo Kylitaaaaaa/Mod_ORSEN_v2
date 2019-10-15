@@ -119,8 +119,8 @@ Logger.setup_loggers()
 
 #Retrieve User Details --- User objects
 print("---------Retrieving User Details---------")
-login_signup()
-print("done")
+# login_signup()
+# print("done")
 
 
 print("---------Launching ORSEN---------")

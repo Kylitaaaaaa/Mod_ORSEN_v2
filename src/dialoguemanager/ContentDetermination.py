@@ -27,6 +27,7 @@ class ContentDetermination:
         #choose template
         chosen_template = self.choose_template()
         print("CHOSEN TEMPLATE IS: ", chosen_template)
+        print("TEMPLATE IS: ", chosen_template.template)
 
         #fill template to use
         if len(chosen_template.template) == 1:
@@ -34,6 +35,8 @@ class ContentDetermination:
         else:
             response = chosen_template.fill_blanks(self.curr_event)
 
+        print("response is: ")
+        print(response)
         if type(response) is not type("dump"):
             str_response = ' '.join(response)
             # TODO replace multiple occurences of spaces with only one space.

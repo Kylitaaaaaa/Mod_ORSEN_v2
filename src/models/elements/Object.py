@@ -9,33 +9,40 @@ class Object:
         self.name = name
         self.type = type
         self.attribute = attribute
-        self.in_setting = in_setting
+        # if type(in_setting) != list:
+        if not isinstance(in_setting, list):
+            self.in_setting = []
+            if in_setting.strip() is not '':
+                self.in_setting.append(in_setting)
+        else:
+            self.in_setting = in_setting
         self.mention_count = mention_count
 
     def add_in_setting(self, setting):
-        self.in_setting.add(setting)
+        self.in_setting.append(setting)
 
     def __str__(self):
-        my_string = "Entity " + self.id + " (" + self.name + ")\n" 
-        
+        my_string = "Entity " + self.id + " (" + self.name + ")\n"
+
         print(" Attribute:")
         for a in self.attribute:
             my_string = my_string + "\t" + str(a) + "\n"
-        
+
         print(" Type: ")
         for t in self.type:
             my_string = my_string + "\t" + str(t) + "\n"
-        
+
         print(" Places: ")
+        print(self.in_setting)
         for s in self.in_setting:
             my_string = my_string + "\t" + s.value + "\n"
-#        if not self.in_setting:
-#            for s in self.in_setting:
-#                my_string = my_string = str(s) + "\n"
-#        else:
-#            my_string = my_string = "Not presented in any settings so far\n"
+        #        if not self.in_setting:
+        #            for s in self.in_setting:
+        #                my_string = my_string = str(s) + "\n"
+        #        else:
+        #            my_string = my_string = "Not presented in any settings so far\n"
         my_string = my_string + "Times mentioned: " + str(self.mention_count)
-                    
+
         return my_string.strip()
 
     @staticmethod
@@ -75,12 +82,11 @@ class Object:
             if a.relation == IS_A:
                 entity_types.append(a)
 
-
-        new_object = Object(id = entity_text,
-                            name = entity_text,
-                            type = entity_types,
-                            attribute = attribute,
-                            in_setting= in_setting,
-                            mention_count = mention_count)
+        new_object = Object(id=entity_text,
+                            name=entity_text,
+                            type=entity_types,
+                            attribute=attribute,
+                            in_setting=in_setting,
+                            mention_count=mention_count)
 
         return new_object

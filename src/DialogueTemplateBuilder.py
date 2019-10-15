@@ -38,5 +38,26 @@ class DialogueTemplateBuilder:
 
       elif dialogue_type == DIALOGUE_TYPE_INPUT_MISHEARD:
          return InputMisheardDialogueTemplate(id, templates, relations, blanks, nodes, dependent_nodes)
+
+
+      elif dialogue_type == DIALOGUE_TYPE_C_PUMPING:
+         return CPumpingDialogueTemplate(id, templates, relations, blanks, nodes, dependent_nodes)
+      elif dialogue_type == DIALOGUE_TYPE_D_CORRECTING:
+         return DCorrectingDialogueTemplate(id, templates, relations, blanks, nodes, dependent_nodes)
+      elif dialogue_type == DIALOGUE_TYPE_D_PRAISE:
+         return DPraiseDialogueTemplate(id, templates, relations, blanks, nodes, dependent_nodes)
+      elif dialogue_type == DIALOGUE_TYPE_D_PUMPING:
+         return DPumpingDialogueTemplate(id, templates, relations, blanks, nodes, dependent_nodes)
+      elif dialogue_type == DIALOGUE_TYPE_E_LABEL:
+         return ELabelDialogueTemplate(id, templates, relations, blanks, nodes, dependent_nodes)
+      elif dialogue_type == DIALOGUE_TYPE_E_PUMPING:
+         return EPumpingDialogueTemplate(id, templates, relations, blanks, nodes, dependent_nodes)
+      elif dialogue_type == DIALOGUE_TYPE_EVALUATION:
+         return EvaluationDialogueTemplate(id, templates, relations, blanks, nodes, dependent_nodes)
+      elif dialogue_type == DIALOGUE_TYPE_RECOLLECTION:
+         return RecollectionDialogueTemplate(id, templates, relations, blanks, nodes, dependent_nodes)
+
+
+
       else:
          return UnknownDialogueTemplate(id, templates, relations, blanks, nodes, dependent_nodes)

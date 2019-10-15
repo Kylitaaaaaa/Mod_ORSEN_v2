@@ -171,6 +171,12 @@ class DialogueTemplate(ABC):
             if len(curr_event.get_objects_involved()) > 0:
                 return True
             return False
+        elif blank_type == 'Emotion':
+            print("EMOTION IS PRESENT: ", curr_event.emotion)
+            if curr_event.emotion is not "":
+                return True
+        return False
+
 
     def get_word_relations(self):
         word_rel = []

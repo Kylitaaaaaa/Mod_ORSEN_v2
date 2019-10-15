@@ -227,6 +227,35 @@ class DBOConcept(ABC):
             concepts.append(self.concept_type(*r))
         return concepts
 
+    """
+            General code to get a concept based on the word-word pairing in a given concept. 
+
+            Input:  first word, second word
+            Output: Concept object based on concept type
+        """
+
+    def get_related_concepts(self, first, second):
+        q = Query \
+            .from_(self.table_reference) \
+            .select("*") \
+            .where(
+            (self.table_reference.first == first) & (
+                    self.table_reference.second == second)
+        )
+
+        query = q.get_sql()
+        query = query.replace("\"", "")
+        print(query)
+
+        result = SQLExecuter.execute_read_query(query, FETCH_ONE)
+        print("RESULT IS THIS:", result)
+        if result is None or not result: return None
+
+        concept = self.concept_type(*result)
+
+        return concept
+
+
     @abstractmethod
     def add_concept(self, concept):
         pass

@@ -14,8 +14,14 @@ class World:
     # The sequence of events used to store the event frames
     event_chains = []
 
-    # The temporary event chain that contains the events from the last dialogue entered by the user.
-    curr_event = []
+    # The temporary event that contains the last event from the last dialogue entered by the user.
+    curr_event = None
+
+    #EDEN: Temporary event with emotions
+    curr_emotion_event = None
+
+    # The temporary event chain that contains the events from the last dialogue entered by the user
+    last_fetched = []
 
     # The previous sentences used to build the event chains
     sentence_references = []
@@ -29,6 +35,9 @@ class World:
         self.event_chains = event_chains
         self.sentence_references = sentence_references
         self.dialogue_move_history = dialogue_move_history
+        self.curr_event = None
+        self.curr_emotion_event = None
+        self.last_fetched = []
 
     def add_event(self, event, sentence):
         event.sequence_number = len(self.event_chains) + 1
@@ -37,6 +46,7 @@ class World:
         self.sentence_references.append(sentence)
 
         self.curr_event = event
+
 
     def add_character(self, character):
         self.characters.append(character)

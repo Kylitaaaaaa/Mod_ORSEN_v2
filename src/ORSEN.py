@@ -8,6 +8,7 @@ from . import Logger
 from src.textunderstanding.InputDecoder import InputDecoder
 from src.dialoguemanager import *
 from src.models.events import *
+from EDEN.OCC import OCCManager
 
 
 class ORSEN:
@@ -21,6 +22,9 @@ class ORSEN:
         self.dialogue_planner = DialoguePlanner()
         self.content_determination = ContentDetermination()
         self.initialize_story_prerequisites()
+
+        ###EDEN
+        self.occ_manager = OCCManager()
 
     def initialize_story_prerequisites(self):
         self.world = World()
@@ -51,6 +55,8 @@ class ORSEN:
         """"
         Check for trigger phrases 
         """""
+
+
         triggered_move = self.dialogue_planner.check_trigger_phrases(response, self.world.event_chains) #TODO: REMOVE AFTER TESTING
 
         if triggered_move is None:
@@ -61,13 +67,21 @@ class ORSEN:
             """""
             ORSEN.perform_text_understanding(self, response)
 
-            """" 
-            Executing Dialogue Manager 
-            """""
-            result = ORSEN.perform_dialogue_manager(self)
+            curr_emotion_event = self.get_emotion(response)
+            result = None
+            if curr_emotion_event is not None:
+                self.world.curr_emotion_event = curr_emotion_event
+                triggered_move = self.dialogue_planner.get_next_eden_move(curr_emotion_event)
+                if triggered_move is not None:
+                    result = ORSEN.perform_dialogue_manager(self, triggered_move)
+            if result is None:
+                """" 
+                Executing Dialogue Manager 
+                """""
+                result = ORSEN.perform_dialogue_manager(self)
 
         else:
-            #TODO: insert KA stuff here
+            """ORSEN 2"""
             if triggered_move == DIALOGUE_TYPE_SUGGESTING_AFFIRM:
                 #add score then general pumping
                 last_dialogue = self.dialogue_planner.get_last_dialogue_move()
@@ -88,7 +102,6 @@ class ORSEN:
                     for X in last_dialogue.word_relation:
                         self.extractor.remove_relation_to_concepts_if_not_valid(X)
                 triggered_move = DIALOGUE_TYPE_PUMPING_GENERAL
-
             elif triggered_move == DIALOGUE_TYPE_PUMPING_SPECIFIC:
                 self.world.curr_event = self.world.event_chains[len(self.world.event_chains)-1]
 
@@ -256,15 +269,20 @@ class ORSEN:
 
         for i in range(len(current_event_list)):
             self.world.add_event(current_event_list[i], current_sentence_list[i])
+        self.world.last_fetched = current_event_list
 
         for i in range(len(current_setting_list)):
             self.world.add_setting(setting)
 
     def perform_dialogue_manager(self, move_to_execute=""):
         # curr_event = None
-        curr_event = self.world.curr_event
-        print("THIS IS THE CURRENT EVENT")
-        print(curr_event)
+        if self.world.curr_emotion_event is not None:
+            curr_event = self.world.curr_emotion_event
+        else:
+            curr_event = self.world.curr_event
+
+
+
         self.dialogue_planner.set_state(curr_event, self.world.get_num_action_events())
 
         # move_to_execute == DIALOGUE_TYPE_HINTING #TODO remove if done
@@ -304,4 +322,19 @@ class ORSEN:
             response = response + to_insert
         return response
 
+    def get_emotion(self, response):
+        #returns only the first emotion detected
+        emotions_found = []
+        for curr_event in self.world.last_fetched:
+            print("THIS IS THE CURRENT EVENT")
+            print(curr_event)
+            if curr_event.type == EVENT_ACTION:
+                print("========== TRYING TO GET EMOTION ========== ")
+
+                emotions_found.append(self.occ_manager.get_occ_emotion(curr_event, response))
+        if len(emotions_found) != 0:
+            print("========== EMOTION FOUND IS: ", emotions_found, " ========== ")
+            return emotions_found[len(emotions_found)-1]
+        print("========== NO EMOTION FOUND ========== ")
+        return None
 
