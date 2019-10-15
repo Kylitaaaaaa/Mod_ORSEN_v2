@@ -215,12 +215,20 @@ class DialoguePlanner:
         return valid_moves
 
     ###checks only dialogue that does not need to go through text understanding
-    def check_trigger_phrases(self, response, event_chain):
-        response = response.lower()
+    def check_trigger_phrases(self, response, event_chain, curr_event):
+        if response in PUMPING_TRIGGER:
+            if len(event_chain) > 0:
+                return DIALOGUE_TYPE_PUMPING_SPECIFIC
+            return DIALOGUE_TYPE_PROMPT
+        elif response in PROMPT_TRIGGER:
+            return DIALOGUE_TYPE_PROMPT
 
-        #get latest dialogue move
+        return self.check_based_prev_move(response, curr_event)
+
+
+
+    def check_based_prev_move(self, response, curr_event):
         last_move = self.get_last_dialogue_move()
-
         if last_move is not None:
             print("LAST MOVE IS: ", last_move.dialogue_type)
             ###START EDEN
@@ -230,23 +238,27 @@ class DialoguePlanner:
                     return DIALOGUE_TYPE_C_PUMPING
                 else:
                     return DIALOGUE_TYPE_E_PUMPING
-                # elif last_move.dialogue_type == DIALOGUE_TYPE_E_PUMPING:
-                #     return DIALOGUE_TYPE_C_PUMPING
-                # elif last_move.dialogue_type == DIALOGUE_TYPE_C_PUMPING:
-                #     #check if emotion is + or -
-                #     if curr_emotion.get_emotion_type == EMOTION_TYPE_POSITIVE:
-                #         return DIALOGUE_TYPE_D_PRAISE
-                #     else:
-                #         return DIALOGUE_TYPE_D_CORRECTING
+            elif last_move.dialogue_type == DIALOGUE_TYPE_E_PUMPING:
+                return DIALOGUE_TYPE_C_PUMPING
+            elif last_move.dialogue_type == DIALOGUE_TYPE_C_PUMPING:
+                #check if emotion is + or -
+                if curr_event.emotion is not None:
+                    print("EMOTION TYPE OF ", curr_event.emotion)
+                    print(" IS: ", curr_event.get_emotion_type())
+                    if curr_event.get_emotion_type() == EMOTION_TYPE_POSITIVE:
+                        # return DIALOGUE_TYPE_D_PRAISE
+                        return DIALOGUE_TYPE_EVALUATION
+                    else:
+                        return DIALOGUE_TYPE_D_CORRECTING
             elif last_move.dialogue_type == DIALOGUE_TYPE_D_CORRECTING:
                 if response in IS_AFFIRM:
                     return DIALOGUE_TYPE_EVALUATION
                 else:
                     return DIALOGUE_TYPE_D_PUMPING
-                # elif last_move.dialogue_type == DIALOGUE_TYPE_D_PUMPING:
-                #     return DIALOGUE_TYPE_EVALUATION
-                # elif last_move.dialogue_type == DIALOGUE_TYPE_EVALUATION:
-                #     return DIALOGUE_TYPE_RECOLLECTION
+            elif last_move.dialogue_type == DIALOGUE_TYPE_D_PUMPING:
+                return DIALOGUE_TYPE_EVALUATION
+            elif last_move.dialogue_type == DIALOGUE_TYPE_EVALUATION:
+                return DIALOGUE_TYPE_RECOLLECTION
 
             ###END EDEN
 
@@ -265,13 +277,67 @@ class DialoguePlanner:
 
         else:
             print("NO PREVIOUS DIALOGUE")
-        if response in PUMPING_TRIGGER:
-            if len(event_chain) > 0:
-                return DIALOGUE_TYPE_PUMPING_SPECIFIC
-            return DIALOGUE_TYPE_PROMPT
-        elif response in PROMPT_TRIGGER:
-            return DIALOGUE_TYPE_PROMPT
         return None
+
+
+    # ###checks only dialogue that does not need to go through text understanding
+    # def check_trigger_phrases(self, response, event_chain):
+    #     response = response.lower()
+    #
+    #     #get latest dialogue move
+    #     last_move = self.get_last_dialogue_move()
+    #
+    #     if last_move is not None:
+    #         print("LAST MOVE IS: ", last_move.dialogue_type)
+    #         ###START EDEN
+    #         #check if last move is eden
+    #         if last_move.dialogue_type == DIALOGUE_TYPE_E_LABEL:
+    #             if response in IS_AFFIRM:
+    #                 return DIALOGUE_TYPE_C_PUMPING
+    #             else:
+    #                 return DIALOGUE_TYPE_E_PUMPING
+    #             # elif last_move.dialogue_type == DIALOGUE_TYPE_E_PUMPING:
+    #             #     return DIALOGUE_TYPE_C_PUMPING
+    #             # elif last_move.dialogue_type == DIALOGUE_TYPE_C_PUMPING:
+    #             #     #check if emotion is + or -
+    #             #     if curr_emotion.get_emotion_type == EMOTION_TYPE_POSITIVE:
+    #             #         return DIALOGUE_TYPE_D_PRAISE
+    #             #     else:
+    #             #         return DIALOGUE_TYPE_D_CORRECTING
+    #         elif last_move.dialogue_type == DIALOGUE_TYPE_D_CORRECTING:
+    #             if response in IS_AFFIRM:
+    #                 return DIALOGUE_TYPE_EVALUATION
+    #             else:
+    #                 return DIALOGUE_TYPE_D_PUMPING
+    #             # elif last_move.dialogue_type == DIALOGUE_TYPE_D_PUMPING:
+    #             #     return DIALOGUE_TYPE_EVALUATION
+    #             # elif last_move.dialogue_type == DIALOGUE_TYPE_EVALUATION:
+    #             #     return DIALOGUE_TYPE_RECOLLECTION
+    #
+    #         ###END EDEN
+    #
+    #         # check if prev move is suggestion
+    #         if last_move.dialogue_type == DIALOGUE_TYPE_SUGGESTING:
+    #             if response in IS_AFFIRM:
+    #                 return DIALOGUE_TYPE_SUGGESTING_AFFIRM
+    #             elif response in IS_DENY:
+    #                 return DIALOGUE_TYPE_FOLLOW_UP
+    #         #check if prev move is follow up
+    #         elif last_move.dialogue_type == DIALOGUE_TYPE_FOLLOW_UP:
+    #             if response in IS_DONT_LIKE:
+    #                 return DIALOGUE_TYPE_FOLLOW_UP_DONT_LIKE
+    #             if response in IS_WRONG:
+    #                 return DIALOGUE_TYPE_FOLLOW_UP_WRONG
+    #
+    #     else:
+    #         print("NO PREVIOUS DIALOGUE")
+    #     if response in PUMPING_TRIGGER:
+    #         if len(event_chain) > 0:
+    #             return DIALOGUE_TYPE_PUMPING_SPECIFIC
+    #         return DIALOGUE_TYPE_PROMPT
+    #     elif response in PROMPT_TRIGGER:
+    #         return DIALOGUE_TYPE_PROMPT
+    #     return None
 
 
     def set_template_details_history(self, chosen_template):

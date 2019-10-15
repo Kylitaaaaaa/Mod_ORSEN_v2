@@ -107,6 +107,7 @@ def start_storytelling():
             print("ORSEN:", orsen_response)
             Logger.log_conversation("ORSEN: " + str(orsen_response))
         else:
+            """ORSEN"""
             print("Thank you for the story! Do you want to hear it again?")
             user_input = get_input()
             if user_input.lower() in IS_AFFIRM:

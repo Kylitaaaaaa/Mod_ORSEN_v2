@@ -56,10 +56,16 @@ class ORSEN:
         Check for trigger phrases 
         """""
 
+        triggered_move = None
 
-        triggered_move = self.dialogue_planner.check_trigger_phrases(response, self.world.event_chains) #TODO: REMOVE AFTER TESTING
+        if self.world.curr_emotion_event is None:
+            triggered_move = self.dialogue_planner.check_trigger_phrases(response, self.world.event_chains, self.world.curr_event)
+        else:
+            triggered_move = self.dialogue_planner.check_trigger_phrases(response, self.world.event_chains,
+                                                                         self.world.curr_emotion_event)
 
         if triggered_move is None:
+            print("NO MOVE TRIGGERED")
             #if not pump
             """"
             Executes text understanding part. This includes the extraction of important information in the text input 
@@ -71,9 +77,8 @@ class ORSEN:
             result = None
             if curr_emotion_event is not None:
                 self.world.curr_emotion_event = curr_emotion_event
-                triggered_move = self.dialogue_planner.get_next_eden_move(curr_emotion_event)
-                if triggered_move is not None:
-                    result = ORSEN.perform_dialogue_manager(self, triggered_move)
+                result = ORSEN.perform_dialogue_manager(self, DIALOGUE_TYPE_E_LABEL)
+
             if result is None:
                 """" 
                 Executing Dialogue Manager 
@@ -81,6 +86,12 @@ class ORSEN:
                 result = ORSEN.perform_dialogue_manager(self)
 
         else:
+            print("TRIGGERED MOVE IS: ", triggered_move)
+            """EDEN"""
+            if triggered_move in [DIALOGUE_TYPE_C_PUMPING, DIALOGUE_TYPE_D_PRAISE, DIALOGUE_TYPE_D_CORRECTING, DIALOGUE_TYPE_EVALUATION, DIALOGUE_TYPE_RECOLLECTION]:
+                ORSEN.perform_text_understanding(self, response)
+                result = ORSEN.perform_dialogue_manager(self, triggered_move)
+
             """ORSEN 2"""
             if triggered_move == DIALOGUE_TYPE_SUGGESTING_AFFIRM:
                 #add score then general pumping
@@ -301,6 +312,9 @@ class ORSEN:
         print("CHOSEN TEMPLATE: ", type(chosen_template))
         print(chosen_template)
 
+        if move_to_execute == DIALOGUE_TYPE_RECOLLECTION:
+            response = response + self.repeat_story()
+
         self.dialogue_planner.set_template_details_history(chosen_template)
 
 
@@ -321,6 +335,7 @@ class ORSEN:
             to_insert = to_insert + ". "
             response = response + to_insert
         return response
+
 
     def get_emotion(self, response):
         #returns only the first emotion detected
