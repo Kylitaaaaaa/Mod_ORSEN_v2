@@ -291,17 +291,45 @@ class ORSEN:
     def repeat_story(self):
         response = ""
         for event in self.world.event_chains:
-            to_insert = event.subject.name + " "
+            to_insert = ""
+            
             if event.get_type() == EVENT_ACTION:
-                to_insert = to_insert + str(event.verb)
+                
+                to_insert = str(event.subject.name) + " "
+                to_insert += str(event.verb.lemma_)
+                
+                if event.direct_object is not None:
+                    to_insert += " " + str(event.direct_object.name)
+                
+                if event.adverb is not None:
+                    to_insert += " " + str(event.adverb)
+                
+                if str(event.preposition).strip() != "":
+                    to_insert += " " + str(event.preposition)
+                    
+                if str(event.object_of_preposition).strip() != "":
+                    to_insert += " " + str(event.object_of_preposition)
+                
             elif event.get_type() == EVENT_CREATION:
-                to_insert = event.subject.name
+                
+                to_insert = "Entity " + str(event.subject.name) + " is introduced"
+                
             elif event.get_type() == EVENT_DESCRIPTION:
+                
+                to_insert = str(event.subject.name) + " is described as "
                 # Iterate through attributes
-                for X in event.attributes:
-                    to_insert = to_insert + X.keyword + " " + str(X.description.lemma_)
-            to_insert = to_insert + ". "
+                for i in range(len(event.attributes)):
+                    attribute = event.attributes[i]
+                    to_insert += str(attribute.description.lemma_)
+                    if i == len(event.attributes) - 1 :
+                        pass
+                    else:
+                        to_insert += ", "
+            
+            to_insert = to_insert.strip() + ". "
+            to_insert = to_insert.capitalize()
             response = response + to_insert
+            
         return response
 
 

@@ -1,5 +1,6 @@
 import datetime
 import logging
+import os
 
 from src.constants import CONVERSATION_LOG, INFORMATION_EXTRACTION_LOG, DIALOGUE_MODEL_LOG, EVENT_CHAIN_LOG
 class Logger:
@@ -10,10 +11,12 @@ class Logger:
     @staticmethod
     def setup_loggers():
         date = datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S")
-        Logger.__setup_logger__(CONVERSATION_LOG, '../logs/conversation/' + date + '.txt')
-        Logger.__setup_logger_basic__(INFORMATION_EXTRACTION_LOG, '../logs/information extraction/' + date + '.txt')
-        Logger.__setup_logger_basic__(DIALOGUE_MODEL_LOG, '../logs/dialogue model/' + date + '.txt')
-        Logger.__setup_logger_basic__(EVENT_CHAIN_LOG, '../logs/event chain/' + date + '.txt')
+        ROOT_DIR = os.path.dirname(os.path.abspath(__file__)) # This is your Project Root
+
+        Logger.__setup_logger__(CONVERSATION_LOG, ROOT_DIR+'/../logs/conversation/' + date + '.txt')
+        Logger.__setup_logger_basic__(INFORMATION_EXTRACTION_LOG, ROOT_DIR+'/../logs/information extraction/' + date + '.txt')
+        Logger.__setup_logger_basic__(DIALOGUE_MODEL_LOG, ROOT_DIR+'/../logs/dialogue model/' + date + '.txt')
+        Logger.__setup_logger_basic__(EVENT_CHAIN_LOG, ROOT_DIR+'/../logs/event chain/' + date + '.txt')
 
     @staticmethod
     def __setup_logger__(name, log_file, level=logging.INFO):
