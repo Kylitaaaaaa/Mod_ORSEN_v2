@@ -52,16 +52,21 @@ class NRC_Emotion:
         self.positive_sense_count = self.joy + self.anticip + self.trust + self.surpise
         self.negative_sense_count = self.anger + self.sadness + self.fear + self.disgust
 
-        self.prior_valence = ((self.positive_sense_count - self.negative_sense_count) / (
-                    self.positive_sense_count + self.negative_sense_count)) * 5
+        if self.positive_sense_count + self.negative_sense_count > 0:
+            self.prior_valence = ((self.positive_sense_count - self.negative_sense_count) / (
+                        self.positive_sense_count + self.negative_sense_count)) * 5
+            self.prospective_value = (max(self.positive_sense_count, self.negative_sense_count) / (
+                    self.positive_sense_count + self.negative_sense_count)) * 5 * self.prospect_polarity
+        else:
+            self.prior_valence = 0
+            self.prospective_value = 0
 
         if self.positive_sense_count > self.negative_sense_count:
             self.prospect_polarity = 1
         else:
             self.prospect_polarity = -1
 
-        self.prospective_value = (max(self.positive_sense_count, self.negative_sense_count) / (
-                    self.positive_sense_count + self.negative_sense_count)) * 5 * self.prospect_polarity
+
         self.praiseworthy_value = self.prior_valence + self.prospective_value
 
     def add_values(self, to_add):

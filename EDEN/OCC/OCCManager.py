@@ -66,7 +66,7 @@ class OCCManager():
                     if self.op == OP_DESIRABLE and self.af == AF_NOT_LIKED:
                         curr_emotions.append(OCC_RESENTMENT)
                     if self.sa == SA_BLAME and self.op == OP_UNDESIRABLE:
-                        curr_emotions.append(OCC_REPROACH)
+                        # curr_emotions.append(OCC_REPROACH)
                         curr_emotions.append(OCC_ANGER)
 
                 if self.de == DE_SELF:
@@ -86,8 +86,8 @@ class OCCManager():
 
             if self.sr == SR_PLEASED:
                 if self.de == DE_OTHERS:
-                    if self.op == OP_UNDESIRABLE and self.af == AF_NOT_LIKED:
-                        curr_emotions.append(OCC_GLOATING)
+                    # if self.op == OP_UNDESIRABLE and self.af == AF_NOT_LIKED:
+                    #     curr_emotions.append(OCC_GLOATING)
                     if self.sa == SA_PRAISE and self.op == OP_DESIRABLE:
                         curr_emotions.append(OCC_ADMIRATION)
                         curr_emotions.append(OCC_GRATITUDE)

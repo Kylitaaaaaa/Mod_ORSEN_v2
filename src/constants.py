@@ -22,7 +22,7 @@ FETCH_ALL = 2
 """ GENERIC RESPONSES """
 IS_AFFIRM = ['yes', 'yes.', 'yeah', 'yeah.', 'sure', 'sure.', 'yup', 'yup.']
 IS_DENY = ['no', 'no.', 'nope', 'nope.']
-IS_END = ['bye', 'bye.', 'the end', 'the end.']
+IS_END = ['bye', 'bye.', 'the end', 'the end.', 'STOP']
 
 """ORSEN2 RESPONSES"""
 IS_DONT_LIKE = ['dont like']
@@ -91,6 +91,7 @@ DIALOGUE_TYPE_D_CORRECTING = "d-correcting"
 DIALOGUE_TYPE_D_PUMPING = "d-pumping"
 DIALOGUE_TYPE_EVALUATION = "evaluation"
 DIALOGUE_TYPE_RECOLLECTION = "recollection"
+DIALOGUE_TYPE_E_END = "e-end"
 
 """ CONSTANTS BASED ON ENGLISH CONCEPTS """
 

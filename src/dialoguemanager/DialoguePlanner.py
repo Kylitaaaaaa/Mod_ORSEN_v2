@@ -48,7 +48,7 @@ class DialoguePlanner:
         self.chosen_dialogue_template = []
         self.chosen_move_index = -1
         self.move_index = -1
-        self.curr_event = None
+        # self.curr_event = None
         self.num_action_events = 0
 
         self.is_usable = []
@@ -216,12 +216,15 @@ class DialoguePlanner:
 
     ###checks only dialogue that does not need to go through text understanding
     def check_trigger_phrases(self, response, event_chain, curr_event):
+        if response in IS_END:
+            return DIALOGUE_TYPE_E_END
         if response in PUMPING_TRIGGER:
             if len(event_chain) > 0:
                 return DIALOGUE_TYPE_PUMPING_SPECIFIC
             return DIALOGUE_TYPE_PROMPT
         elif response in PROMPT_TRIGGER:
             return DIALOGUE_TYPE_PROMPT
+
 
         return self.check_based_prev_move(response, curr_event)
 
@@ -233,12 +236,15 @@ class DialoguePlanner:
             print("LAST MOVE IS: ", last_move.dialogue_type)
             ###START EDEN
             #check if last move is eden
+
             if last_move.dialogue_type == DIALOGUE_TYPE_E_LABEL:
                 if response in IS_AFFIRM:
                     return DIALOGUE_TYPE_C_PUMPING
                 else:
                     return DIALOGUE_TYPE_E_PUMPING
             elif last_move.dialogue_type == DIALOGUE_TYPE_E_PUMPING:
+                self.curr_event.emotion = response
+
                 return DIALOGUE_TYPE_C_PUMPING
             elif last_move.dialogue_type == DIALOGUE_TYPE_C_PUMPING:
                 #check if emotion is + or -

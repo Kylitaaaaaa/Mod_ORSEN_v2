@@ -27,4 +27,5 @@ EDEN_DIALOGUE_LIST = [CPumpingDialogueTemplate(),
                       DPumpingDialogueTemplate(),
                       ELabelDialogueTemplate(),
                       EvaluationDialogueTemplate(),
-                      RecollectionDialogueTemplate()]
+                      RecollectionDialogueTemplate(),
+                      EEndDialogueTemplate()]

@@ -56,6 +56,8 @@ class DialogueTemplateBuilder:
          return EvaluationDialogueTemplate(id, templates, relations, blanks, nodes, dependent_nodes)
       elif dialogue_type == DIALOGUE_TYPE_RECOLLECTION:
          return RecollectionDialogueTemplate(id, templates, relations, blanks, nodes, dependent_nodes)
+      elif dialogue_type == DIALOGUE_TYPE_E_END:
+         return EEndDialogueTemplate(id, templates, relations, blanks, nodes, dependent_nodes)
 
 
 

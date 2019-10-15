@@ -1,6 +1,6 @@
 from src.dbo.user import DBOUser
 from src.models.user import User
-from src import Logger, IS_AFFIRM, IS_DENY, IS_END, UserHandler
+from src import Logger, IS_AFFIRM, IS_DENY, IS_END, UserHandler, DIALOGUE_TYPE_E_END, DIALOGUE_TYPE_RECOLLECTION
 from src.ORSEN import ORSEN
 from src.textunderstanding.InputDecoder import InputDecoder
 
@@ -75,10 +75,6 @@ def login_signup_automatic():
         UserHandler.get_instance().set_global_curr_user(temp_user)
         print("Alright %s, let's make a story. You start!")
 
-def is_end_story_func(response):
-    if response.lower() in IS_END:
-        return True
-    return False
 
 def clean_user_input(response):
     response = response.strip()
@@ -100,18 +96,28 @@ def start_storytelling():
         else:
             Logger.log_conversation(UserHandler.get_instance().curr_user.name.strip() + ": " + str(user_input))
 
-        is_end_story = is_end_story_func(user_input)
+        is_end_story = orsen.is_end_story(user_input)
+        print("IS END STORY: ", is_end_story)
 
         if not is_end_story:
             orsen_response = orsen.get_response(user_input)
             print("ORSEN:", orsen_response)
             Logger.log_conversation("ORSEN: " + str(orsen_response))
         else:
-            """ORSEN"""
-            print("Thank you for the story! Do you want to hear it again?")
-            user_input = get_input()
-            if user_input.lower() in IS_AFFIRM:
-                print(orsen.repeat_story())
+            """EDEN"""
+            orsen_response = orsen.get_response("", triggered_move = DIALOGUE_TYPE_E_END)
+            print("ORSEN:", orsen_response)
+            orsen_response = orsen_response + orsen.get_response("", triggered_move = DIALOGUE_TYPE_RECOLLECTION)
+            print("ORSEN RECOLLECTION:", orsen_response)
+            Logger.log_conversation("ORSEN: " + str(orsen_response))
+
+            is_end_story = True
+
+            # """ORSEN"""
+            # print("Thank you for the story! Do you want to hear it again?")
+            # user_input = get_input()
+            # if user_input.lower() in IS_AFFIRM:
+            #     print(orsen.repeat_story())
 
 
 # start here

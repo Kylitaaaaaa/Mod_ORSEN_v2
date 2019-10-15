@@ -23,4 +23,5 @@ from .ELabelDialogueTemplate import ELabelDialogueTemplate
 from .EPumpingDialogueTemplate import EPumpingDialogueTemplate
 from .EvaluationDialogueTemplate import EvaluationDialogueTemplate
 from .RecollectionDialogueTemplate import RecollectionDialogueTemplate
+from .EEndDialogueTemplate import EEndDialogueTemplate
 
