@@ -3,6 +3,8 @@ CONVERSATION_LOG = "conversation"
 INFORMATION_EXTRACTION_LOG = "information_extraction"
 DIALOGUE_MODEL_LOG = "dialogue_model"
 EVENT_CHAIN_LOG = "event chain"
+EMOTION_CLASSIFICATION = "emotion classification"
+DUMP_LOG = "dump"
 
 """ PACKAGE VERSIONING CONTROL """
 SPACY_VERSION = '2.1.0'

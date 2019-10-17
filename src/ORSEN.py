@@ -377,19 +377,24 @@ class ORSEN:
 
 
     def get_emotion(self, response):
+        Logger.log_occ_values("CHECKING: " + response)
         #returns only the first emotion detected
         emotions_found = []
+        print("LAST FETCHED LENGTH: ", len(self.world.last_fetched))
         for curr_event in self.world.last_fetched:
             print("THIS IS THE CURRENT EVENT")
             print(curr_event)
             if curr_event.type == EVENT_ACTION:
                 print("========== TRYING TO GET EMOTION ========== ")
-
-                emotions_found.append(self.occ_manager.get_occ_emotion(curr_event, response))
+                temp_emotion = self.occ_manager.get_occ_emotion(curr_event, response)
+                if temp_emotion is not None:
+                    emotions_found.append(temp_emotion)
         if len(emotions_found) != 0:
             print("========== EMOTION FOUND IS: ", emotions_found, " ========== ")
+            Logger.log_occ_values("FINAL EMOTION FOR RESPONSE: " + emotions_found[len(emotions_found)-1].emotion)
             return emotions_found[len(emotions_found)-1]
         print("========== NO EMOTION FOUND ========== ")
+        Logger.log_occ_values("NO EMOTION FOUND FOR RESPONSE")
         return None
 
     def is_end_story(self, response):
