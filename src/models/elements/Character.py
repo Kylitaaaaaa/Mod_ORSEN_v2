@@ -18,7 +18,7 @@ class Character(Object):
     def create_character(sentence, token, id="", attribute=[], in_setting=[], mention_count=0, gender=""):
         entity = Object.get_object_entity_via_token(token, sentence)
         print("The entity I found is: ", entity)
-        entity_text = token.text
+        entity_text = str(token)
         entity_types = []
 
         if entity is not None:

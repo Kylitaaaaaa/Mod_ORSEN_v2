@@ -101,14 +101,17 @@ def start_storytelling():
 
         if not is_end_story:
             orsen_response = orsen.get_response(user_input)
-            print("ORSEN:", orsen_response)
-            Logger.log_conversation("ORSEN: " + str(orsen_response))
+            print("=========================================================")
+            print("EDEN:", orsen_response)
+            print("=========================================================")
+            Logger.log_conversation("EDEN: " + str(orsen_response))
         else:
             """EDEN"""
             orsen_response = orsen.get_response("", triggered_move = DIALOGUE_TYPE_E_END)
-            print("ORSEN:", orsen_response)
             orsen_response = orsen_response + orsen.get_response("", triggered_move = DIALOGUE_TYPE_RECOLLECTION)
-            print("ORSEN RECOLLECTION:", orsen_response)
+            print("=========================================================")
+            print("EDEN:", orsen_response)
+            print("=========================================================")
             Logger.log_conversation("ORSEN: " + str(orsen_response))
 
             is_end_story = True
