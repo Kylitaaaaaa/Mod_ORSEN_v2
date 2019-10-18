@@ -1,5 +1,7 @@
 from src import IS_A
 from src.models.elements import Object, Attribute
+from src.models.pickles.PickleObject import PickleObject
+
 
 class Character(Object):
 
@@ -52,3 +54,21 @@ class Character(Object):
                              attribute = object.attributes)
         return new_char
 
+
+    def get_pickled_character(self):
+        pickled_character = PickleObject()
+        pickled_character.id = str(self.id)
+        pickled_character.name = str(self.name)
+
+        pickled_character.type = []
+        for X in self.type:
+            pickled_character.type.append(X.get_pickled_atribute())
+
+        pickled_character.in_setting = []
+        for X in self.in_setting:
+            pickled_character.in_setting.append(X.get_pickled_setting())
+
+        pickled_character.mention_count = self.mention_count
+        pickled_character.gender = self.gender
+
+        return pickled_character

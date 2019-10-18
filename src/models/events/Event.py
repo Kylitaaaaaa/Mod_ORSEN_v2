@@ -37,3 +37,6 @@ class Event():
 
         return objects
 
+    def get_pickled_event(self):
+        pass
+

@@ -79,3 +79,34 @@ class World:
             if X.type == EVENT_ACTION:
                 count = count + 1
         return count
+
+    def get_pickled_world(self):
+        pickled_world = []
+
+        #pickle objects
+        pickled_objects = []
+        for X in self.objects:
+            pickled_objects.append(X.get_pickled_object())
+
+        # pickle characters
+        pickled_characters = []
+        for X in self.characters:
+            pickled_characters.append(X.get_pickled_character())
+
+        # pickle setting
+        pickled_settings = []
+        for X in self.settings:
+            pickled_settings.append(X.get_pickled_setting())
+
+        # pickle event
+        pickled_event_chain = []
+        for X in self.event_chains:
+            pickled_event_chain.append(X.get_pickled_event())
+
+        pickled_world.append(pickled_objects)
+        pickled_world.append(pickled_characters)
+        pickled_world.append(pickled_settings)
+        pickled_world.append(pickled_event_chain)
+        return pickled_world
+
+

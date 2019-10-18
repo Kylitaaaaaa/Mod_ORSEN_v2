@@ -1,4 +1,5 @@
 from src.models.elements import Character, Object
+from src.models.pickles.PickleObject import PickleObject
 from . import Event
 from src.constants import EVENT_ACTION
 
@@ -154,3 +155,15 @@ class ActionEvent(Event):
             objects.append(self.object_of_preposition)
 
         return objects
+
+    def get_pickled_event(self):
+        pickled_event = PickleObject()
+        pickled_event.type = self.sequence_number
+        pickled_event.subject = str(self.subject)
+        pickled_event.verb = str(self.verb)
+        pickled_event.direct_object = str(self.direct_object)
+        pickled_event.adverb = str(self.adverb)
+        pickled_event.preposition = str(self.preposition)
+        pickled_event.object_of_preposition = str(self.object_of_preposition)
+
+        return pickled_event

@@ -11,6 +11,7 @@ from src.models.events import *
 from EDEN.OCC import OCCManager
 
 
+
 class ORSEN:
 
     def __init__(self):
@@ -380,20 +381,28 @@ class ORSEN:
         Logger.log_occ_values("CHECKING: " + response)
         #returns only the first emotion detected
         emotions_found = []
-        print("LAST FETCHED LENGTH: ", len(self.world.last_fetched))
-        for curr_event in self.world.last_fetched:
-            print("THIS IS THE CURRENT EVENT")
-            print(curr_event)
+        for i in range(0, len(self.world.last_fetched)):
+            curr_event = self.world.last_fetched[i]
             if curr_event.type == EVENT_ACTION:
-                print("========== TRYING TO GET EMOTION ========== ")
                 temp_emotion = self.occ_manager.get_occ_emotion(curr_event, response)
-                if temp_emotion is not None:
-                    emotions_found.append(temp_emotion)
+                emotions_found.append(temp_emotion)
+            else:
+                Logger.log_occ_values("NO EMOTION FOUND")
+
+        # for i in range(0, len(emotions_found)):
+        #     emotion = emotions_found[i]
+        #     Logger.log_occ_values("EVALUATING: " )
+        #     if emotion is None:
+        #         Logger.log_occ_values("NO EMOTION FOUND")
+        #     else:
+        #         emotion.print_occ_values()
+
+        #remove none
+        emotions_found = list(filter(None, emotions_found))
         if len(emotions_found) != 0:
-            print("========== EMOTION FOUND IS: ", emotions_found, " ========== ")
             Logger.log_occ_values("FINAL EMOTION FOR RESPONSE: " + emotions_found[len(emotions_found)-1].emotion)
             return emotions_found[len(emotions_found)-1]
-        print("========== NO EMOTION FOUND ========== ")
+
         Logger.log_occ_values("NO EMOTION FOUND FOR RESPONSE")
         return None
 

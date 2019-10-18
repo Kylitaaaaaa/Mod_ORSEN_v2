@@ -1,3 +1,4 @@
+from src.models.pickles.PickleObject import PickleObject
 from . import Event
 from src.constants import EVENT_CREATION
 
@@ -35,3 +36,10 @@ class CreationEvent(Event):
         # for attr in self.attributes:
         #     string += attr + ","
         # string += " ]\n"
+
+    def get_pickled_event(self):
+        pickled_event = PickleObject()
+        pickled_event.type = self.sequence_number
+        pickled_event.subject = str(self.subject)
+
+        return pickled_event

@@ -1,4 +1,5 @@
 from src import IS_A
+from src.models.pickles.PickleObject import PickleObject
 from . import Attribute
 
 
@@ -90,3 +91,23 @@ class Object:
                             mention_count=mention_count)
 
         return new_object
+
+
+
+    def get_pickled_object(self):
+        pickled_object = PickleObject()
+        pickled_object.id = str(self.id)
+        pickled_object.name = str(self.name)
+
+        attribute = []
+        for a in self.attribute:
+            attribute.append(a.get_pickled_atribute())
+        pickled_object.attribute = attribute
+
+        setting = []
+        for s in self.in_setting:
+            setting.append(s.get_pickled_setting())
+        pickled_object.setting = setting
+
+        pickled_object.mention_count = self.mention_count
+        return pickled_object

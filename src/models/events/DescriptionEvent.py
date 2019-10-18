@@ -1,4 +1,5 @@
 from src.models.elements import Attribute
+from src.models.pickles.PickleObject import PickleObject
 from . import Event
 from src.constants import EVENT_DESCRIPTION, IS_A
 
@@ -55,3 +56,14 @@ class DescriptionEvent(Event):
                        return False
                 return True
         return False
+
+    def get_pickled_event(self):
+        pickled_event = PickleObject()
+        pickled_event.type = self.sequence_number
+        pickled_event.subject = str(self.subject)
+
+        pickled_event.attributes = []
+        for X in self.attributes:
+            pickled_event.attributes.append(X.get_pickled_atribute())
+
+        return pickled_event

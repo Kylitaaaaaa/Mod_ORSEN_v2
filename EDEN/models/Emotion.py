@@ -1,17 +1,42 @@
 from EDEN.constants import *
 from src.models.events import ActionEvent
+from src import Logger
 
 
 class Emotion(ActionEvent):
 
-    def __init__(self, event, emotion =""):
+    def __init__(self, event, emotion ="", af="", de="", of="", oa="", sp="", sr="", op="", pros="", stat="", unexp=False, sa="", vr=False, ed="", eoa="", edev="", ef=""):
         print("event is")
         print(event)
         super().__init__(sequence_number = event.sequence_number, subject=event.subject, verb=event.verb, direct_object=event.direct_object, adverb=event.adverb, preposition=event.preposition, object_of_preposition=event.object_of_preposition)
         self.event = event
         self.emotion = emotion
+        self.af = af
+        self.de = de
+        self.of = of
+        self.oa = oa
+        self.sp = sp
+        self.sr = sr
+        self.op = op
+        self.pros = pros
+        self.stat = stat
+        self.unexp = unexp
+        self.sa = sa
+        self.vr = vr
+        self.ed = ed
+        self.eoa = eoa
+        self.edev = edev
+        self.ef = ef
 
     def get_emotion_type(self):
         if self.emotion in NEGATIVE_EMOTIONS:
             return EMOTION_TYPE_NEGATIVE
         return EMOTION_TYPE_POSITIVE
+
+
+    def print_occ_values(self):
+        Logger.log_occ_values(self.af + " , " + self.de + " , " +
+                                    self.of + " , " + self.oa + " , " +
+                                    self.sp + " , " + self.sr + " , " + self.op + " , " + self.pros + " , " + self.stat + " , " + str(
+            self.unexp) + " , " + self.sa + " , " + str(self.vr) + " , " +
+                                    self.ed + " , " + self.eoa + " , " + self.edev + " , " + self.ef)

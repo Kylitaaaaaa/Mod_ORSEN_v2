@@ -1,8 +1,9 @@
 from src.dbo.user import DBOUser
 from src.models.user import User
-from src import Logger, IS_AFFIRM, IS_DENY, IS_END, UserHandler, DIALOGUE_TYPE_E_END, DIALOGUE_TYPE_RECOLLECTION
+from src import Logger, IS_AFFIRM, IS_DENY, IS_END, UserHandler, DIALOGUE_TYPE_E_END, DIALOGUE_TYPE_RECOLLECTION, Pickle
 from src.ORSEN import ORSEN
 from src.textunderstanding.InputDecoder import InputDecoder
+import datetime
 
 # Database access
 dbo_user = DBOUser('users', User)
@@ -123,41 +124,52 @@ def start_storytelling():
             #     print(orsen.repeat_story())
 
 
-# start here
-# Initialize loggers
-Logger.setup_loggers()
 
-#Retrieve User Details --- User objects
-print("---------Retrieving User Details---------")
-# login_signup()
-# print("done")
+try:
 
+    # start here
+    # Initialize loggers
+    Logger.setup_loggers()
 
-print("---------Launching ORSEN---------")
-orsen = ORSEN()
+    #Retrieve User Details --- User objects
+    print("---------Retrieving User Details---------")
+    # login_signup()
+    print("done")
 
-# test_sentence = "My mother's name is Sasha, she likes dogs."
-# test_sentence = "John kicked the ball."
-# test_sentence = "The ball was kicked by John."
-# test_sentence = "John the mighty is a brave, strong warrior"
-# test_sentence = "Once there was a boy"
+    # pickle_filepath = '../logs/user world/' + datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S") + "-" + UserHandler.get_instance().curr_user.name
+    pickle_filepath = '../logs/user world/' + datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S")
 
-# orsen_response = orsen.get_response(test_sentence)
+    print("---------Launching ORSEN---------")
+    orsen = ORSEN()
 
-#TODO: uncomment after testing
-#for repeating the story
-is_engaged = True
-while is_engaged:
-    orsen.initialize_story_prerequisites()
-    print("Let's make another story! You go first")
-    start_storytelling()
-    print("Do you want to make another story?")
-    user_input = get_input()
-    if user_input.lower() in IS_DENY:
-        is_engaged = False
+    # test_sentence = "My mother's name is Sasha, she likes dogs."
+    # test_sentence = "John kicked the ball."
+    # test_sentence = "The ball was kicked by John."
+    # test_sentence = "John the mighty is a brave, strong warrior"
+    # test_sentence = "Once there was a boy"
 
+    # orsen_response = orsen.get_response(test_sentence)
 
+    #TODO: uncomment after testing
+    #for repeating the story
+    is_engaged = True
+    while is_engaged:
+        orsen.initialize_story_prerequisites()
+        print("Let's make another story! You go first")
+        start_storytelling()
+        print("Do you want to make another story?")
+        user_input = get_input()
+        if user_input.lower() in IS_DENY:
+            is_engaged = False
 
+    Pickle.pickle_world_wb(pickle_filepath, orsen.world.get_pickled_world())
+    Pickle.pickle_world_rb(pickle_filepath)
+except:
+    print("Something went wrong when writing to the file")
+finally:
+    print("AT FINALLY")
+    Pickle.pickle_world_wb(pickle_filepath, orsen.world.get_pickled_world())
+    Pickle.pickle_world_rb(pickle_filepath)
 print("---------Closing ORSEN---------")
 
 

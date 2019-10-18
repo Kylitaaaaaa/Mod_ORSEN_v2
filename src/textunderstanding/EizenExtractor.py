@@ -580,6 +580,7 @@ class EizenExtractor(object):
         relations = []
         extracted = self.extract_relation_via_template(template, token)
         if extracted is not None:
+            Logger.log_information_extraction_basic_example(str(extracted))
             relations.append(extracted)
 
         # if event_type == EVENT_DESCRIPTION:
