@@ -12,7 +12,7 @@ from flask import json
 # change status to "login_signup" creates/logins users at the start
 # change status to "start_storytelling" does not creates/logins users at the start. 
 ## It starts storytelling right away
-status = "start_storytelling"
+status = "login_signup"
 name = ""
 code = ""
 have_account = ""

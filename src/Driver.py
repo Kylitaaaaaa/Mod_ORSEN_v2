@@ -106,19 +106,21 @@ def start_storytelling():
             print("EDEN:", orsen_response)
             print("=========================================================")
             Logger.log_conversation("EDEN: " + str(orsen_response))
-        else:
-            """EDEN"""
-            orsen_response = orsen.get_response("", triggered_move = DIALOGUE_TYPE_E_END)
-            orsen_response = orsen_response + orsen.get_response("", triggered_move = DIALOGUE_TYPE_RECOLLECTION)
-            print("=========================================================")
-            print("EDEN:", orsen_response)
-            print("=========================================================")
-            Logger.log_conversation("ORSEN: " + str(orsen_response))
+
+            is_end_story = orsen.is_end_story(user_input)
+        # else:
+        #     """EDEN"""
+        #     orsen_response = orsen.get_response("", triggered_move = DIALOGUE_TYPE_E_END)
+        #     orsen_response = orsen_response + orsen.get_response("", triggered_move = DIALOGUE_TYPE_RECOLLECTION)
+        #     print("=========================================================")
+        #     print("EDEN:", orsen_response)
+        #     print("=========================================================")
+        #     Logger.log_conversation("ORSEN: " + str(orsen_response))
 
 
 
 
-            is_end_story = True
+            # is_end_story = True
 
             # """ORSEN"""
             # print("Thank you for the story! Do you want to hear it again?")
@@ -127,8 +129,8 @@ def start_storytelling():
             #     print(orsen.repeat_story())
 
 orsen = ORSEN()
-pickle_filepath = '../logs/user world/' + datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S") + "-" + UserHandler.get_instance().curr_user.name
-# pickle_filepath = '../Mod_ORSEN_v2//logs/user world/' + datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S") + "-" + UserHandler.get_instance().curr_user.name
+# pickle_filepath = '../logs/user world/' + datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S") + "-" + UserHandler.get_instance().curr_user.name
+pickle_filepath = '../Mod_ORSEN_v2//logs/user world/' + datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S") + "-" + UserHandler.get_instance().curr_user.name
 
 try:
 
@@ -138,7 +140,7 @@ try:
 
     #Retrieve User Details --- User objects
     print("---------Retrieving User Details---------")
-    # login_signup()
+    login_signup()
     print("done")
 
     print("---------Launching ORSEN---------")
@@ -152,26 +154,34 @@ try:
 
     # orsen_response = orsen.get_response(test_sentence)
 
-    #TODO: uncomment after testing
-    #for repeating the story
-    is_engaged = True
-    while is_engaged:
-        orsen.initialize_story_prerequisites()
-        print("Let's make another story! You go first")
-        start_storytelling()
+    # for non-repeating the story
+    orsen.initialize_story_prerequisites()
+    print("Let's make another story! You go first")
+    start_storytelling()
 
-        #save story world
-        Pickle.pickle_world_wb(pickle_filepath, orsen.world.get_pickled_world())
+    # save story world
+    Pickle.pickle_world_wb(pickle_filepath, orsen.world.get_pickled_world())
 
-        print("Do you want to make another story?")
-        user_input = get_input()
-        if user_input.lower() in IS_DENY:
-            is_engaged = False
-        else:
-            pickle_filepath = '../logs/user world/' + datetime.datetime.now().strftime(
-                "%Y-%m-%d %H-%M-%S") + "-" + UserHandler.get_instance().curr_user.name
-            # pickle_filepath = '../Mod_ORSEN_v2//logs/user world/' + datetime.datetime.now().strftime(
-            #     "%Y-%m-%d %H-%M-%S") + "-" + UserHandler.get_instance().curr_user.name
+    # #TODO: uncomment after testing
+    # #for repeating the story
+    # is_engaged = True
+    # while is_engaged:
+    #     orsen.initialize_story_prerequisites()
+    #     print("Let's make another story! You go first")
+    #     start_storytelling()
+    #
+    #     #save story world
+    #     Pickle.pickle_world_wb(pickle_filepath, orsen.world.get_pickled_world())
+    #
+    #     print("Do you want to make another story?")
+    #     user_input = get_input()
+    #     if user_input.lower() in IS_DENY:
+    #         is_engaged = False
+    #     else:
+    #         pickle_filepath = '../logs/user world/' + datetime.datetime.now().strftime(
+    #             "%Y-%m-%d %H-%M-%S") + "-" + UserHandler.get_instance().curr_user.name
+    #         # pickle_filepath = '../Mod_ORSEN_v2//logs/user world/' + datetime.datetime.now().strftime(
+    #         #     "%Y-%m-%d %H-%M-%S") + "-" + UserHandler.get_instance().curr_user.name
 
 
 except:
