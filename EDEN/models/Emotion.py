@@ -1,6 +1,7 @@
 from EDEN.constants import *
 from src.models.events import ActionEvent
 from src import Logger
+from src.models.pickles.PickleObject import PickleObject
 
 
 class Emotion(ActionEvent):
@@ -38,5 +39,27 @@ class Emotion(ActionEvent):
         Logger.log_occ_values(self.af + " , " + self.de + " , " +
                                     self.of + " , " + self.oa + " , " +
                                     self.sp + " , " + self.sr + " , " + self.op + " , " + self.pros + " , " + self.stat + " , " + str(
-            self.unexp) + " , " + self.sa + " , " + str(self.vr) + " , " +
+                                    self.unexp) + " , " + self.sa + " , " + str(self.vr) + " , " +
                                     self.ed + " , " + self.eoa + " , " + self.edev + " , " + self.ef)
+
+
+    def get_pickled_emotion_event(self):
+        pickled_event = self.get_pickled_event()
+        pickled_event.af = self.af
+        pickled_event.de = self.de
+        pickled_event.of = self.of
+        pickled_event.oa = self.oa
+        pickled_event.sp = self.sp
+        pickled_event.sr = self.sr
+        pickled_event.op = self.op
+        pickled_event.pros = self.pros
+        pickled_event.stat = self.stat
+        pickled_event.unexp = self.unexp
+        pickled_event.sa = self.sa
+        pickled_event.vr = self.vr
+        pickled_event.ed = self.ed
+        pickled_event.eoa = self.eoa
+        pickled_event.edev = self.edev
+        pickled_event.ef = self.ef
+
+        return pickled_event

@@ -79,7 +79,7 @@ class ORSEN:
                 curr_emotion_event = self.get_emotion(response)
                 result = None
                 if curr_emotion_event is not None:
-                    self.world.curr_emotion_event = curr_emotion_event
+                    self.world.add_emotion_event(curr_emotion_event)
                     result = ORSEN.perform_dialogue_manager(self, DIALOGUE_TYPE_E_LABEL)
 
                 if result is None:

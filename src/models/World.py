@@ -14,6 +14,9 @@ class World:
     # The sequence of events used to store the event frames
     event_chains = []
 
+    # List of emotional events
+    emotion_events = []
+
     # The temporary event that contains the last event from the last dialogue entered by the user.
     curr_event = None
 
@@ -46,6 +49,11 @@ class World:
         self.sentence_references.append(sentence)
 
         self.curr_event = event
+
+    def add_emotion_event(self, event):
+        self.emotion_events.append(event)
+
+        self.curr_emotion_event = event
 
 
     def add_character(self, character):
@@ -103,10 +111,16 @@ class World:
         for X in self.event_chains:
             pickled_event_chain.append(X.get_pickled_event())
 
+        # pickle emotion event
+        pickled_emotion_event = []
+        for X in self.emotion_events:
+            pickled_emotion_event.append(X.get_pickled_emotion_event())
+
         pickled_world.append(pickled_objects)
         pickled_world.append(pickled_characters)
         pickled_world.append(pickled_settings)
         pickled_world.append(pickled_event_chain)
+        pickled_world.append(pickled_emotion_event)
         return pickled_world
 
 
