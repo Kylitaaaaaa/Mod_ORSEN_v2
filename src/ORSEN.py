@@ -26,6 +26,7 @@ class ORSEN:
 
         ###EDEN
         self.occ_manager = OCCManager()
+        self.is_end = False
 
     def initialize_story_prerequisites(self):
         self.world = World()
@@ -106,6 +107,7 @@ class ORSEN:
                     elif triggered_move == DIALOGUE_TYPE_RECOLLECTION:
                         temp_end = ORSEN.perform_dialogue_manager(self, DIALOGUE_TYPE_E_END)
                         result = result + temp_end
+                        self.is_end = True
                 else:
                     result = ORSEN.perform_dialogue_manager(self, triggered_move)
 
@@ -424,6 +426,10 @@ class ORSEN:
         return None
 
     def is_end_story(self, response):
+        if self.is_end:
+            print("IS END IS TRUE")
+            return True
         if response.lower() in IS_END:
+            print("RESPONSE FOR IS END IS TRUE")
             return True
         return False
