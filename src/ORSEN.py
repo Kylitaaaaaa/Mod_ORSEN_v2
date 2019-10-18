@@ -97,17 +97,13 @@ class ORSEN:
                     ORSEN.perform_text_understanding(self, response)
                     result = ORSEN.perform_dialogue_manager(self, triggered_move)
                     if triggered_move == DIALOGUE_TYPE_D_PRAISE:
-                        print("TRIGGERED D-PRAISE")
                         temp_eval = ORSEN.perform_dialogue_manager(self, DIALOGUE_TYPE_EVALUATION)
-                        print("HERE'S TEMPORARY EVALUATION TEMPLATE")
-                        print(temp_eval)
                         result = result + temp_eval
-                        print(result)
-                        print("DONE PRINTING TRIGERRED D-PRAISE + EVAL")
                     elif triggered_move == DIALOGUE_TYPE_RECOLLECTION:
-                        temp_end = ORSEN.perform_dialogue_manager(self, DIALOGUE_TYPE_E_END)
+                        temp_end = ORSEN.perform_dialogue_manager(self, DIALOGUE_TYPE_PUMPING_GENERAL)
+                        # temp_end = ORSEN.perform_dialogue_manager(self, DIALOGUE_TYPE_E_END)
                         result = result + temp_end
-                        self.is_end = True
+                        # self.is_end = True
                 else:
                     result = ORSEN.perform_dialogue_manager(self, triggered_move)
 

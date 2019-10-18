@@ -107,15 +107,15 @@ def start_storytelling():
             print("=========================================================")
             Logger.log_conversation("EDEN: " + str(orsen_response))
 
-            is_end_story = orsen.is_end_story(user_input)
-        # else:
-        #     """EDEN"""
-        #     orsen_response = orsen.get_response("", triggered_move = DIALOGUE_TYPE_E_END)
-        #     orsen_response = orsen_response + orsen.get_response("", triggered_move = DIALOGUE_TYPE_RECOLLECTION)
-        #     print("=========================================================")
-        #     print("EDEN:", orsen_response)
-        #     print("=========================================================")
-        #     Logger.log_conversation("ORSEN: " + str(orsen_response))
+            # is_end_story = orsen.is_end_story(user_input)
+        else:
+            """EDEN"""
+            orsen_response = orsen.get_response("", triggered_move = DIALOGUE_TYPE_E_END)
+            orsen_response = orsen_response + orsen.get_response("", triggered_move = DIALOGUE_TYPE_RECOLLECTION)
+            print("=========================================================")
+            print("EDEN:", orsen_response)
+            print("=========================================================")
+            Logger.log_conversation("ORSEN: " + str(orsen_response))
 
 
 
@@ -129,8 +129,8 @@ def start_storytelling():
             #     print(orsen.repeat_story())
 
 orsen = ORSEN()
-# pickle_filepath = '../logs/user world/' + datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S") + "-" + UserHandler.get_instance().curr_user.name
-pickle_filepath = '../Mod_ORSEN_v2//logs/user world/' + datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S") + "-" + UserHandler.get_instance().curr_user.name
+pickle_filepath = '../logs/user world/' + datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S") + "-" + UserHandler.get_instance().curr_user.name
+# pickle_filepath = '../Mod_ORSEN_v2//logs/user world/' + datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S") + "-" + UserHandler.get_instance().curr_user.name
 
 try:
 
