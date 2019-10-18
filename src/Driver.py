@@ -115,6 +115,9 @@ def start_storytelling():
             print("=========================================================")
             Logger.log_conversation("ORSEN: " + str(orsen_response))
 
+
+
+
             is_end_story = True
 
             # """ORSEN"""
@@ -136,8 +139,7 @@ try:
     # login_signup()
     print("done")
 
-    # pickle_filepath = '../logs/user world/' + datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S") + "-" + UserHandler.get_instance().curr_user.name
-    pickle_filepath = '../logs/user world/' + datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S")
+    pickle_filepath = '../logs/user world/' + datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S") + "-" + UserHandler.get_instance().curr_user.name
 
     print("---------Launching ORSEN---------")
     orsen = ORSEN()
@@ -157,13 +159,19 @@ try:
         orsen.initialize_story_prerequisites()
         print("Let's make another story! You go first")
         start_storytelling()
+
+        #save story world
+        Pickle.pickle_world_wb(pickle_filepath, orsen.world.get_pickled_world())
+
         print("Do you want to make another story?")
         user_input = get_input()
         if user_input.lower() in IS_DENY:
             is_engaged = False
+        else:
+            pickle_filepath = '../logs/user world/' + datetime.datetime.now().strftime(
+                "%Y-%m-%d %H-%M-%S") + "-" + UserHandler.get_instance().curr_user.name
 
-    Pickle.pickle_world_wb(pickle_filepath, orsen.world.get_pickled_world())
-    Pickle.pickle_world_rb(pickle_filepath)
+
 except:
     print("Something went wrong when writing to the file")
 finally:
