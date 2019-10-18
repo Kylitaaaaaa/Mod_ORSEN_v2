@@ -126,7 +126,9 @@ def start_storytelling():
             # if user_input.lower() in IS_AFFIRM:
             #     print(orsen.repeat_story())
 
-
+orsen = ORSEN()
+pickle_filepath = '../logs/user world/' + datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S") + "-" + UserHandler.get_instance().curr_user.name
+# pickle_filepath = '../Mod_ORSEN_v2//logs/user world/' + datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S") + "-" + UserHandler.get_instance().curr_user.name
 
 try:
 
@@ -139,10 +141,8 @@ try:
     # login_signup()
     print("done")
 
-    pickle_filepath = '../logs/user world/' + datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S") + "-" + UserHandler.get_instance().curr_user.name
-
     print("---------Launching ORSEN---------")
-    orsen = ORSEN()
+    # orsen = ORSEN()
 
     # test_sentence = "My mother's name is Sasha, she likes dogs."
     # test_sentence = "John kicked the ball."
@@ -170,6 +170,8 @@ try:
         else:
             pickle_filepath = '../logs/user world/' + datetime.datetime.now().strftime(
                 "%Y-%m-%d %H-%M-%S") + "-" + UserHandler.get_instance().curr_user.name
+            # pickle_filepath = '../Mod_ORSEN_v2//logs/user world/' + datetime.datetime.now().strftime(
+            #     "%Y-%m-%d %H-%M-%S") + "-" + UserHandler.get_instance().curr_user.name
 
 
 except:

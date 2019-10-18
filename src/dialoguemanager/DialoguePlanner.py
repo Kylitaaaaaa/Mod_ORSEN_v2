@@ -252,8 +252,8 @@ class DialoguePlanner:
                     print("EMOTION TYPE OF ", curr_event.emotion)
                     print(" IS: ", curr_event.get_emotion_type())
                     if curr_event.get_emotion_type() == EMOTION_TYPE_POSITIVE:
-                        # return DIALOGUE_TYPE_D_PRAISE
-                        return DIALOGUE_TYPE_EVALUATION
+                        return DIALOGUE_TYPE_D_PRAISE
+                        # return DIALOGUE_TYPE_EVALUATION
                     else:
                         return DIALOGUE_TYPE_D_CORRECTING
             elif last_move.dialogue_type == DIALOGUE_TYPE_D_CORRECTING:
@@ -376,7 +376,7 @@ class DialoguePlanner:
                 return DIALOGUE_TYPE_C_PUMPING
             elif last_move.dialogue_type == DIALOGUE_TYPE_C_PUMPING:
                 #check if emotion is + or -
-                if curr_emotion.get_emotion_type == EMOTION_TYPE_POSITIVE:
+                if curr_emotion.get_emotion_type() == EMOTION_TYPE_POSITIVE:
                     return DIALOGUE_TYPE_D_PRAISE
                 else:
                     return DIALOGUE_TYPE_D_CORRECTING

@@ -795,7 +795,7 @@ class EizenExtractor(object):
                 event_entities.append(event_entity)
                 sentence_entities.append(s)
 
-            self.display_tokens(s)
+            # self.display_tokens(s)
 
         return event_entities, sentence_entities
 

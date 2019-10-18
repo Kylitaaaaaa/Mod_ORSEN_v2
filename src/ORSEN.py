@@ -61,7 +61,8 @@ class ORSEN:
         if triggered_move is not None:
             result = ORSEN.perform_dialogue_manager(self, triggered_move)
         else:
-            if self.world.curr_emotion_event is None:
+            if self.world.\
+                    curr_emotion_event is None:
                 triggered_move = self.dialogue_planner.check_trigger_phrases(response, self.world.event_chains, self.world.curr_event)
             else:
                 triggered_move = self.dialogue_planner.check_trigger_phrases(response, self.world.event_chains,
@@ -94,34 +95,48 @@ class ORSEN:
                 if triggered_move in [DIALOGUE_TYPE_C_PUMPING, DIALOGUE_TYPE_D_PRAISE, DIALOGUE_TYPE_D_CORRECTING, DIALOGUE_TYPE_EVALUATION, DIALOGUE_TYPE_RECOLLECTION]:
                     ORSEN.perform_text_understanding(self, response)
                     result = ORSEN.perform_dialogue_manager(self, triggered_move)
+                    if triggered_move == DIALOGUE_TYPE_D_PRAISE:
+                        print("TRIGGERED D-PRAISE")
+                        temp_eval = ORSEN.perform_dialogue_manager(self, DIALOGUE_TYPE_EVALUATION)
+                        print("HERE'S TEMPORARY EVALUATION TEMPLATE")
+                        print(temp_eval)
+                        result = result + temp_eval
+                        print(result)
+                        print("DONE PRINTING TRIGERRED D-PRAISE + EVAL")
+                    elif triggered_move == DIALOGUE_TYPE_RECOLLECTION:
+                        temp_end = ORSEN.perform_dialogue_manager(self, DIALOGUE_TYPE_E_END)
+                        result = result + temp_end
+                else:
+                    result = ORSEN.perform_dialogue_manager(self, triggered_move)
 
 
-                """ORSEN 2"""
-                if triggered_move == DIALOGUE_TYPE_SUGGESTING_AFFIRM:
-                    #add score then general pumping
-                    last_dialogue = self.dialogue_planner.get_last_dialogue_move()
-                    if last_dialogue is not None:
-                        for X in last_dialogue.word_relation:
-                            self.extractor.add_relation_to_concepts_if_not_existing(X)
-                    triggered_move = DIALOGUE_TYPE_PUMPING_GENERAL
-                    pass
-                elif triggered_move == DIALOGUE_TYPE_FOLLOW_UP:
-                    # Why dont u like it or is it wrong -- called from database
-                    pass
-                elif triggered_move == DIALOGUE_TYPE_FOLLOW_UP_DONT_LIKE:
-                    triggered_move = DIALOGUE_TYPE_PUMPING_GENERAL
-                elif triggered_move == DIALOGUE_TYPE_FOLLOW_UP_WRONG:
-                    #deduct score then general pumping
-                    last_dialogue = self.dialogue_planner.get_last_dialogue_move()
-                    if last_dialogue is not None:
-                        for X in last_dialogue.word_relation:
-                            self.extractor.remove_relation_to_concepts_if_not_valid(X)
-                    triggered_move = DIALOGUE_TYPE_PUMPING_GENERAL
-                elif triggered_move == DIALOGUE_TYPE_PUMPING_SPECIFIC:
-                    self.world.curr_event = self.world.event_chains[len(self.world.event_chains)-1]
+
+                # """ORSEN 2"""
+                # elif triggered_move == DIALOGUE_TYPE_SUGGESTING_AFFIRM:
+                #     #add score then general pumping
+                #     last_dialogue = self.dialogue_planner.get_last_dialogue_move()
+                #     if last_dialogue is not None:
+                #         for X in last_dialogue.word_relation:
+                #             self.extractor.add_relation_to_concepts_if_not_existing(X)
+                #     triggered_move = DIALOGUE_TYPE_PUMPING_GENERAL
+                #     pass
+                # elif triggered_move == DIALOGUE_TYPE_FOLLOW_UP:
+                #     # Why dont u like it or is it wrong -- called from database
+                #     pass
+                # elif triggered_move == DIALOGUE_TYPE_FOLLOW_UP_DONT_LIKE:
+                #     triggered_move = DIALOGUE_TYPE_PUMPING_GENERAL
+                # elif triggered_move == DIALOGUE_TYPE_FOLLOW_UP_WRONG:
+                #     #deduct score then general pumping
+                #     last_dialogue = self.dialogue_planner.get_last_dialogue_move()
+                #     if last_dialogue is not None:
+                #         for X in last_dialogue.word_relation:
+                #             self.extractor.remove_relation_to_concepts_if_not_valid(X)
+                #     triggered_move = DIALOGUE_TYPE_PUMPING_GENERAL
+                # elif triggered_move == DIALOGUE_TYPE_PUMPING_SPECIFIC:
+                #     self.world.curr_event = self.world.event_chains[len(self.world.event_chains)-1]
 
                 #if prompt
-                result = ORSEN.perform_dialogue_manager(self, triggered_move)
+                # result = ORSEN.perform_dialogue_manager(self, triggered_move)
 
         self.dialogue_planner.reset_state()
 
@@ -290,6 +305,8 @@ class ORSEN:
             self.world.add_setting(setting)
 
     def perform_dialogue_manager(self, move_to_execute=""):
+        print("**********CURR EMOTION EVENT")
+        print(self.world.curr_emotion_event)
         print("AT DIALOGUE MANAGER 1: ", move_to_execute)
         # curr_event = None
         if self.world.curr_emotion_event is not None:
@@ -329,7 +346,7 @@ class ORSEN:
 
                 print("EVENTS after: ")
                 print(self.world.curr_emotion_event)
-            self.world.curr_emotion_event = None
+            # self.world.curr_emotion_event = None
 
         self.dialogue_planner.set_template_details_history(chosen_template)
 
