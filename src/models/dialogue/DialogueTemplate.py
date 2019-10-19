@@ -172,8 +172,10 @@ class DialogueTemplate(ABC):
                 return True
             return False
         elif blank_type == 'Emotion':
+            # if len(curr_event) > 0:
+            #     if curr_event
             print("EMOTION IS PRESENT: ", curr_event.emotion)
-            if curr_event.emotion is not "":
+            if curr_event is not "":
                 return True
         return False
 

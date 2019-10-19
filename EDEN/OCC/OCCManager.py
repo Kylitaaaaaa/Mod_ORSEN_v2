@@ -4,17 +4,19 @@ from EDEN.db import DBOEmotion
 import spacy
 
 from EDEN.models import Emotion
+from EDEN.models.EmotionEventTemplateBuilder import EmotionEventTemplateBuilder
 from src.dbo.concept import DBOConcept, DBOConceptGlobalImpl
 from src.models.elements import Character
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
-from src import Logger
+from src import Logger, EVENT_ACTION
 
 nlp = spacy.load("en_core_web_sm")
 
 class OCCManager():
     def __init__(self, af="", de="", of="", oa="", sr ="", sp ="", op="", pros="", stat="", unexp=False, sa="", vr=False, ed="", eoa="", edev="", ef=""):
         super().__init__()
-        self.curr_action_event = None
+        # self.curr_action_event = None
+        self.curr_event = None
         self.response = ""
         self.dbo_concept = DBOConceptGlobalImpl()
 
@@ -45,31 +47,6 @@ class OCCManager():
         self.edev = edev
         self.ef = ef
 
-    def reset_occ(self):
-        """Agent-Based"""
-        self.af = ""
-        self.de = ""
-
-        """Object-Based"""
-        self.of = ""
-        self.oa = ""
-
-        """Event-Based"""
-        self.sr = ""
-        self.sp = ""
-        self.op = ""
-        self.pros = ""
-        self.stat = ""
-        self.unexp = False
-        self.sa = ""
-        self.vr = False
-
-        """Intensity"""
-        self.ed = ""
-        self.eoa = ""
-        self.edev = ""
-        self.ef = ""
-
     def set_values(self, af="", de="", of="", oa="", sr ="", sp ="", op="", pros="", stat="", unexp=False, sa="", vr=False, ed="", eoa="", edev="", ef=""):
         """Agent-Based"""
         self.af = af
@@ -97,7 +74,7 @@ class OCCManager():
 
     def get_occ_emotion(self, curr_action_event, response):
         # setup event to evaluate
-        self.curr_action_event = curr_action_event
+        self.curr_event = curr_action_event
 
         # setup response
         self.response = response
@@ -126,7 +103,6 @@ class OCCManager():
 
         # self.print_occ_values()
 
-        chosen_emotion = None
         if self.vr:
             if self.sr == SR_DISPLEASED:
                 if self.de == DE_OTHERS:
@@ -193,82 +169,101 @@ class OCCManager():
             if OCC_JOY in curr_emotions and self.unexp:
                 curr_emotions.append(OCC_SURPRISE)
 
-            # if (
-            #         OCC_FEARS_CONFIRMED in curr_emotions or OCC_FEAR in curr_emotions) and OCC_SATISFACTION in curr_emotions:
-            #     chosen_emotion = OCC_RELIEF
-            # if OCC_HOPE in curr_emotions and (OCC_FEARS_CONFIRMED in curr_emotions or OCC_FEAR in curr_emotions):
-            #     chosen_emotion = OCC_DISAPPOINTMENT
-            # if OCC_ANGER in curr_emotions and (OCC_GRATIFICATION in curr_emotions or OCC_GRATITUDE in curr_emotions):
-            #     chosen_emotion = OCC_GRATITUDE
-            # if OCC_REMORSE in curr_emotions and (OCC_GRATIFICATION in curr_emotions or OCC_GRATITUDE in curr_emotions):
-            #     chosen_emotion = OCC_GRATITUDE
-            # if OCC_GRATIFICATION and (OCC_REMORSE in curr_emotions or OCC_ANGER in curr_emotions):
-            #     chosen_emotion = OCC_ANGER
-            # if OCC_GRATITUDE in curr_emotions and (OCC_REMORSE in curr_emotions or OCC_ANGER in curr_emotions):
-            #     chosen_emotion = OCC_ANGER
 
+        if len(curr_emotions) > 0:
+            listToStr = ' '.join([str(curr_emotion) for curr_emotion in curr_emotions])
+            print("EMOTIONS FOUND: " + listToStr)
+            Logger.log_occ_values("EMOTIONS FOUND: " + listToStr)
+            simplified_emotion_str = self.simplify_emotions(emotions = curr_emotions)
+            final_emotion_list = []
+            for X in simplified_emotion_str:
+                final_emotion_list.append(EmotionEventTemplateBuilder.build(curr_action_event,
+                                            emotion=X,
+                                            af=self.af,
+                                            de=self.de,
+                                            of=self.of,
+                                            oa=self.oa,
+                                            sp=self.sp,
+                                            sr=self.sr,
+                                            op=self.op,
+                                            pros=self.pros,
+                                            stat=self.stat,
+                                            unexp=self.unexp,
+                                            sa=self.sa,
+                                            vr=self.vr,
+                                            ed=self.ed,
+                                            eoa=self.eoa,
+                                            edev=self.edev,
+                                            ef=self.ef))
 
-            if len(curr_emotions) > 0:
-                listToStr = ' '.join([str(curr_emotion) for curr_emotion in curr_emotions])
-                print("EMOTIONS FOUND: " + listToStr)
-                Logger.log_occ_values("EMOTIONS FOUND: " + listToStr)
-
-                #simplify emotions
-                curr_emotions = self.simplify_emotions(emotions = curr_emotions)
-                listToStr = ' '.join([str(curr_emotion) for curr_emotion in curr_emotions])
-                print("SIMPLIFIED EMOTIONS: " + listToStr)
-                Logger.log_occ_values("SIMPLIFIED EMOTIONS: " + listToStr)
-
-                #choose emotion
-
-                if chosen_emotion is None:
-                    chosen_emotion = curr_emotions[0]
-
-        # print("CHOSEN EMOTION IS: ", chosen_emotion)
-        if chosen_emotion is not None:
-            Logger.log_occ_values("CHOSEN EMOTION: " + chosen_emotion)
-            return Emotion(curr_action_event,
-                           emotion=chosen_emotion,
-                           af=self.af,
-                           de=self.de,
-                           of=self.of,
-                           oa=self.oa,
-                           sp=self.sp,
-                           sr=self.sr,
-                           op=self.op,
-                           pros=self.pros,
-                           stat=self.stat,
-                           unexp=self.unexp,
-                           sa=self.sa,
-                           vr=self.vr,
-                           ed=self.ed,
-                           eoa=self.eoa,
-                           edev=self.edev,
-                           ef=self.ef)
+            return final_emotion_list
         else:
             Logger.log_occ_values("NO EMOTION FOUND")
-        return None
+            return []
+
+
 
     def simplify_emotions(self, emotions =[]):
         simplified_emotions = []
         for X in emotions:
+            candidate = X
             if X in OCC_SIMPLIFY_ANGER:
-                simplified_emotions.append(OCC_ANGER)
+                candidate = OCC_ANGER
             elif X in OCC_SIMPLIFY_FEAR_CONFIRMED:
-                simplified_emotions.append(OCC_FEARS_CONFIRMED)
+                candidate = OCC_FEARS_CONFIRMED
             elif X in OCC_SIMPLIFY_GRATITUDE:
-                simplified_emotions.append(OCC_GRATITUDE)
+                candidate = OCC_GRATITUDE
             elif X in OCC_SIMPLIFY_SATISFACTION:
-                simplified_emotions.append(OCC_SATISFACTION)
-            else:
-                simplified_emotions.append(X)
+                candidate = OCC_SATISFACTION
+
+            #check if not yet in simplified list
+            if candidate not in simplified_emotions:
+                simplified_emotions.append(candidate)
         return simplified_emotions
 
+    def apply_but_logic(self, emotions = []):
+        final_emotions = []
+
+
+
+
+        if (OCC_FEARS_CONFIRMED in emotions or OCC_FEAR in emotions) and OCC_SATISFACTION in emotions:
+            final_emotions.append(OCC_RELIEF)
+            emotions = self.remove_from_list(emotions, [OCC_FEARS_CONFIRMED, OCC_FEAR, OCC_SATISFACTION])
+
+        if OCC_HOPE in emotions and (OCC_FEARS_CONFIRMED in emotions or OCC_FEAR in emotions):
+            final_emotions.append(OCC_DISAPPOINTMENT)
+            emotions = self.remove_from_list(emotions, [OCC_HOPE, OCC_FEARS_CONFIRMED, OCC_FEAR])
+
+        if (OCC_ANGER in emotions or OCC_REMORSE in emotions) and (OCC_GRATIFICATION in emotions or OCC_GRATITUDE in emotions):
+            final_emotions.append(OCC_GRATITUDE)
+            emotions = self.remove_from_list(emotions, [OCC_ANGER, OCC_REMORSE, OCC_GRATIFICATION, OCC_GRATITUDE])
+
+        if (OCC_GRATIFICATION in emotions or OCC_GRATITUDE in emotions) and (OCC_ANGER in emotions or OCC_REMORSE in emotions):
+            final_emotions.append(OCC_ANGER)
+            emotions = self.remove_from_list(emotions, [OCC_GRATIFICATION, OCC_GRATITUDE, OCC_ANGER, OCC_REMORSE])
+
+        if len(emotions) > 0:
+            temp = emotions[0]
+            for i in range(len(emotions)):
+                if i + 1 < len(emotions):
+                    temp_next = emotions[i+1]
+                    if temp in NEGATIVE_EMOTIONS and temp_next in POSITIVE_EMOTIONS:
+                        temp = temp_next
+                    elif (temp in NEGATIVE_EMOTIONS and temp_next in NEGATIVE_EMOTIONS) or (temp in POSITIVE_EMOTIONS and temp_next in POSITIVE_EMOTIONS) :
+                        final_emotions.append(temp)
+                        temp = temp_next
+
+            final_emotions.append(temp)
+
+    def remove_from_list(self, orig_list, list_to_remove):
+        for X in list_to_remove:
+            if X in orig_list:
+                orig_list.remove(X)
+        return orig_list
 
 
     def set_state(self):
-
-
         """Get OCC Values"""
         """Agent-Based"""
         self.af, self.of = self.get_af_of()
@@ -352,7 +347,7 @@ class OCCManager():
             Hero --> Positive Valence
     """
     def get_af_of(self):
-        sentiment = self.get_vader_sentiment(self.curr_action_event.subject.name)
+        sentiment = self.get_vader_sentiment(self.curr_event.subject.name)
         if sentiment == VADER_NEGATIVE:
             return AF_NOT_LIKED, OF_NOT_LIKED
         return AF_LIKED, AF_NOT_LIKED
@@ -365,10 +360,12 @@ class OCCManager():
         Else --> self    
     """
     def get_de(self):
-        if self.curr_action_event.direct_object is not None:
-            if type(self.curr_action_event.direct_object) == Character:
-                return DE_OTHERS
-        return DE_SELF
+        if self.curr_event.type == EVENT_ACTION:
+            if self.curr_event.direct_object is not None:
+                if type(self.curr_event.direct_object) == Character:
+                    return DE_OTHERS
+            return DE_SELF
+        return ""
 
     """OBJECT"""
     """
@@ -388,18 +385,20 @@ class OCCManager():
             Thief --> Common, Negative --> Not Attractive 
     """
     def get_oa(self):
-        for X in self.curr_action_event.get_objects_involved():
-            sentiment = self.get_vader_sentiment(X.name)
-            if self.is_familiar(X.name):
-                if sentiment == VADER_NEGATIVE:
-                    return OA_NOT_ATTRACTIVE
-                elif sentiment == VADER_POSITIVE:
-                    return OA_NEUTRAL
-            else:
-                if sentiment == VADER_NEGATIVE:
-                    return OA_NOT_ATTRACTIVE
-                return OA_ATTRACTIVE
-        return OA_ATTRACTIVE
+        if self.curr_event.type == EVENT_ACTION:
+            for X in self.curr_event.get_objects_involved():
+                sentiment = self.get_vader_sentiment(X.name)
+                if self.is_familiar(X.name):
+                    if sentiment == VADER_NEGATIVE:
+                        return OA_NOT_ATTRACTIVE
+                    elif sentiment == VADER_POSITIVE:
+                        return OA_NEUTRAL
+                else:
+                    if sentiment == VADER_NEGATIVE:
+                        return OA_NOT_ATTRACTIVE
+                    return OA_ATTRACTIVE
+            return OA_ATTRACTIVE
+        return ""
 
     """EVENT"""
     """
@@ -443,7 +442,7 @@ class OCCManager():
         verb_obj_val = ""
 
         #check subject
-        subj_val = self.get_vader_sentiment(self.curr_action_event.subject.name)
+        subj_val = self.get_vader_sentiment(self.curr_event.subject.name)
 
         #check verb and object
         verb_obj_val = self.get_vader_sentiment(self.get_vader_event_string())
@@ -480,22 +479,24 @@ class OCCManager():
             The team did not play well --> Disconfirmed
         """
     def get_stat(self):
-        doc = nlp(self.response)
+        if self.curr_event.type == EVENT_ACTION:
+            doc = nlp(self.response)
 
-        #check if input has past verb tense
-        past_verb_tokens = [tok for tok in doc if (tok.tag_ == 'VBD' or tok.tag_ == "VBN")]
-        print(past_verb_tokens)
+            #check if input has past verb tense
+            past_verb_tokens = [tok for tok in doc if (tok.tag_ == 'VBD' or tok.tag_ == "VBN")]
+            print(past_verb_tokens)
 
-        #check if input has negation
-        negation_tokens = [tok for tok in doc if tok.dep_ == 'neg']
-        print(negation_tokens)
+            #check if input has negation
+            negation_tokens = [tok for tok in doc if tok.dep_ == 'neg']
+            print(negation_tokens)
 
-        if len(past_verb_tokens) > 0:
-            if len(negation_tokens) > 0:
-                return STAT_DISCONFIRMED
-            else:
-                return STAT_CONFIRMED
-        return STAT_UNCONFIRMED
+            if len(past_verb_tokens) > 0:
+                if len(negation_tokens) > 0:
+                    return STAT_DISCONFIRMED
+                else:
+                    return STAT_CONFIRMED
+            return STAT_UNCONFIRMED
+        return ""
 
     """
     Unexpectedness (unexp)
@@ -563,18 +564,20 @@ class OCCManager():
         Else --> Not Obvious 
     """
     def get_eoa(self):
-        #check if has adverb and not exceptional adverb
-        if self.curr_action_event.adverb is not None:
-            if str(self.curr_action_event.adverb.lemma_) not in EXC_ADVERB_LIST:
+        if self.curr_event.type == EVENT_ACTION:
+            #check if has adverb and not exceptional adverb
+            if self.curr_event.adverb is not None:
+                if str(self.curr_event.adverb.lemma_) not in EXC_ADVERB_LIST:
+                    return EOA_OBVIOUS
+            elif len(self.curr_event.get_objects_involved()) > 0:
+                for object in self.curr_event.get_objects_involved():
+                    print(object.attribute)
+                    for attribute in object.attribute:
+                        if attribute.is_negated:
+                            return EOA_NOT_OBVIOUS
                 return EOA_OBVIOUS
-        elif len(self.curr_action_event.get_objects_involved()) > 0:
-            for object in self.curr_action_event.get_objects_involved():
-                print(object.attribute)
-                for attribute in object.attribute:
-                    if attribute.is_negated:
-                        return EOA_NOT_OBVIOUS
-            return EOA_OBVIOUS
-        return EOA_NOT_OBVIOUS
+            return EOA_NOT_OBVIOUS
+        return ""
 
     """
     Expected Deviation (edev)
@@ -588,10 +591,12 @@ class OCCManager():
             Scientist invented the theory --> Low
     """
     def get_edev(self):
-        concepts = self.dbo_concept.get_specific_concept(self.curr_action_event.subject.name, 'CapableOf', str(self.curr_action_event.verb.lemma_))
-        if concepts is not None:
-            return EDEV_LOW
-        return EDEV_HIGH
+        if self.curr_event.type == EVENT_ACTION:
+            concepts = self.dbo_concept.get_specific_concept(self.curr_event.subject.name, 'CapableOf', str(self.curr_event.verb.lemma_))
+            if concepts is not None:
+                return EDEV_LOW
+            return EDEV_HIGH
+        return ""
 
     """
     Event Familiarity
@@ -603,25 +608,29 @@ class OCCManager():
         If verb does not exists, do does not exists --> Uncommon  
     """
     def get_ef(self):
-        if self.curr_action_event.direct_object is None:
-            return EF_COMMON
-
-        if len(self.dbo_concept.get_concept_by_word(str(self.curr_action_event.verb.lemma_))) > 0:
-            if len(self.dbo_concept.get_concept_by_word(self.curr_action_event.direct_object.name)) > 0:
+        if self.curr_event.type == EVENT_ACTION:
+            if self.curr_event.direct_object is None:
                 return EF_COMMON
-        return EF_UNCOMMON
+
+            if len(self.dbo_concept.get_concept_by_word(str(self.curr_event.verb.lemma_))) > 0:
+                if len(self.dbo_concept.get_concept_by_word(self.curr_event.direct_object.name)) > 0:
+                    return EF_COMMON
+            return EF_UNCOMMON
+        return ""
 
     """VADER FUNCTIONS"""
 
     def get_vader_event_string(self):
+        if self.curr_event.type == EVENT_ACTION:
+            final_string = str(self.curr_event.verb.lemma_)
+            if self.curr_event.direct_object is not None:
+                final_string = final_string + " " + self.curr_event.direct_object.name
 
-        final_string = str(self.curr_action_event.verb.lemma_)
-        if self.curr_action_event.direct_object is not None:
-            final_string = final_string + " " + self.curr_action_event.direct_object.name
+            print("THIS IS THE FINAL STRING: ", final_string)
+            final_string = str(final_string)
+            return final_string
+        return ""
 
-        print("THIS IS THE FINAL STRING: ", final_string)
-        final_string = str(final_string)
-        return final_string
 
 
     def get_vader_sentiment(self, to_eval_str):

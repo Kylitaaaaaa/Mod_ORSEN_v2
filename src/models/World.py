@@ -39,7 +39,7 @@ class World:
         self.sentence_references = sentence_references
         self.dialogue_move_history = dialogue_move_history
         self.curr_event = None
-        self.curr_emotion_event = None
+        self.curr_emotion_event = []
         self.last_fetched = []
 
     def add_event(self, event, sentence):
@@ -51,7 +51,7 @@ class World:
         self.curr_event = event
 
     def add_emotion_event(self, event):
-        self.emotion_events.append(event)
+        self.emotion_events.extend(event)
 
         self.curr_emotion_event = event
 

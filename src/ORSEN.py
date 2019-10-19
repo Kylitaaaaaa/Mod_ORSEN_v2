@@ -1,3 +1,4 @@
+from EDEN.models import Emotion
 from src.dataprocessor import Annotator
 from src.models import World
 from src.models.elements import Attribute, Setting
@@ -80,7 +81,7 @@ class ORSEN:
 
                 curr_emotion_event = self.get_emotion(response)
                 result = None
-                if curr_emotion_event is not None:
+                if len(curr_emotion_event) > 0:
                     self.world.add_emotion_event(curr_emotion_event)
                     result = ORSEN.perform_dialogue_manager(self, DIALOGUE_TYPE_E_LABEL)
 
@@ -307,8 +308,10 @@ class ORSEN:
         print(self.world.curr_emotion_event)
         print("AT DIALOGUE MANAGER 1: ", move_to_execute)
         # curr_event = None
-        if self.world.curr_emotion_event is not None:
-            curr_event = self.world.curr_emotion_event
+        if len(self.world.curr_emotion_event) > 0:
+            #only passing the first emotion event
+            #TODO:
+            curr_event = self.world.curr_emotion_event[len(self.world.curr_emotion_event)-1]
         else:
             curr_event = self.world.curr_event
 
@@ -398,11 +401,16 @@ class ORSEN:
         emotions_found = []
         for i in range(0, len(self.world.last_fetched)):
             curr_event = self.world.last_fetched[i]
+            #check if description later
             if curr_event.type == EVENT_ACTION:
+                #reset occ values
+                self.occ_manager.set_values()
+                #get emotion list (str)
                 temp_emotion = self.occ_manager.get_occ_emotion(curr_event, response)
-                emotions_found.append(temp_emotion)
-            else:
-                Logger.log_occ_values("NO EMOTION FOUND")
+                for X in temp_emotion:
+                    if X.emotion not in emotions_found:
+                        emotions_found.append(X)
+
 
         # for i in range(0, len(emotions_found)):
         #     emotion = emotions_found[i]
@@ -411,15 +419,19 @@ class ORSEN:
         #         Logger.log_occ_values("NO EMOTION FOUND")
         #     else:
         #         emotion.print_occ_values()
+        #
+        # #remove none
+        # emotions_found = list(filter(None, emotions_found))
+        # if len(emotions_found) != 0:
+        #     Logger.log_occ_values("FINAL EMOTION FOR RESPONSE: " + emotions_found[len(emotions_found)-1].emotion)
+        #     return emotions_found[len(emotions_found)-1]
+        #
+        # Logger.log_occ_values("NO EMOTION FOUND FOR RESPONSE")
+        # return None
 
-        #remove none
-        emotions_found = list(filter(None, emotions_found))
-        if len(emotions_found) != 0:
-            Logger.log_occ_values("FINAL EMOTION FOR RESPONSE: " + emotions_found[len(emotions_found)-1].emotion)
-            return emotions_found[len(emotions_found)-1]
-
-        Logger.log_occ_values("NO EMOTION FOUND FOR RESPONSE")
-        return None
+        if len(emotions_found) > 0:
+            return emotions_found
+        return []
 
     def is_end_story(self, response):
         if self.is_end:

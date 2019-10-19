@@ -64,7 +64,7 @@ STAT_CONFIRMED = "CONFIRMED"
 STAT_UNCONFIRMED = "UNCONFIRMED"
 STAT_DISCONFIRMED = "DISCONFIRMED"
 
-# Unexpectedness (UNEXP)
+# Unexpectedness (UNEXP)EDEV
 UNEXP_TRUE = True
 UNEXP_FALSE = False
 UNEXP_LIST = ["abruptly", "unexpectedly", "immediately", "instantaneously", "promptly", "swiftly", "instantly", "short", "unaware", "unawares", "without warning", "unanticipatedly", "at once", "straight away", "forthwith", "sudden", "straight off", "asudden", "all at once", "quickly", "without notice", "in a flash", "in a trice", "in an instant", "in two shakes", "all of a sudden", "like a shot", "out of the blue", "on spur of moment", "before you can say knife", "before you can say Jack Robinson", "on the spur of the moment"]
@@ -102,7 +102,7 @@ EF_UNCOMMON = "UNCOMMON"
 OCC_DISTRESS = "DISTRESS"
 OCC_SORRY_FOR = "SORRY FOR"
 OCC_RESENTMENT = "RESENTMENT"
-OCC_GLOATING = "GLOATING"
+# OCC_GLOATING = "GLOATING"
 OCC_HOPE = "HOPE"
 OCC_FEAR = "FEAR"
 OCC_SATISFACTION = "SATISFACTION"
@@ -113,21 +113,50 @@ OCC_PRIDE = "PRIDE"
 OCC_SHAME = "SHAME"
 OCC_ADMIRATION = "ADMIRATION"
 # OCC_REPROACH = "REPROACH"
-OCC_REPROACH = "DISGRACE"
+# OCC_REPROACH = "DISGRACE"
 OCC_LOVE = "LOVE"
 OCC_HATE = "HATE"
 OCC_GRATIFICATION = "GRATIFICATION"
-# OCC_REMORSE = "REMORSE"
-OCC_REMORSE = "GUILT"
+OCC_REMORSE = "REMORSE"
+# OCC_REMORSE = "GUILT"
 OCC_GRATITUDE = "GRATITUDE"
 OCC_ANGER = "ANGER"
 OCC_SHOCK = "SHOCK"
 OCC_SURPRISE = "SURPRISE"
 OCC_JOY = "JOY"
 
-NEGATIVE_EMOTIONS = [OCC_REMORSE,
+"""SIMPLIFIED EMOTIONS"""
+OCC_SIMPLIFY_ANGER = [OCC_SHAME, OCC_REMORSE, OCC_ANGER]
+OCC_SIMPLIFY_FEAR_CONFIRMED = [OCC_FEARS_CONFIRMED, OCC_FEAR]
+OCC_SIMPLIFY_GRATITUDE = [OCC_PRIDE, OCC_ADMIRATION, OCC_GRATIFICATION, OCC_GRATITUDE]
+OCC_SIMPLIFY_SATISFACTION = [OCC_HOPE, OCC_SATISFACTION]
+
+#change to disciplinary emotions
+DISCIPLINARY_EMOTIONS = [OCC_HATE]
+
+NEGATIVE_EMOTIONS = [OCC_DISTRESS,
+                     OCC_SORRY_FOR,
+                     OCC_RESENTMENT,
+                     OCC_FEAR,
+                     OCC_FEARS_CONFIRMED,
+                     OCC_DISAPPOINTMENT,
+                     OCC_SHAME,
                      OCC_HATE,
-                     OCC_DISTRESS]
+                     OCC_REMORSE,
+                     OCC_ANGER,
+                     OCC_SHOCK]
+
+POSITIVE_EMOTIONS = [OCC_HOPE,
+                     OCC_SATISFACTION,
+                     OCC_RELIEF,
+                     OCC_PRIDE,
+                     OCC_ADMIRATION,
+                     OCC_LOVE,
+                     OCC_GRATIFICATION,
+                     OCC_GRATITUDE,
+                     OCC_SURPRISE,
+                     OCC_JOY]
 
 EMOTION_TYPE_POSITIVE = "POSITIVE"
 EMOTION_TYPE_NEGATIVE = "NEGATIVE"
+

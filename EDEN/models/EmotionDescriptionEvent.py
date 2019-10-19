@@ -1,16 +1,15 @@
 from EDEN.constants import *
-from src.models.events import ActionEvent, Event
-from src import Logger, EVENT_ACTION, EVENT_DESCRIPTION
+from src.models.events import ActionEvent, Event, DescriptionEvent
+from src import Logger, EVENT_ACTION, EVENT_DESCRIPTION, EMOTION_EVENT_DESCRIPTION
 from src.models.pickles.PickleObject import PickleObject
 
 
-class Emotion(Event):
+class EmotionDescriptionEvent(DescriptionEvent):
 
     def __init__(self, event, emotion =[], af="", de="", of="", oa="", sp="", sr="", op="", pros="", stat="", unexp=False, sa="", vr=False, ed="", eoa="", edev="", ef=""):
-        if event is not None and event.type == EVENT_ACTION:
-            super().__init__(sequence_number = event.sequence_number, subject=event.subject, verb=event.verb, direct_object=event.direct_object, adverb=event.adverb, preposition=event.preposition, object_of_preposition=event.object_of_preposition)
-        # elif event is not None and event.type == EVENT_DESCRIPTION:
-        #     super().__init__(sequence_number = event.sequence_number, EVENT_DESCRIPTION, subject)
+        if event is not None:
+            super().__init__(sequence_number = event.sequence_number, subject=event.subject, attributes=event.attributes)
+
         self.event = event
         self.emotion = emotion
         self.af = af
@@ -29,6 +28,7 @@ class Emotion(Event):
         self.eoa = eoa
         self.edev = edev
         self.ef = ef
+        self.type = EMOTION_EVENT_DESCRIPTION
 
     def get_emotion_type(self):
         if self.emotion in NEGATIVE_EMOTIONS:
