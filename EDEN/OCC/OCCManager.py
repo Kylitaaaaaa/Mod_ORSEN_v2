@@ -212,6 +212,15 @@ class OCCManager():
                 listToStr = ' '.join([str(curr_emotion) for curr_emotion in curr_emotions])
                 print("EMOTIONS FOUND: " + listToStr)
                 Logger.log_occ_values("EMOTIONS FOUND: " + listToStr)
+
+                #simplify emotions
+                curr_emotions = self.simplify_emotions(emotions = curr_emotions)
+                listToStr = ' '.join([str(curr_emotion) for curr_emotion in curr_emotions])
+                print("SIMPLIFIED EMOTIONS: " + listToStr)
+                Logger.log_occ_values("SIMPLIFIED EMOTIONS: " + listToStr)
+
+                #choose emotion
+
                 if chosen_emotion is None:
                     chosen_emotion = curr_emotions[0]
 
@@ -239,6 +248,23 @@ class OCCManager():
         else:
             Logger.log_occ_values("NO EMOTION FOUND")
         return None
+
+    def simplify_emotions(self, emotions =[]):
+        simplified_emotions = []
+        for X in emotions:
+            if X in OCC_SIMPLIFY_ANGER:
+                simplified_emotions.append(OCC_ANGER)
+            elif X in OCC_SIMPLIFY_FEAR_CONFIRMED:
+                simplified_emotions.append(OCC_FEARS_CONFIRMED)
+            elif X in OCC_SIMPLIFY_GRATITUDE:
+                simplified_emotions.append(OCC_GRATITUDE)
+            elif X in OCC_SIMPLIFY_SATISFACTION:
+                simplified_emotions.append(OCC_SATISFACTION)
+            else:
+                simplified_emotions.append(X)
+        return simplified_emotions
+
+
 
     def set_state(self):
 
