@@ -12,7 +12,7 @@ from src import Logger
 nlp = spacy.load("en_core_web_sm")
 
 class OCCManager():
-    def __init__(self):
+    def __init__(self, af="", de="", of="", oa="", sr ="", sp ="", op="", pros="", stat="", unexp=False, sa="", vr=False, ed="", eoa="", edev="", ef=""):
         super().__init__()
         self.curr_action_event = None
         self.response = ""
@@ -21,6 +21,31 @@ class OCCManager():
         self.emotion = None
 
         # setup OCC Values
+        """Agent-Based"""
+        self.af = af
+        self.de = de
+
+        """Object-Based"""
+        self.of = of
+        self.oa = oa
+
+        """Event-Based"""
+        self.sr = sr
+        self.sp = sp
+        self.op = op
+        self.pros = pros
+        self.stat = stat
+        self.unexp = unexp
+        self.sa = sa
+        self.vr = vr
+
+        """Intensity"""
+        self.ed = ed
+        self.eoa = eoa
+        self.edev = edev
+        self.ef = ef
+
+    def reset_occ(self):
         """Agent-Based"""
         self.af = ""
         self.de = ""
@@ -45,6 +70,31 @@ class OCCManager():
         self.edev = ""
         self.ef = ""
 
+    def set_values(self, af="", de="", of="", oa="", sr ="", sp ="", op="", pros="", stat="", unexp=False, sa="", vr=False, ed="", eoa="", edev="", ef=""):
+        """Agent-Based"""
+        self.af = af
+        self.de = de
+
+        """Object-Based"""
+        self.of = of
+        self.oa = oa
+
+        """Event-Based"""
+        self.sr = sr
+        self.sp = sp
+        self.op = op
+        self.pros = pros
+        self.stat = stat
+        self.unexp = unexp
+        self.sa = sa
+        self.vr = vr
+
+        """Intensity"""
+        self.ed = ed
+        self.eoa = eoa
+        self.edev = edev
+        self.ef = ef
+
     def get_occ_emotion(self, curr_action_event, response):
         # setup event to evaluate
         self.curr_action_event = curr_action_event
@@ -65,12 +115,14 @@ class OCCManager():
 
         self.set_state()
 
+        return self.choose_emotion(curr_action_event, self.get_event_valence())
 
-
+    def choose_emotion(self, curr_action_event=None, event_valence=None):
         curr_emotions = []
 
-        Logger.log_occ_values("EVALUATING: " + str(curr_action_event.sequence_number) + " : " + self.get_vader_event_string())
-        Logger.log_occ_values(self.print_occ_values())
+        # Logger.log_occ_values(
+        #     "EVALUATING: " + str(curr_action_event.sequence_number) + " : " + self.get_vader_event_string())
+        # Logger.log_occ_values(self.print_occ_values())
 
         # self.print_occ_values()
 
@@ -78,7 +130,7 @@ class OCCManager():
         if self.vr:
             if self.sr == SR_DISPLEASED:
                 if self.de == DE_OTHERS:
-                    if self.sp == SP_UNDESIRABLE and self.of == OF_NOT_LIKED and self.oa == OA_NOT_ATTRACTIVE and self.get_event_valence() == VADER_NEGATIVE:
+                    if self.sp == SP_UNDESIRABLE and self.of == OF_NOT_LIKED and self.oa == OA_NOT_ATTRACTIVE and event_valence == VADER_NEGATIVE:
                         curr_emotions.append(OCC_HATE)
                     if self.op == OP_UNDESIRABLE and self.af == AF_LIKED:
                         curr_emotions.append(OCC_SORRY_FOR)
@@ -93,15 +145,14 @@ class OCCManager():
                         curr_emotions.append(OCC_DISTRESS)
                     if self.pros == PROS_NEGATIVE and self.sp == SP_UNDESIRABLE and self.stat == STAT_UNCONFIRMED:
                         curr_emotions.append(OCC_FEAR)
-                        curr_emotions.append(OCC_FEARS_CONFIRMED)
+                        # curr_emotions.append(OCC_FEARS_CONFIRMED)
                     if self.pros == PROS_NEGATIVE and self.sp == SP_UNDESIRABLE and self.stat == STAT_CONFIRMED:
                         curr_emotions.append(OCC_FEARS_CONFIRMED)
                     if self.sa == SA_BLAME and self.sp == SP_UNDESIRABLE:
                         curr_emotions.append(OCC_SHAME)
-                        curr_emotions.append(OCC_ANGER)
+                        # curr_emotions.append(OCC_ANGER)
                     if self.pros == PROS_POSITIVE and self.sp == SP_DESIRABLE and self.stat == STAT_DISCONFIRMED:
                         curr_emotions.append(OCC_DISAPPOINTMENT)
-
 
             if self.sr == SR_PLEASED:
                 if self.sp == SP_DESIRABLE:
@@ -112,55 +163,59 @@ class OCCManager():
                     #     curr_emotions.append(OCC_GLOATING)
                     if self.sa == SA_PRAISE and self.op == OP_DESIRABLE:
                         curr_emotions.append(OCC_ADMIRATION)
-                        curr_emotions.append(OCC_GRATITUDE)
-                    if self.sp == SP_DESIRABLE and self.of == OF_LIKED and self.oa == OA_ATTRACTIVE and self.get_event_valence() == VADER_POSITIVE:
+                        # curr_emotions.append(OCC_GRATITUDE)
+                    if self.sp == SP_DESIRABLE and self.of == OF_LIKED and self.oa == OA_ATTRACTIVE and event_valence == VADER_POSITIVE:
                         curr_emotions.append(OCC_LOVE)
 
                 if self.de == DE_SELF:
                     if self.pros == PROS_POSITIVE and self.sp == SP_DESIRABLE and self.stat == STAT_UNCONFIRMED:
                         curr_emotions.append(OCC_HOPE)
-                        curr_emotions.append(OCC_SATISFACTION)
+                        # curr_emotions.append(OCC_SATISFACTION)
                     if self.pros == PROS_POSITIVE and self.sp == SP_DESIRABLE and self.stat == STAT_CONFIRMED:
                         curr_emotions.append(OCC_SATISFACTION)
                     if self.pros == PROS_NEGATIVE and self.sp == SP_UNDESIRABLE and self.stat == STAT_DISCONFIRMED:
                         curr_emotions.append(OCC_RELIEF)
                     if self.sa == SA_PRAISE and self.sp == SP_DESIRABLE:
                         curr_emotions.append(OCC_PRIDE)
-                        curr_emotions.append(OCC_GRATITUDE)
+                        # curr_emotions.append(OCC_GRATITUDE)
 
             if OCC_JOY in curr_emotions and OCC_PRIDE in curr_emotions:
-                curr_emotions.append(OCC_GRATITUDE)
+                curr_emotions.append(OCC_GRATIFICATION)
             if OCC_DISTRESS in curr_emotions and OCC_SHAME in curr_emotions:
-                curr_emotions.append(OCC_ANGER)
+                curr_emotions.append(OCC_REMORSE)
             if OCC_JOY in curr_emotions and OCC_ADMIRATION in curr_emotions:
                 curr_emotions.append(OCC_GRATITUDE)
-            if OCC_DISTRESS in curr_emotions and OCC_REPROACH in curr_emotions:
-                curr_emotions.append(OCC_ANGER)
+            # if OCC_DISTRESS in curr_emotions and OCC_REPROACH in curr_emotions:
+            #     curr_emotions.append(OCC_ANGER)
+
             if OCC_DISTRESS in curr_emotions and self.unexp:
                 curr_emotions.append(OCC_SHOCK)
-            if OCC_DISTRESS in curr_emotions and self.unexp:
+            if OCC_JOY in curr_emotions and self.unexp:
                 curr_emotions.append(OCC_SURPRISE)
 
+            # if (
+            #         OCC_FEARS_CONFIRMED in curr_emotions or OCC_FEAR in curr_emotions) and OCC_SATISFACTION in curr_emotions:
+            #     chosen_emotion = OCC_RELIEF
+            # if OCC_HOPE in curr_emotions and (OCC_FEARS_CONFIRMED in curr_emotions or OCC_FEAR in curr_emotions):
+            #     chosen_emotion = OCC_DISAPPOINTMENT
+            # if OCC_ANGER in curr_emotions and (OCC_GRATIFICATION in curr_emotions or OCC_GRATITUDE in curr_emotions):
+            #     chosen_emotion = OCC_GRATITUDE
+            # if OCC_REMORSE in curr_emotions and (OCC_GRATIFICATION in curr_emotions or OCC_GRATITUDE in curr_emotions):
+            #     chosen_emotion = OCC_GRATITUDE
+            # if OCC_GRATIFICATION and (OCC_REMORSE in curr_emotions or OCC_ANGER in curr_emotions):
+            #     chosen_emotion = OCC_ANGER
+            # if OCC_GRATITUDE in curr_emotions and (OCC_REMORSE in curr_emotions or OCC_ANGER in curr_emotions):
+            #     chosen_emotion = OCC_ANGER
 
-            if (OCC_FEARS_CONFIRMED in curr_emotions or OCC_FEAR in curr_emotions) and OCC_SATISFACTION in curr_emotions:
-                chosen_emotion = OCC_RELIEF
-            if OCC_HOPE in curr_emotions and (OCC_FEARS_CONFIRMED in curr_emotions or OCC_FEAR in curr_emotions):
-                chosen_emotion = OCC_DISAPPOINTMENT
-            if OCC_ANGER in curr_emotions and (OCC_GRATIFICATION in curr_emotions or OCC_GRATITUDE in curr_emotions):
-                chosen_emotion = OCC_GRATITUDE
-            if OCC_REMORSE in curr_emotions and (OCC_GRATIFICATION in curr_emotions or OCC_GRATITUDE in curr_emotions):
-                chosen_emotion = OCC_GRATITUDE
-            if OCC_GRATIFICATION and (OCC_REMORSE in curr_emotions or OCC_ANGER in curr_emotions):
-                chosen_emotion = OCC_ANGER
-            if OCC_GRATITUDE in curr_emotions and (OCC_REMORSE in curr_emotions or OCC_ANGER in curr_emotions):
-                chosen_emotion = OCC_ANGER
 
             if len(curr_emotions) > 0:
                 listToStr = ' '.join([str(curr_emotion) for curr_emotion in curr_emotions])
+                print("EMOTIONS FOUND: " + listToStr)
                 Logger.log_occ_values("EMOTIONS FOUND: " + listToStr)
-                chosen_emotion = curr_emotions[0]
+                if chosen_emotion is None:
+                    chosen_emotion = curr_emotions[0]
 
-        print("CHOSEN EMOTION IS: ", chosen_emotion)
+        # print("CHOSEN EMOTION IS: ", chosen_emotion)
         if chosen_emotion is not None:
             Logger.log_occ_values("CHOSEN EMOTION: " + chosen_emotion)
             return Emotion(curr_action_event,
@@ -168,22 +223,21 @@ class OCCManager():
                            af=self.af,
                            de=self.de,
                            of=self.of,
-                           oa = self.oa,
-                           sp = self.sp,
-                           sr = self.sr,
-                           op = self.op,
-                           pros = self.pros,
-                           stat = self.stat,
-                           unexp = self.unexp,
-                           sa = self.sa,
-                           vr =self.vr,
-                           ed = self.ed,
-                           eoa = self.eoa,
-                           edev = self.edev,
-                           ef = self.ef)
+                           oa=self.oa,
+                           sp=self.sp,
+                           sr=self.sr,
+                           op=self.op,
+                           pros=self.pros,
+                           stat=self.stat,
+                           unexp=self.unexp,
+                           sa=self.sa,
+                           vr=self.vr,
+                           ed=self.ed,
+                           eoa=self.eoa,
+                           edev=self.edev,
+                           ef=self.ef)
         else:
             Logger.log_occ_values("NO EMOTION FOUND")
-
         return None
 
     def set_state(self):

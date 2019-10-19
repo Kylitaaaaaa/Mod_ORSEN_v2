@@ -7,9 +7,8 @@ from src.models.pickles.PickleObject import PickleObject
 class Emotion(ActionEvent):
 
     def __init__(self, event, emotion ="", af="", de="", of="", oa="", sp="", sr="", op="", pros="", stat="", unexp=False, sa="", vr=False, ed="", eoa="", edev="", ef=""):
-        print("event is")
-        print(event)
-        super().__init__(sequence_number = event.sequence_number, subject=event.subject, verb=event.verb, direct_object=event.direct_object, adverb=event.adverb, preposition=event.preposition, object_of_preposition=event.object_of_preposition)
+        if event is not None:
+            super().__init__(sequence_number = event.sequence_number, subject=event.subject, verb=event.verb, direct_object=event.direct_object, adverb=event.adverb, preposition=event.preposition, object_of_preposition=event.object_of_preposition)
         self.event = event
         self.emotion = emotion
         self.af = af

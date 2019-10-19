@@ -5,6 +5,8 @@ from src.ORSEN import ORSEN
 from src.textunderstanding.InputDecoder import InputDecoder
 import datetime
 
+import time
+
 # Database access
 dbo_user = DBOUser('users', User)
 
@@ -88,7 +90,10 @@ def clean_user_input(response):
 def start_storytelling():
     is_end_story = False
     while not is_end_story:
+        start_time = time.time()
         user_input = get_input() #TODO: Uncomment after testing
+
+        Logger.log_conversation(str(time.time() - start_time))
         # user_input = "John kicked the love"
         user_input = clean_user_input(user_input)
 
@@ -129,8 +134,8 @@ def start_storytelling():
             #     print(orsen.repeat_story())
 
 orsen = ORSEN()
-pickle_filepath = '../logs/user world/' + datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S") + "-" + UserHandler.get_instance().curr_user.name
-# pickle_filepath = '../Mod_ORSEN_v2//logs/user world/' + datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S") + "-" + UserHandler.get_instance().curr_user.name
+# pickle_filepath = '../logs/user world/' + datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S") + "-" + UserHandler.get_instance().curr_user.name
+pickle_filepath = '../Mod_ORSEN_v2//logs/user world/' + datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S") + "-" + UserHandler.get_instance().curr_user.name
 
 try:
 
