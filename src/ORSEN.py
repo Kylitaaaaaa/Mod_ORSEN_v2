@@ -60,19 +60,18 @@ class ORSEN:
         Check for trigger phrases 
         """""
 
+        #check if trigger phrase is assigned/requested by the user
         if triggered_move is not None:
             result = ORSEN.perform_dialogue_manager(self, triggered_move)
         else:
-            if self.world.\
-                    curr_emotion_event is None:
+            #checks if certain phrases are trigerred based on previous moves and world state
+            if self.world.curr_emotion_event is None:
                 triggered_move = self.dialogue_planner.check_trigger_phrases(response, self.world.event_chains, self.world.curr_event)
             else:
                 triggered_move = self.dialogue_planner.check_trigger_phrases(response, self.world.event_chains,
                                                                              self.world.curr_emotion_event)
-
             if triggered_move is None:
                 print("NO MOVE TRIGGERED")
-                #if not pump
                 """"
                 Executes text understanding part. This includes the extraction of important information in the text input 
                 (using previous sentences as context). This also including breaking the sentences into different event entities.  
