@@ -1,6 +1,6 @@
 import numpy as np
 
-from src import DEFAULT_SEED
+from src import DEFAULT_SEED, EVENT_ACTION, EVENT_CREATION, EVENT_DESCRIPTION
 
 
 class ContentDetermination:
@@ -51,6 +51,46 @@ class ContentDetermination:
         print("templates:")
         print(self.usable_template_list)
         return np.random.choice(self.usable_template_list)
+
+    def repeat_story(self, event_chains):
+        response = ""
+        for event in event_chains:
+            to_insert = event.subject.name + " "
+            if event.get_type() == EVENT_ACTION:
+                to_insert = to_insert + str(event.verb)
+            elif event.get_type() == EVENT_CREATION:
+                to_insert = event.subject.name
+            elif event.get_type() == EVENT_DESCRIPTION:
+                # Iterate through attributes
+                for X in event.attributes:
+                    to_insert = to_insert + X.keyword + " " + str(X.description.lemma_)
+            to_insert = to_insert + ". "
+            response = response + to_insert
+        return response
+
+    def repeat_emotion_story(self, curr_emotion_event, event_chains):
+        print("curr_emotion event")
+        print(curr_emotion_event)
+        if curr_emotion_event is None:
+            return ""
+
+        # self.world.curr_emotion_event.sequence_number
+        response = ""
+        for i in range (curr_emotion_event.sequence_number-1, len(event_chains)):
+            event = event_chains[i]
+            to_insert = event.subject.name + " "
+            if event.get_type() == EVENT_ACTION:
+                to_insert = to_insert + str(event.verb)
+            elif event.get_type() == EVENT_CREATION:
+                to_insert = event.subject.name
+            elif event.get_type() == EVENT_DESCRIPTION:
+                # Iterate through attributes
+                for X in event.attributes:
+                    to_insert = to_insert + X.keyword + " " + str(X.description.lemma_)
+            to_insert = to_insert + ". "
+            response = response + to_insert
+        return response
+
 
 
 

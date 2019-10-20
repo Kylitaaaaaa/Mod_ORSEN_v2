@@ -51,7 +51,8 @@ class World:
         self.curr_event = event
 
     def add_emotion_event(self, event):
-        self.emotion_events.extend(event)
+        self.emotion_events.append(event)
+        # self.emotion_events.extend(event)
 
         self.curr_emotion_event = event
 

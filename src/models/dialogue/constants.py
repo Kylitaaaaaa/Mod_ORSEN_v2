@@ -19,7 +19,16 @@ from src.knowledgeacquisition.followup import SuggestingDialogueTemplate
 #                  SuggestingDialogueTemplate()]
 
 """EDEN"""
-DIALOGUE_LIST = [PumpingGeneralDialogueTemplate()]
+DIALOGUE_LIST = [PumpingGeneralDialogueTemplate(),
+                 CPumpingDialogueTemplate(),
+                 DCorrectingDialogueTemplate(),
+                 DPraiseDialogueTemplate(),
+                 DPumpingDialogueTemplate(),
+                 ELabelDialogueTemplate(),
+                 EvaluationDialogueTemplate(),
+                 RecollectionDialogueTemplate(),
+                 EEndDialogueTemplate()
+                 ]
 
 EDEN_DIALOGUE_LIST = [CPumpingDialogueTemplate(),
                       DCorrectingDialogueTemplate(),

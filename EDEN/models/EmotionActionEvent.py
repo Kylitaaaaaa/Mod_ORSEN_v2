@@ -1,6 +1,6 @@
 from EDEN.constants import *
 from src.models.events import ActionEvent, Event
-from src import Logger, EVENT_ACTION, EVENT_DESCRIPTION, EMOTION_EVENT_ACTION
+from src import Logger, EVENT_ACTION, EVENT_DESCRIPTION
 from src.models.pickles.PickleObject import PickleObject
 
 
@@ -28,7 +28,7 @@ class EmotionActionEvent(ActionEvent):
         self.eoa = eoa
         self.edev = edev
         self.ef = ef
-        self.type = EMOTION_EVENT_ACTION
+        self.type = EVENT_EMOTION
 
     def get_emotion_type(self):
         if self.emotion in NEGATIVE_EMOTIONS:

@@ -10,7 +10,7 @@ class ELabelDialogueTemplate(DialogueTemplate):
 
 
     def fill_blanks(self, curr_emotion_event):
-        print("curr emotion: ", curr_emotion_event.emotion)
+        print("curr emotion: ", curr_emotion_event.type)
         response = copy.deepcopy(self.template)
 
         for i in range (len(self.nodes)):
