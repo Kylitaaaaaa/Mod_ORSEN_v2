@@ -57,6 +57,11 @@ class EDENDialoguePlanner(DialoguePlanner):
 
         return next_move
 
+    def choose_dialogue(self):
+        for i in range(len(DIALOGUE_LIST)):
+            if DIALOGUE_LIST[i].get_type() == DIALOGUE_TYPE_PUMPING_GENERAL:
+                return i
+
     ###checks only dialogue that does not need to go through text understanding
     def check_trigger_phrases(self, event_chain =[]):
         if self.response in IS_END:
