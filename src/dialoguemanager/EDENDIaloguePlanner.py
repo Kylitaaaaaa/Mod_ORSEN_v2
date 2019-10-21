@@ -47,11 +47,14 @@ class EDENDialoguePlanner(DialoguePlanner):
         return self.chosen_dialogue_move
 
     def check_auto_response(self):
-        next_move = ""
         next_move = self.check_trigger_phrases()
-        if next_move == "":
+        if next_move != "":
+            return next_move
+        else:
             next_move = self.check_affirm_deny()
-        print("NEXT MOVE SHOULD BE: ", next_move)
+
+        print("NEXTTTTT MVOEEEEE: ", next_move)
+
         return next_move
 
     ###checks only dialogue that does not need to go through text understanding
@@ -80,7 +83,7 @@ class EDENDialoguePlanner(DialoguePlanner):
             elif self.ongoing_c_pumping and self.response.lower() in IS_DONE_EXPLAINING:
                 self.ongoing_c_pumping = False
                 print("DONE EXPLANING")
-                print(self.curr_event.emotion)
+                print(self.curr_event.type)
                 if self.curr_event.emotion is not None:
                     # check if emotion should be disciplined
                     if self.curr_event.emotion in DISCIPLINARY_EMOTIONS:
@@ -93,7 +96,7 @@ class EDENDialoguePlanner(DialoguePlanner):
                             return DIALOGUE_TYPE_EVALUATION
         return ""
 
-    def check_based_prev_move(self, curr_event=None, curr_emotion_event=None):
+    def check_based_prev_move(self):
         last_move = self.get_last_dialogue_move()
 
         if last_move is not None:
@@ -102,9 +105,9 @@ class EDENDialoguePlanner(DialoguePlanner):
                 print("currently ongoing c pumping: ", self.response.lower())
                 print(IS_DONE_EXPLAINING)
 
-                if curr_event is not None and curr_emotion_event is not None and curr_event.type == EVENT_EMOTION and curr_event.emotion == curr_emotion_event.emotion:
-                    print("triggering e emphasis")
-                    return DIALOGUE_TYPE_E_EMPHASIS
+                # if curr_event is not None and curr_emotion_event is not None and curr_event.type == EVENT_EMOTION and curr_event.emotion == curr_emotion_event.emotion:
+                #     print("triggering e emphasis")
+                #     return DIALOGUE_TYPE_E_EMPHASIS
                 # elif self.response.lower() in IS_DONE_EXPLAINING:
                 #     self.ongoing_c_pumping = False
                 #     print("DONE EXPLANING")
@@ -119,8 +122,8 @@ class EDENDialoguePlanner(DialoguePlanner):
                 #                 return DIALOGUE_TYPE_D_PRAISE
                 #             else:
                 #                 return DIALOGUE_TYPE_EVALUATION
-                else:
-                    return DIALOGUE_TYPE_PUMPING_GENERAL
+                # else:
+                #     return DIALOGUE_TYPE_PUMPING_GENERAL
             ###START EDEN
             #check if last move is eden
             elif last_move.dialogue_type == DIALOGUE_TYPE_E_PUMPING:
@@ -155,6 +158,16 @@ class EDENDialoguePlanner(DialoguePlanner):
         else:
             print("NO PREVIOUS DIALOGUE")
         return ""
+
+    def check_based_curr_event(self, detected_event=None, curr_event=None):
+        if self.ongoing_c_pumping:
+            if detected_event is not None and curr_event is not None:
+                if detected_event.type == EVENT_EMOTION and detected_event.emotion == curr_event.emotion:
+                    return DIALOGUE_TYPE_E_EMPHASIS
+                else:
+                    return DIALOGUE_TYPE_PUMPING_GENERAL
+        return ""
+
 
     #emotion coaching model
     def is_model_ongoing(self):
@@ -203,6 +216,7 @@ class EDENDialoguePlanner(DialoguePlanner):
             curr_event = last_fetched[i]
             # check if description later
             if curr_event.type == EVENT_ACTION:
+                print("IT'S EVENT ACTION")
                 # reset occ values
                 self.occ_manager.set_values()
                 # get emotion list (str)
@@ -211,6 +225,9 @@ class EDENDialoguePlanner(DialoguePlanner):
                     for X in temp_emotion:
                         if X.emotion not in emotions_found:
                             emotions_found.append(X)
+
+        print("EMOTIONS FOUND: ")
+        print(emotions_found)
         #emotion found
         if len(emotions_found) > 0:
             # self.world.add_emotion_event(emotions_found)
@@ -225,7 +242,7 @@ class EDENDialoguePlanner(DialoguePlanner):
         else:
             if len(last_fetched) > 0:
                 return last_fetched[len(last_fetched)-1]
-            return None
+        return None
         # return []
 
     def is_repeat_story(self, move_to_execute):
