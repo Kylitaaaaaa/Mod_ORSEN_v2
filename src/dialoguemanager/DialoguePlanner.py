@@ -372,6 +372,12 @@ class DialoguePlanner:
         print("LEN DIALOGUE HISTORY: ", len(self.dialogue_history))
         return self.dialogue_history[len(self.dialogue_history)-1]
 
+    def get_second_to_last_dialogue_move(self):
+        if len(self.dialogue_history) >=2:
+            return self.dialogue_history[len(self.dialogue_history) - 2]
+        return None
+
+
     def is_move_eden(self, type):
         for X in EDEN_DIALOGUE_LIST:
             if X.dialogue_type == type:

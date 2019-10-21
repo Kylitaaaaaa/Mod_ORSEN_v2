@@ -222,6 +222,7 @@ class ORSEN:
     def perform_dialogue_manager(self, response, preselected_move=""):
         curr_event = None
         move_to_execute = ""
+
         if self.world.curr_emotion_event is not None:
             curr_event = self.world.curr_emotion_event
         elif self.world.curr_event is not None:
@@ -238,15 +239,30 @@ class ORSEN:
         else:
             #check if trigger phrases, affirm, deny responses
             move_to_execute = self.dialogue_planner.check_auto_response()
-            print("AFTER SELECTING AUTO: ", move_to_execute)
             if move_to_execute !="":
+                print("I HAVE MOVE TO EXECUTE!!")
                 self.dialogue_planner.perform_dialogue_planner(move_to_execute)
+
             else:
+                print("I DONT HAVE MOVE TO EXECUTE!!")
                 # regardless if model is done or not, undergo text understanding
                 self.perform_text_understanding(response)
 
-                print("CHECKING PREVIOUS DIALOGUE")
-                new_move_from_old = self.dialogue_planner.check_based_prev_move()
+                temp_event = self.dialogue_planner.get_latest_event(self.world.last_fetched)
+                if temp_event is not None and temp_event.type == EVENT_EMOTION:
+                    self.world.emotion_events.append(temp_event)
+                    new_move_from_old = self.dialogue_planner.check_based_prev_move(curr_event=temp_event, curr_emotion_event=self.world.curr_emotion_event)
+                else:
+                    new_move_from_old = ""
+
+
+                print("IS ongoing_c_pumping: ", self.dialogue_planner.ongoing_c_pumping)
+                if not self.dialogue_planner.ongoing_c_pumping:
+                    prev_move = self.dialogue_planner.get_last_dialogue_move()
+                    if prev_move is None or prev_move.dialogue_type != DIALOGUE_TYPE_E_PUMPING:
+                        curr_event = temp_event
+                # curr_event = temp_event
+
                 if new_move_from_old != "":
                     print("NEW DIALOGUE FORM PREV: ", new_move_from_old)
                     move_to_execute = new_move_from_old
@@ -258,17 +274,19 @@ class ORSEN:
                     print("No model ongoing")
                     print("Setting curr event")
                     # setting up curr event
-                    curr_event = self.dialogue_planner.get_latest_event(self.world.last_fetched)
+                    # curr_event = self.dialogue_planner.get_latest_event(self.world.last_fetched)
 
                     if curr_event is None:
                         move_to_execute = self.dialogue_planner.perform_dialogue_planner(DIALOGUE_TYPE_PUMPING_GENERAL)
                     else:
-
                         self.dialogue_planner.set_state(curr_event, self.world.get_num_action_events())
-                        if curr_event.type == EVENT_EMOTION:
-                            self.world.add_emotion_event(curr_event)
+                        if curr_event.type == EVENT_EMOTION and not self.dialogue_planner.ongoing_c_pumping:
+                            print("EMOTION IS PRESENT BUT NO C PUMPING")
+                            # self.world.add_emotion_event(curr_event)
+                            self.world.curr_emotion_event = curr_event
                             move_to_execute = self.dialogue_planner.perform_dialogue_planner(DIALOGUE_TYPE_E_LABEL)
                         else:
+                            print("GONNA FIND A NEW DIALOGUE MOVE")
                             self.world.curr_event = curr_event
                             move_to_execute = self.dialogue_planner.perform_dialogue_planner()
 
@@ -282,6 +300,15 @@ class ORSEN:
         self.content_determination.set_state(move_to_execute, curr_event, available_templates)
         response, chosen_template = self.content_determination.perform_content_determination()
 
+
+
+
+
+
+
+
+        """FINALIZE MOVES"""
+
         #check if other dialogue moves should be appended
         #is it necessary to repeat the story
         if self.dialogue_planner.is_repeat_story(move_to_execute):
@@ -291,6 +318,10 @@ class ORSEN:
             else:
                 response = response + \
                            "\n" + emotion_story
+        #update event chain with new emotion
+        if move_to_execute == DIALOGUE_TYPE_C_PUMPING:
+            self.world.curr_emotion_event.emotion = curr_event.emotion
+            self.world.emotion_events[self.world.curr_emotion_event.sequence_number - 1] = self.world.curr_emotion_event
 
         #saves dialogue move to history
         self.dialogue_planner.set_template_details_history(chosen_template)
