@@ -1,5 +1,6 @@
 import numpy as np
 
+from EDEN.constants import EVENT_EMOTION
 from src import DEFAULT_SEED, EVENT_ACTION, EVENT_CREATION, EVENT_DESCRIPTION
 
 
@@ -87,6 +88,8 @@ class ContentDetermination:
                 # Iterate through attributes
                 for X in event.attributes:
                     to_insert = to_insert + X.keyword + " " + str(X.description.lemma_)
+            elif event.get_type() == EVENT_EMOTION:
+                to_insert = to_insert + str(event.verb)
             to_insert = to_insert + ". "
             response = response + to_insert
         return response

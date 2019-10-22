@@ -46,12 +46,12 @@ class EDENDialoguePlanner(DialoguePlanner):
         self.print_dialogue_list()
         return self.chosen_dialogue_move
 
-    def check_auto_response(self):
+    def check_auto_response(self, destructive = True):
         next_move = self.check_trigger_phrases()
         if next_move != "":
             return next_move
         else:
-            next_move = self.check_affirm_deny()
+            next_move = self.check_affirm_deny(destructive)
 
         print("NEXTTTTT MVOEEEEE: ", next_move)
 
@@ -68,7 +68,7 @@ class EDENDialoguePlanner(DialoguePlanner):
             return DIALOGUE_TYPE_E_END
         return ""
 
-    def check_affirm_deny(self):
+    def check_affirm_deny(self, destructive = True):
         # check if last dialogue move has yes or no:
         print("CHECKING AFFIRM DENY")
         last_move = self.get_last_dialogue_move()
@@ -86,7 +86,8 @@ class EDENDialoguePlanner(DialoguePlanner):
                 else:
                     return DIALOGUE_TYPE_D_PUMPING
             elif self.ongoing_c_pumping and self.response.lower() in IS_DONE_EXPLAINING:
-                self.ongoing_c_pumping = False
+                if destructive:
+                    self.ongoing_c_pumping = False
                 print("DONE EXPLANING")
                 print(self.curr_event.type)
                 if self.curr_event.emotion is not None:
@@ -101,7 +102,7 @@ class EDENDialoguePlanner(DialoguePlanner):
                             return DIALOGUE_TYPE_EVALUATION
         return ""
 
-    def check_based_prev_move(self):
+    def check_based_prev_move(self, destructive = True):
         last_move = self.get_last_dialogue_move()
 
         if last_move is not None:
@@ -132,9 +133,11 @@ class EDENDialoguePlanner(DialoguePlanner):
             ###START EDEN
             #check if last move is eden
             elif last_move.dialogue_type == DIALOGUE_TYPE_E_PUMPING:
-                print("SETTING CURR_EVENT_EMOTION TO: ", self.response.upper())
-                self.curr_event.emotion = self.response.upper()
-                self.ongoing_c_pumping = True
+                if destructive:
+                    print("SETTING CURR_EVENT_EMOTION TO: ", self.response.upper())
+
+                    self.curr_event.emotion = self.response.upper()
+                    self.ongoing_c_pumping = True
                 return DIALOGUE_TYPE_C_PUMPING
             # elif self.ongoing_c_pumping and (self.response.lower() in IS_DONE_EXPLAINING):
             #     self.ongoing_c_pumping = False
@@ -259,7 +262,7 @@ class EDENDialoguePlanner(DialoguePlanner):
         if curr_dialogue_move == DIALOGUE_TYPE_D_PRAISE:
             return DIALOGUE_TYPE_EVALUATION
         elif curr_dialogue_move == DIALOGUE_TYPE_RECOLLECTION:
-            return DIALOGUE_TYPE_PUMPING_GENERAL
+            return DIALOGUE_TYPE_E_END
         # if curr_dialogue_move == DIALOGUE_TYPE_E_END:
         #     return DIALOGUE_TYPE_RECOLLECTION
         return ""

@@ -115,7 +115,8 @@ def start_storytelling():
             # is_end_story = orsen.is_end_story(user_input)
         else:
             """EDEN"""
-            orsen_response = orsen.get_response("", move_to_execute = DIALOGUE_TYPE_E_END)
+            # orsen_response = orsen.get_response("", move_to_execute = DIALOGUE_TYPE_E_END)
+            orsen_response = orsen.get_response("", move_to_execute = DIALOGUE_TYPE_RECOLLECTION)
             # orsen_response = orsen_response + orsen.get_response("", move_to_execute = DIALOGUE_TYPE_RECOLLECTION)
             print("=========================================================")
             print("EDEN:", orsen_response)

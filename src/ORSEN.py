@@ -241,7 +241,7 @@ class ORSEN:
             print("----------PRESELECTED: ", move_to_execute)
             # self.dialogue_planner.perform_dialogue_planner(move_to_execute)
 
-        elif self.dialogue_planner.check_auto_response() != "":
+        elif self.dialogue_planner.check_auto_response(destructive = False) != "":
             # check if trigger phrases, affirm, deny responses
             move_to_execute = self.dialogue_planner.check_auto_response()
             # self.dialogue_planner.perform_dialogue_planner(move_to_execute)
@@ -249,7 +249,7 @@ class ORSEN:
             print("----------AUTO: ", move_to_execute)
 
         # regardless if model is done or not, undergo text understanding
-        elif self.dialogue_planner.check_based_prev_move() != "":
+        elif self.dialogue_planner.check_based_prev_move(destructive = False) != "":
             self.perform_text_understanding(response)
             move_to_execute = self.dialogue_planner.check_based_prev_move()
             # self.dialogue_planner.perform_dialogue_planner(move_to_execute)
@@ -350,7 +350,7 @@ class ORSEN:
         #update event chain with new emotion
         if move_to_execute == DIALOGUE_TYPE_C_PUMPING:
             self.world.curr_emotion_event.emotion = self.dialogue_planner.curr_event.emotion
-            self.world.emotion_events[self.world.curr_emotion_event.sequence_number-1] = self.world.curr_emotion_event
+            self.world.emotion_events[len(self.world.emotion_events)-1] = self.world.curr_emotion_event
 
         #saves dialogue move to history
         self.dialogue_planner.set_template_details_history(chosen_template)
