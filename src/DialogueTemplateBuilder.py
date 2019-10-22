@@ -58,6 +58,8 @@ class DialogueTemplateBuilder:
          return RecollectionDialogueTemplate(id, templates, relations, blanks, nodes, dependent_nodes)
       elif dialogue_type == DIALOGUE_TYPE_E_END:
          return EEndDialogueTemplate(id, templates, relations, blanks, nodes, dependent_nodes)
+      elif dialogue_type == DIALOGUE_TYPE_E_EMPHASIS:
+         return EEmphasisDialogueTemplate(id, templates, relations, blanks, nodes, dependent_nodes)
 
 
 

@@ -24,4 +24,5 @@ from .EPumpingDialogueTemplate import EPumpingDialogueTemplate
 from .EvaluationDialogueTemplate import EvaluationDialogueTemplate
 from .RecollectionDialogueTemplate import RecollectionDialogueTemplate
 from .EEndDialogueTemplate import EEndDialogueTemplate
+from .EEmphasisDialogueTemplate import EEmphasisDialogueTemplate
 

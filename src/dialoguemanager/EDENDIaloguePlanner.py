@@ -4,12 +4,12 @@ from src import *
 from src.dialoguemanager import DialoguePlanner
 from src.models.dialogue.constants import DIALOGUE_LIST, DialogueHistoryTemplate, EDEN_DIALOGUE_LIST
 
-
 class EDENDialoguePlanner(DialoguePlanner):
 
     def __init__(self):
         super().__init__()
         self.occ_manager = OCCManager()
+        self.ongoing_c_pumping = False
 
     def perform_dialogue_planner(self, dialogue_move=""):
         #still no triggered phrase
@@ -46,13 +46,21 @@ class EDENDialoguePlanner(DialoguePlanner):
         self.print_dialogue_list()
         return self.chosen_dialogue_move
 
-    def check_auto_response(self):
-        next_move = ""
+    def check_auto_response(self, destructive = True):
         next_move = self.check_trigger_phrases()
-        if next_move == "":
-            next_move = self.check_affirm_deny()
-        print("NEXT MOVE SHOULD BE: ", next_move)
+        if next_move != "":
+            return next_move
+        else:
+            next_move = self.check_affirm_deny(destructive)
+
+        print("NEXTTTTT MVOEEEEE: ", next_move)
+
         return next_move
+
+    def choose_dialogue(self):
+        for i in range(len(DIALOGUE_LIST)):
+            if DIALOGUE_LIST[i].get_type() == DIALOGUE_TYPE_PUMPING_GENERAL:
+                return i
 
     ###checks only dialogue that does not need to go through text understanding
     def check_trigger_phrases(self, event_chain =[]):
@@ -60,13 +68,15 @@ class EDENDialoguePlanner(DialoguePlanner):
             return DIALOGUE_TYPE_E_END
         return ""
 
-    def check_affirm_deny(self):
+    def check_affirm_deny(self, destructive = True):
         # check if last dialogue move has yes or no:
         print("CHECKING AFFIRM DENY")
         last_move = self.get_last_dialogue_move()
+        second_to_last_move = self.get_second_to_last_dialogue_move
         if last_move is not None:
             if last_move.dialogue_type == DIALOGUE_TYPE_E_LABEL:
                 if self.response in IS_AFFIRM:
+                    self.ongoing_c_pumping = True
                     return DIALOGUE_TYPE_C_PUMPING
                 else:
                     return DIALOGUE_TYPE_E_PUMPING
@@ -75,29 +85,78 @@ class EDENDialoguePlanner(DialoguePlanner):
                     return DIALOGUE_TYPE_EVALUATION
                 else:
                     return DIALOGUE_TYPE_D_PUMPING
+            elif self.ongoing_c_pumping and self.response.lower() in IS_DONE_EXPLAINING:
+                if destructive:
+                    self.ongoing_c_pumping = False
+                print("DONE EXPLANING")
+                print(self.curr_event.type)
+                if self.curr_event.emotion is not None:
+                    # check if emotion should be disciplined
+                    if self.curr_event.emotion in DISCIPLINARY_EMOTIONS:
+                        return DIALOGUE_TYPE_D_CORRECTING
+                    else:
+                        # check if emotion is + or -
+                        if self.curr_event.emotion in POSITIVE_EMOTIONS:
+                            return DIALOGUE_TYPE_D_PRAISE
+                        else:
+                            return DIALOGUE_TYPE_EVALUATION
         return ""
 
-    def check_based_prev_move(self):
+    def check_based_prev_move(self, destructive = True):
         last_move = self.get_last_dialogue_move()
 
         if last_move is not None:
             print("LAST MOVE IS: ", last_move.dialogue_type)
+            if self.ongoing_c_pumping:
+                print("currently ongoing c pumping: ", self.response.lower())
+                print(IS_DONE_EXPLAINING)
+
+                # if curr_event is not None and curr_emotion_event is not None and curr_event.type == EVENT_EMOTION and curr_event.emotion == curr_emotion_event.emotion:
+                #     print("triggering e emphasis")
+                #     return DIALOGUE_TYPE_E_EMPHASIS
+                # elif self.response.lower() in IS_DONE_EXPLAINING:
+                #     self.ongoing_c_pumping = False
+                #     print("DONE EXPLANING")
+                #     print(self.curr_event.emotion)
+                #     if self.curr_event.emotion is not None:
+                #         # check if emotion should be disciplined
+                #         if self.curr_event.emotion in DISCIPLINARY_EMOTIONS:
+                #             return DIALOGUE_TYPE_D_CORRECTING
+                #         else:
+                #             # check if emotion is + or -
+                #             if self.curr_event.emotion in POSITIVE_EMOTIONS:
+                #                 return DIALOGUE_TYPE_D_PRAISE
+                #             else:
+                #                 return DIALOGUE_TYPE_EVALUATION
+                # else:
+                #     return DIALOGUE_TYPE_PUMPING_GENERAL
             ###START EDEN
             #check if last move is eden
-            if last_move.dialogue_type == DIALOGUE_TYPE_E_PUMPING:
-                self.curr_event.emotion = self.response.upper()
+            elif last_move.dialogue_type == DIALOGUE_TYPE_E_PUMPING:
+                if destructive:
+                    print("SETTING CURR_EVENT_EMOTION TO: ", self.response.upper())
 
+                    self.curr_event.emotion = self.response.upper()
+                    self.ongoing_c_pumping = True
                 return DIALOGUE_TYPE_C_PUMPING
-            elif last_move.dialogue_type == DIALOGUE_TYPE_C_PUMPING:
-                #check if emotion is + or -
-                if self.curr_event.emotion is not None:
-                    print("EMOTION TYPE OF ", self.curr_event.emotion)
-                    print(" IS: ", self.curr_event.get_emotion_type())
-                    if self.curr_event.get_emotion_type() == EMOTION_TYPE_POSITIVE:
-                        return DIALOGUE_TYPE_D_PRAISE
-                        # return DIALOGUE_TYPE_EVALUATION
-                    else:
-                        return DIALOGUE_TYPE_D_CORRECTING
+            # elif self.ongoing_c_pumping and (self.response.lower() in IS_DONE_EXPLAINING):
+            #     self.ongoing_c_pumping = False
+            #     if self.curr_event.emotion is not None:
+            #         #check if emotion should be disciplined
+            #         if self.curr_event.emotion in DISCIPLINARY_EMOTIONS:
+            #             return DIALOGUE_TYPE_D_CORRECTING
+            #         else:
+            #             # check if emotion is + or -
+            #             if self.curr_event.emotion in POSITIVE_EMOTIONS:
+            #                 return DIALOGUE_TYPE_D_PRAISE
+            #             else:
+            #                 return DIALOGUE_TYPE_EVALUATION
+            # elif self.ongoing_c_pumping and not (self.response.lower() in IS_DONE_EXPLAINING):
+            # # elif last_move.dialogue_type == DIALOGUE_TYPE_C_PUMPING or last_move.dialogue_type == DIALOGUE_TYPE_PUMPING_GENERAL and \
+            # #         (not self.ongoing_c_pumping and self.response.lower() in IS_DONE_EXPLAINING):
+            #     #check if emotion is repeating -- return emphasis
+            #     return DIALOGUE_TYPE_PUMPING_GENERAL
+
 
             elif last_move.dialogue_type == DIALOGUE_TYPE_D_PUMPING:
                 return DIALOGUE_TYPE_EVALUATION
@@ -108,12 +167,23 @@ class EDENDialoguePlanner(DialoguePlanner):
             print("NO PREVIOUS DIALOGUE")
         return ""
 
+    def check_based_curr_event(self, detected_event=None, curr_event=None):
+        if self.ongoing_c_pumping:
+            if detected_event is not None and curr_event is not None:
+                if detected_event.type == EVENT_EMOTION and detected_event.emotion == curr_event.emotion:
+                    return DIALOGUE_TYPE_E_EMPHASIS
+                else:
+                    return DIALOGUE_TYPE_PUMPING_GENERAL
+        return ""
+
+
     #emotion coaching model
     def is_model_ongoing(self):
         last_move = self.get_last_dialogue_move()
         if last_move is not None:
             if last_move.dialogue_type != EDEN_LAST_MODEL_MOVE\
-                    and last_move.dialogue_type != DIALOGUE_TYPE_PUMPING_GENERAL:
+                    and last_move.dialogue_type != DIALOGUE_TYPE_PUMPING_GENERAL \
+                    and not self.ongoing_c_pumping:
                 return True
         return False
 
@@ -154,14 +224,18 @@ class EDENDialoguePlanner(DialoguePlanner):
             curr_event = last_fetched[i]
             # check if description later
             if curr_event.type == EVENT_ACTION:
+                print("IT'S EVENT ACTION")
                 # reset occ values
                 self.occ_manager.set_values()
                 # get emotion list (str)
                 temp_emotion = self.occ_manager.get_occ_emotion(curr_event, self.response)
-                if len(temp_emotion) > 0:
+                if temp_emotion is not None and len(temp_emotion) > 0:
                     for X in temp_emotion:
                         if X.emotion not in emotions_found:
                             emotions_found.append(X)
+
+        print("EMOTIONS FOUND: ")
+        print(emotions_found)
         #emotion found
         if len(emotions_found) > 0:
             # self.world.add_emotion_event(emotions_found)
@@ -176,7 +250,7 @@ class EDENDialoguePlanner(DialoguePlanner):
         else:
             if len(last_fetched) > 0:
                 return last_fetched[len(last_fetched)-1]
-            return None
+        return None
         # return []
 
     def is_repeat_story(self, move_to_execute):
@@ -188,7 +262,7 @@ class EDENDialoguePlanner(DialoguePlanner):
         if curr_dialogue_move == DIALOGUE_TYPE_D_PRAISE:
             return DIALOGUE_TYPE_EVALUATION
         elif curr_dialogue_move == DIALOGUE_TYPE_RECOLLECTION:
-            return DIALOGUE_TYPE_PUMPING_GENERAL
+            return DIALOGUE_TYPE_E_END
         # if curr_dialogue_move == DIALOGUE_TYPE_E_END:
         #     return DIALOGUE_TYPE_RECOLLECTION
         return ""

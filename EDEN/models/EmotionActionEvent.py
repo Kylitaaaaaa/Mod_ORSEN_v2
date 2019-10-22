@@ -64,3 +64,8 @@ class EmotionActionEvent(ActionEvent):
         pickled_event.ef = self.ef
 
         return pickled_event
+
+
+    def __str__(self):
+        temp_str = "========== ACTION EMOTION EVENT FOUND ========== \n Event Seq No: " + str(self.event.sequence_number) + "\nEmotion: " + self.emotion
+        return temp_str

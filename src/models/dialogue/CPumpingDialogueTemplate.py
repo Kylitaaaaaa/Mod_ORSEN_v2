@@ -10,7 +10,6 @@ class CPumpingDialogueTemplate(DialogueTemplate):
 
 
     def fill_blanks(self, curr_emotion_event):
-        print("curr emotion: ", curr_emotion_event.emotion)
         response = copy.deepcopy(self.template)
 
         for i in range(len(self.nodes)):

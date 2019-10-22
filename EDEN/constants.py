@@ -132,10 +132,22 @@ OCC_SIMPLIFY_GRATITUDE = [OCC_PRIDE, OCC_ADMIRATION, OCC_GRATIFICATION, OCC_GRAT
 OCC_SIMPLIFY_SATISFACTION = [OCC_HOPE, OCC_SATISFACTION]
 
 #change to disciplinary emotions
-DISCIPLINARY_EMOTIONS = [OCC_HATE]
+DISCIPLINARY_EMOTIONS = [OCC_HATE,
+                         OCC_DISTRESS]
 
-NEGATIVE_EMOTIONS = [OCC_DISTRESS,
-                     OCC_SORRY_FOR,
+# NEGATIVE_EMOTIONS = [OCC_DISTRESS,
+#                      OCC_SORRY_FOR,
+#                      OCC_RESENTMENT,
+#                      OCC_FEAR,
+#                      OCC_FEARS_CONFIRMED,
+#                      OCC_DISAPPOINTMENT,
+#                      OCC_SHAME,
+#                      OCC_HATE,
+#                      OCC_REMORSE,
+#                      OCC_ANGER,
+#                      OCC_SHOCK]
+
+NEGATIVE_EMOTIONS = [OCC_SORRY_FOR,
                      OCC_RESENTMENT,
                      OCC_FEAR,
                      OCC_FEARS_CONFIRMED,

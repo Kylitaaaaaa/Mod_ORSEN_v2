@@ -25,6 +25,7 @@ FETCH_ALL = 2
 IS_AFFIRM = ['yes', 'yes.', 'yeah', 'yeah.', 'sure', 'sure.', 'yup', 'yup.']
 IS_DENY = ['no', 'no.', 'nope', 'nope.']
 IS_END = ['bye', 'bye.', 'the end', 'the end.', 'STOP']
+IS_DONE_EXPLAINING = ['nothing', 'i dont know', 'nothing.', 'i dont know.']
 
 """ORSEN2 RESPONSES"""
 IS_DONT_LIKE = ['dont like']
@@ -92,6 +93,7 @@ DIALOGUE_TYPE_E_LABEL = "e-label"
 DIALOGUE_TYPE_E_PUMPING = "e-pumping"
 DIALOGUE_TYPE_C_PUMPING = "c-pumping"
 DIALOGUE_TYPE_D_PRAISE = "d-praise"
+DIALOGUE_TYPE_E_EMPHASIS = "e-emphasis"
 DIALOGUE_TYPE_D_CORRECTING = "d-correcting"
 DIALOGUE_TYPE_D_PUMPING = "d-pumping"
 DIALOGUE_TYPE_EVALUATION = "evaluation"
