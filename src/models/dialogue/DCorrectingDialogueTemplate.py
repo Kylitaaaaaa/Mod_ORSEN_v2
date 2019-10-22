@@ -1,5 +1,6 @@
 from . import DialogueTemplate
 from src.constants import *
+import copy
 
 
 class DCorrectingDialogueTemplate(DialogueTemplate):
@@ -13,7 +14,18 @@ class DCorrectingDialogueTemplate(DialogueTemplate):
         #        return []
         pass
 
-    def fill_blanks(self, event):
-        return self.template
+    def fill_blanks(self, curr_emotion_event):
+        response = copy.deepcopy(self.template)
+
+        for i in range(len(self.nodes)):
+            to_insert = ""
+            curr_index = response.index(self.nodes[i])
+            if self.blanks[i] == 'Character':
+                if curr_emotion_event.event.get_characters_involved()[0].name.lower() == 'i':
+                    to_insert = 'you'
+                else:
+                    to_insert = curr_emotion_event.event.get_characters_involved()[0].name
+            response[curr_index] = to_insert
+        return response
 
 
