@@ -23,12 +23,8 @@ class ContentDetermination:
         self.usable_template_list = []
 
     def perform_content_determination(self):
-        print("FETCHING: ", self.move_to_execute)
-
         #choose template
         chosen_template = self.choose_template()
-        print("CHOSEN TEMPLATE IS: ", chosen_template)
-        print("TEMPLATE IS: ", chosen_template.template)
 
         #fill template to use
         if len(chosen_template.template) == 1:
@@ -36,21 +32,16 @@ class ContentDetermination:
         else:
             response = chosen_template.fill_blanks(self.curr_event)
 
-        print("response is: ")
-        print(response)
         if type(response) is not type("dump"):
             str_response = ' '.join(response)
             # TODO replace multiple occurences of spaces with only one space.
         else:
             str_response = response
-        print("RESPONSE IS: ", str_response)
 
         self.reset_state()
         return str_response, chosen_template
 
     def choose_template(self):
-        print("templates:")
-        print(self.usable_template_list)
         return np.random.choice(self.usable_template_list)
 
     def repeat_story(self, event_chains):
@@ -70,8 +61,6 @@ class ContentDetermination:
         return response
 
     def repeat_emotion_story(self, curr_emotion_event, event_chains):
-        print("curr_emotion event")
-        print(curr_emotion_event)
         if curr_emotion_event is None:
             return ""
 

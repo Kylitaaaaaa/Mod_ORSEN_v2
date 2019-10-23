@@ -55,39 +55,6 @@ class DialoguePlanner:
         self.is_usable = []
         self.is_usable = [False] * len(DIALOGUE_LIST)
 
-    # def perform_dialogue_planner(self, response="", dialogue_move=""):
-    #     if dialogue_move == "":
-    #         self.setup_templates_is_usable()
-    #
-    #         Logger.log_dialogue_model_basic("Breakdown of values used:")
-    #         Logger.log_dialogue_model_basic_example(DIALOGUE_LIST)
-    #         Logger.log_dialogue_model_basic_example(self.is_usable)
-    #         Logger.log_dialogue_model_basic_example(self.frequency_count)
-    #
-    #         self.chosen_move_index = self.choose_dialogue()
-    #         Logger.log_dialogue_model_basic("Chosen dialogue index: " + str(self.chosen_move_index))
-    #
-    #         self.chosen_dialogue_move = DIALOGUE_LIST[self.chosen_move_index].get_type()
-    #         self.chosen_dialogue_template = self.usable_templates[self.chosen_move_index]
-    #
-    #         # self.dialogue_history.append(DialogueHistoryTemplate(dialogue_type=self.chosen_dialogue_move))
-    #         # print("HERE'S THE DIALOGUE HISTORY: ", len(self.dialogue_history))
-    #         # print(self.dialogue_history)
-    #         # self.print_dialogue_list()
-    #
-    #     else:
-    #         self.chosen_dialogue_move = dialogue_move
-    #         self.chosen_dialogue_template = self.get_usable_templates(dialogue_move)
-    #
-    #     self.dialogue_history.append(DialogueHistoryTemplate(dialogue_type=self.chosen_dialogue_move))
-    #     print("HERE'S THE DIALOGUE HISTORY: ", len(self.dialogue_history))
-    #     print(self.dialogue_history)
-    #     # self.print_dialogue_list()
-    #
-    #     return self.chosen_dialogue_move
-
-
-
     def setup_templates_is_usable(self, move_to_execute=""):
         #sets usable dialogue moves based on previous dialogue move -- modify check_based_prev_move
         self.init_set_dialogue_moves_usable(move_to_execute)
@@ -109,26 +76,6 @@ class DialoguePlanner:
         # recheck dialogue moves given templates
         for i in range(len(DIALOGUE_LIST)):
             self.is_usable[i] = self.is_dialogue_usable(DIALOGUE_LIST[i].get_type(), self.usable_templates[i])
-
-        print("PRINTING AFTER MAGIC")
-        self.print_dialogue_list()
-
-
-    # def init_set_dialogue_moves_usable(self):
-    #     # check which dialogue moves are usable
-    #     set_to_true = []
-    #
-    #     if self.num_action_events <= 3:
-    #         set_to_true.append(DIALOGUE_TYPE_FEEDBACK)
-    #         set_to_true.append(DIALOGUE_TYPE_PUMPING_GENERAL)
-    #
-    #     elif self.get_num_usage(DIALOGUE_TYPE_FEEDBACK) == 3 or self.get_num_usage(DIALOGUE_TYPE_PUMPING_GENERAL) == 3:
-    #         set_to_true.append(DIALOGUE_TYPE_PUMPING_SPECIFIC)
-    #         set_to_true.append(DIALOGUE_TYPE_PUMPING_GENERAL)
-    #
-    #     else:
-    #         set_to_true = [True for i in range(len(DIALOGUE_LIST))]
-    #     self.set_dialogue_list_true(set_to_true)
 
     def set_dialogue_list_true(self, set_to_true):
         for i in range(len(set_to_true)):
@@ -159,7 +106,6 @@ class DialoguePlanner:
 
         # check which template is usable
         for X in template_list:
-            print("Checking:", X)
             if X.is_usable(self.curr_event, self.get_num_usage(X.get_type())):
                 usable_template_list.append(X)
 
@@ -184,14 +130,11 @@ class DialoguePlanner:
             weights_to_use - np.asarray(weights_to_use)
 
             numerator = max_value_list - weights_to_use
-            print(numerator)
 
             probability = numerator / max_value_list
-            print(probability)
 
         candidates = np.argwhere(probability == np.amax(probability))
         candidates = candidates.flatten().tolist()
-        print(candidates)
 
         # np.random.seed(int(self.seed_time))
         choice = np.random.choice(candidates)
@@ -220,142 +163,7 @@ class DialoguePlanner:
                 valid_moves.append(i)
         return valid_moves
 
-    # ###checks only dialogue that does not need to go through text understanding
-    # # def check_trigger_phrases(self, response, event_chain):
-    # def check_trigger_phrases(self, response, event_chain):
-    #     if response in IS_END:
-    #         return DIALOGUE_TYPE_E_END
-    #     if response in PUMPING_TRIGGER:
-    #         if len(event_chain) > 0:
-    #             return DIALOGUE_TYPE_PUMPING_SPECIFIC
-    #         return DIALOGUE_TYPE_PROMPT
-    #     elif response in PROMPT_TRIGGER:
-    #         return DIALOGUE_TYPE_PROMPT
-    #
-    #
-    #     # return self.check_based_prev_move(response)
-
-
-
-    # def check_based_prev_move(self, response):
-    #     last_move = self.get_last_dialogue_move()
-    #
-    #     if last_move is not None:
-    #         print("LAST MOVE IS: ", last_move.dialogue_type)
-    #         ###START EDEN
-    #         #check if last move is eden
-    #
-    #         if last_move.dialogue_type == DIALOGUE_TYPE_E_LABEL:
-    #             if response in IS_AFFIRM:
-    #                 return DIALOGUE_TYPE_C_PUMPING
-    #             else:
-    #                 return DIALOGUE_TYPE_E_PUMPING
-    #         elif last_move.dialogue_type == DIALOGUE_TYPE_E_PUMPING:
-    #             self.curr_event.emotion = response
-    #
-    #             return DIALOGUE_TYPE_C_PUMPING
-    #         elif last_move.dialogue_type == DIALOGUE_TYPE_C_PUMPING:
-    #             #check if emotion is + or -
-    #             if self.curr_event.emotion is not None:
-    #                 print("EMOTION TYPE OF ", self.curr_event.emotion)
-    #                 print(" IS: ", self.curr_event.get_emotion_type())
-    #                 if self.curr_event.get_emotion_type() == EMOTION_TYPE_POSITIVE:
-    #                     return DIALOGUE_TYPE_D_PRAISE
-    #                     # return DIALOGUE_TYPE_EVALUATION
-    #                 else:
-    #                     return DIALOGUE_TYPE_D_CORRECTING
-    #         elif last_move.dialogue_type == DIALOGUE_TYPE_D_CORRECTING:
-    #             if response in IS_AFFIRM:
-    #                 return DIALOGUE_TYPE_EVALUATION
-    #             else:
-    #                 return DIALOGUE_TYPE_D_PUMPING
-    #         elif last_move.dialogue_type == DIALOGUE_TYPE_D_PUMPING:
-    #             return DIALOGUE_TYPE_EVALUATION
-    #         elif last_move.dialogue_type == DIALOGUE_TYPE_EVALUATION:
-    #             return DIALOGUE_TYPE_RECOLLECTION
-    #
-    #         ###END EDEN
-    #
-    #         # check if prev move is suggestion
-    #         if last_move.dialogue_type == DIALOGUE_TYPE_SUGGESTING:
-    #             if response in IS_AFFIRM:
-    #                 return DIALOGUE_TYPE_SUGGESTING_AFFIRM
-    #             elif response in IS_DENY:
-    #                 return DIALOGUE_TYPE_FOLLOW_UP
-    #         #check if prev move is follow up
-    #         elif last_move.dialogue_type == DIALOGUE_TYPE_FOLLOW_UP:
-    #             if response in IS_DONT_LIKE:
-    #                 return DIALOGUE_TYPE_FOLLOW_UP_DONT_LIKE
-    #             if response in IS_WRONG:
-    #                 return DIALOGUE_TYPE_FOLLOW_UP_WRONG
-    #
-    #     else:
-    #         print("NO PREVIOUS DIALOGUE")
-    #     return ""
-
-
-    # ###checks only dialogue that does not need to go through text understanding
-    # def check_trigger_phrases(self, response, event_chain):
-    #     response = response.lower()
-    #
-    #     #get latest dialogue move
-    #     last_move = self.get_last_dialogue_move()
-    #
-    #     if last_move is not None:
-    #         print("LAST MOVE IS: ", last_move.dialogue_type)
-    #         ###START EDEN
-    #         #check if last move is eden
-    #         if last_move.dialogue_type == DIALOGUE_TYPE_E_LABEL:
-    #             if response in IS_AFFIRM:
-    #                 return DIALOGUE_TYPE_C_PUMPING
-    #             else:
-    #                 return DIALOGUE_TYPE_E_PUMPING
-    #             # elif last_move.dialogue_type == DIALOGUE_TYPE_E_PUMPING:
-    #             #     return DIALOGUE_TYPE_C_PUMPING
-    #             # elif last_move.dialogue_type == DIALOGUE_TYPE_C_PUMPING:
-    #             #     #check if emotion is + or -
-    #             #     if curr_emotion.get_emotion_type == EMOTION_TYPE_POSITIVE:
-    #             #         return DIALOGUE_TYPE_D_PRAISE
-    #             #     else:
-    #             #         return DIALOGUE_TYPE_D_CORRECTING
-    #         elif last_move.dialogue_type == DIALOGUE_TYPE_D_CORRECTING:
-    #             if response in IS_AFFIRM:
-    #                 return DIALOGUE_TYPE_EVALUATION
-    #             else:
-    #                 return DIALOGUE_TYPE_D_PUMPING
-    #             # elif last_move.dialogue_type == DIALOGUE_TYPE_D_PUMPING:
-    #             #     return DIALOGUE_TYPE_EVALUATION
-    #             # elif last_move.dialogue_type == DIALOGUE_TYPE_EVALUATION:
-    #             #     return DIALOGUE_TYPE_RECOLLECTION
-    #
-    #         ###END EDEN
-    #
-    #         # check if prev move is suggestion
-    #         if last_move.dialogue_type == DIALOGUE_TYPE_SUGGESTING:
-    #             if response in IS_AFFIRM:
-    #                 return DIALOGUE_TYPE_SUGGESTING_AFFIRM
-    #             elif response in IS_DENY:
-    #                 return DIALOGUE_TYPE_FOLLOW_UP
-    #         #check if prev move is follow up
-    #         elif last_move.dialogue_type == DIALOGUE_TYPE_FOLLOW_UP:
-    #             if response in IS_DONT_LIKE:
-    #                 return DIALOGUE_TYPE_FOLLOW_UP_DONT_LIKE
-    #             if response in IS_WRONG:
-    #                 return DIALOGUE_TYPE_FOLLOW_UP_WRONG
-    #
-    #     else:
-    #         print("NO PREVIOUS DIALOGUE")
-    #     if response in PUMPING_TRIGGER:
-    #         if len(event_chain) > 0:
-    #             return DIALOGUE_TYPE_PUMPING_SPECIFIC
-    #         return DIALOGUE_TYPE_PROMPT
-    #     elif response in PROMPT_TRIGGER:
-    #         return DIALOGUE_TYPE_PROMPT
-    #     return None
-
-
     def set_template_details_history(self, chosen_template):
-        print("CUR LEN DIALOGUE HISTORY: ", len(self.dialogue_history))
         self.dialogue_history[len(self.dialogue_history) - 1].set_template_details(chosen_template)
 
     def print_dialogue_list(self):
@@ -367,9 +175,7 @@ class DialoguePlanner:
 
     def get_last_dialogue_move(self):
         if len(self.dialogue_history) ==0:
-            print("NO DIALOGUE HISTORY YET")
             return None
-        print("LEN DIALOGUE HISTORY: ", len(self.dialogue_history))
         return self.dialogue_history[len(self.dialogue_history)-1]
 
     def get_second_to_last_dialogue_move(self):

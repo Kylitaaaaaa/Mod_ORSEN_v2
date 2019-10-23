@@ -225,11 +225,6 @@ class ORSEN:
         curr_event = None
         move_to_execute = ""
 
-        # if self.world.curr_emotion_event is not None:
-        #     curr_event = self.world.curr_emotion_event
-        # elif self.world.curr_event is not None:
-        #     curr_event = self.world.curr_event
-
         #set response in dialogue planner
         self.dialogue_planner.response = response
         move_to_execute = ""
@@ -239,21 +234,16 @@ class ORSEN:
         if preselected_move != "":
             move_to_execute = preselected_move
             print("----------PRESELECTED: ", move_to_execute)
-            # self.dialogue_planner.perform_dialogue_planner(move_to_execute)
 
         elif self.dialogue_planner.check_auto_response(destructive = False) != "":
             # check if trigger phrases, affirm, deny responses
             move_to_execute = self.dialogue_planner.check_auto_response()
-            # self.dialogue_planner.perform_dialogue_planner(move_to_execute)
-
             print("----------AUTO: ", move_to_execute)
 
         # regardless if model is done or not, undergo text understanding
         elif self.dialogue_planner.check_based_prev_move(destructive = False) != "":
             self.perform_text_understanding(response)
             move_to_execute = self.dialogue_planner.check_based_prev_move()
-            # self.dialogue_planner.perform_dialogue_planner(move_to_execute)
-
             print("----------BASED ON PREV MOVE: ", move_to_execute)
 
         else:
@@ -267,7 +257,6 @@ class ORSEN:
 
             new_move_from_old = self.dialogue_planner.\
                 check_based_curr_event(detected_event, self.world.curr_emotion_event)
-
             print("----------EVENT: ", move_to_execute)
 
             if new_move_from_old == "":
@@ -277,49 +266,12 @@ class ORSEN:
                     self.dialogue_planner.curr_event = self.world.curr_emotion_event
 
                     move_to_execute = DIALOGUE_TYPE_E_LABEL
-                    # self.dialogue_planner.perform_dialogue_planner(move_to_execute)
                 else:
                     move_to_execute = ""
                     self.dialogue_planner.curr_event = self.world.curr_event
                 print("----------NO MOVE SELECTED: ", move_to_execute)
             else:
                 move_to_execute = new_move_from_old
-                # self.dialogue_planner.perform_dialogue_planner(move_to_execute)
-
-
-
-
-
-            # if new_move_from_old != "":
-            #     print("NEW DIALOGUE FORM PREV: ", new_move_from_old)
-            #     move_to_execute = new_move_from_old
-            #     self.dialogue_planner.perform_dialogue_planner(move_to_execute)
-
-
-            # #check if model is done, update curr_events
-            # elif not self.dialogue_planner.is_model_ongoing():
-            #     print("No model ongoing")
-            #     print("Setting curr event")
-            #     # setting up curr event
-            #     # curr_event = self.dialogue_planner.get_latest_event(self.world.last_fetched)
-            #
-            #     if curr_event is None:
-            #         move_to_execute = self.dialogue_planner.perform_dialogue_planner(DIALOGUE_TYPE_PUMPING_GENERAL)
-            #     else:
-            #         self.dialogue_planner.set_state(curr_event, self.world.get_num_action_events())
-            #         if curr_event.type == EVENT_EMOTION and not self.dialogue_planner.ongoing_c_pumping:
-            #             print("EMOTION IS PRESENT BUT NO C PUMPING")
-            #             # self.world.add_emotion_event(curr_event)
-            #             self.world.curr_emotion_event = curr_event
-            #             move_to_execute = self.dialogue_planner.perform_dialogue_planner(DIALOGUE_TYPE_E_LABEL)
-            #         else:
-            #             print("GONNA FIND A NEW DIALOGUE MOVE")
-            #             self.world.curr_event = curr_event
-            #             move_to_execute = self.dialogue_planner.perform_dialogue_planner()
-            #
-            #
-            #         # move_to_execute = self.dialogue_planner.perform_dialogue_planner()
-
 
         self.dialogue_planner.perform_dialogue_planner(move_to_execute)
         #fetches templates of chosen dialogue move
@@ -328,13 +280,6 @@ class ORSEN:
         # send current event to ContentDetermination
         self.content_determination.set_state(move_to_execute, self.dialogue_planner.curr_event, available_templates)
         response, chosen_template = self.content_determination.perform_content_determination()
-
-
-
-
-
-
-
 
         """FINALIZE MOVES"""
 
@@ -364,16 +309,9 @@ class ORSEN:
 
         return response
 
-
-
-
-
-
     def is_end_story(self, response):
-        if self.is_end:
-            print("IS END IS TRUE")
-            return True
-        if response.lower() in IS_END:
-            print("RESPONSE FOR IS END IS TRUE")
+        if self.is_end or \
+                response.lower() in IS_END or \
+                (self.dialogue_planner.get_last_dialogue_move() is not None and self.dialogue_planner.get_last_dialogue_move().dialogue_type == DIALOGUE_TYPE_E_END):
             return True
         return False
