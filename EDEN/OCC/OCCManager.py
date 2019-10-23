@@ -92,7 +92,11 @@ class OCCManager():
 
         self.set_state()
 
-        return self.choose_emotion(curr_action_event, self.get_event_valence())
+        chosen_emotion = self.choose_emotion(curr_action_event, self.get_event_valence())
+
+
+
+        return chosen_emotion
 
     def choose_emotion(self, curr_action_event=None, event_valence=None):
         curr_emotions = []
@@ -173,7 +177,7 @@ class OCCManager():
         if len(curr_emotions) > 0:
             listToStr = ' '.join([str(curr_emotion) for curr_emotion in curr_emotions])
             print("EMOTIONS FOUND: " + listToStr)
-            Logger.log_occ_values("EMOTIONS FOUND: " + listToStr)
+            Logger.log_occ_values("INITIAL EMOTIONS FOUND: " + listToStr)
             simplified_emotion_str = self.simplify_emotions(emotions = curr_emotions)
             final_emotion_list = []
             for X in simplified_emotion_str:

@@ -158,12 +158,15 @@ class ActionEvent(Event):
 
     def get_pickled_event(self):
         pickled_event = PickleObject()
-        pickled_event.type = self.sequence_number
-        pickled_event.subject = str(self.subject)
+        pickled_event.sequence_number = self.sequence_number
+        pickled_event.type = self.type
+
+        pickled_event.subject = self.get_pickled_char_obj(self.subject)
+        pickled_event.direct_object = self.get_pickled_char_obj(self.direct_object)
+        pickled_event.object_of_preposition = self.get_pickled_char_obj(self.object_of_preposition)
+
         pickled_event.verb = str(self.verb)
-        pickled_event.direct_object = str(self.direct_object)
         pickled_event.adverb = str(self.adverb)
         pickled_event.preposition = str(self.preposition)
-        pickled_event.object_of_preposition = str(self.object_of_preposition)
 
         return pickled_event

@@ -70,5 +70,6 @@ class Character(Object):
 
         pickled_character.mention_count = self.mention_count
         pickled_character.gender = self.gender
+        pickled_character.pickled_char_obj = 'Character'
 
         return pickled_character

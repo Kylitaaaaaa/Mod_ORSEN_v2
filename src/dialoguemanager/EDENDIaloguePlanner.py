@@ -105,6 +105,7 @@ class EDENDialoguePlanner(DialoguePlanner):
             elif last_move.dialogue_type == DIALOGUE_TYPE_E_PUMPING:
                 if destructive:
                     print("SETTING CURR_EVENT_EMOTION TO: ", self.response.upper())
+                    Logger.log_occ_values("UPDATING EMOTION TO: " +  self.response.upper())
 
                     self.curr_event.emotion = self.response.upper()
                     self.ongoing_c_pumping = True
@@ -174,7 +175,9 @@ class EDENDialoguePlanner(DialoguePlanner):
             # self.world.add_emotion_event(emotions_found)
             #return latest emotion
             listToStr = ' '.join([str(curr_emotion.emotion) for curr_emotion in emotions_found])
-            Logger.log_occ_values("EMOTIONS FOUND 2: " + listToStr)
+            Logger.log_occ_values("SIMPLIFIED EMOTIONS: " + listToStr)
+
+            Logger.log_occ_values("CHOSEN EMOTION: " + emotions_found[len(emotions_found)-1].emotion)
 
             return emotions_found[len(emotions_found)-1]
 

@@ -59,8 +59,9 @@ class DescriptionEvent(Event):
 
     def get_pickled_event(self):
         pickled_event = PickleObject()
-        pickled_event.type = self.sequence_number
-        pickled_event.subject = str(self.subject)
+        pickled_event.type = self.type
+        pickled_event.sequence_number = self.sequence_number
+        pickled_event.subject = self.get_pickled_char_obj(self.subject)
 
         pickled_event.attributes = []
         for X in self.attributes:

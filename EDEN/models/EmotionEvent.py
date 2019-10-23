@@ -63,5 +63,6 @@ class Emotion(Event):
         pickled_event.eoa = self.eoa
         pickled_event.edev = self.edev
         pickled_event.ef = self.ef
+        pickled_event.emotion = self.emotion
 
         return pickled_event

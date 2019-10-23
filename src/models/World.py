@@ -30,7 +30,7 @@ class World:
     sentence_references = []
 
     def __init__(self, objects=[], characters=[], settings=[], event_chains=[], sentence_references=[],
-                 dialogue_move_history=[]):
+                 dialogue_move_history=[], emotion_events = []):
         print("IM AT WORLD")
         self.objects = objects
         self.characters = characters
@@ -41,6 +41,7 @@ class World:
         self.curr_event = None
         self.curr_emotion_event = None
         self.last_fetched = []
+        self.emotion_events = []
 
     def add_event(self, event, sentence):
         event.sequence_number = len(self.event_chains) + 1
@@ -123,5 +124,21 @@ class World:
         pickled_world.append(pickled_event_chain)
         pickled_world.append(pickled_emotion_event)
         return pickled_world
+
+
+    def __str__(self):
+        my_string = "" \
+                    "============================\n" \
+                    "= WORLD \t============\n" \
+                    "============================\n\n" \
+                    "============== OBJECTS ==============\n"
+
+
+        # objects
+        for object in self.objects:
+            my_string = my_string + str(object)
+
+        return my_string.strip()
+
 
 

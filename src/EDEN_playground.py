@@ -1,9 +1,13 @@
 from EDEN.OCC import OCCManager
 from EDEN.constants import *
-from src.ORSEN import ORSEN
+from EDEN.models import EmotionActionEvent
+from src.ORSEN import ORSEN, EVENT_CREATION, CreationEvent, EVENT_DESCRIPTION, EVENT_ACTION, ActionEvent
 from src import Logger
 import pickle
 import datetime
+
+from src.models import World
+from src.models.elements import Object, Attribute, Setting, Character
 
 
 def test_eden():
@@ -47,18 +51,20 @@ def test_open_pickle(date, dogs_dict):
     # pickle.dump(dogs_dict, outfile)
     # outfile.close()
 
-def test_read_pickle(date, dogs_dict):
-    with open('../logs/user world/' + date, 'rb') as f:
-        new_dict = pickle.load(f)
-        f.close()
+def test_read_pickle(filepath):
+    # with open('../logs/user world/' + date, 'rb') as f:
+    new_dict = None
+    try:
 
-    # infile = open(filename, 'rb')
-    # new_dict = pickle.load(infile)
-    # infile.close()
+        with open(filepath, 'rb') as f:
+            new_dict = pickle.load(f)
+            f.close()
+    except:
+        print("File not found")
 
-    print(new_dict)
-    print(new_dict == dogs_dict)
-    print(type(new_dict))
+
+
+    return new_dict
 
 def test_pickle():
     date = datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S")
@@ -252,4 +258,147 @@ def print_emotion(expected_emotion, chosen_emotion):
         print("EXPECTING: ", expected_emotion, " : ", chosen_emotion)
     print("===============================")
 
-test_occ_model()
+
+def convert_pickle_to_world(curr_pickle):
+    world_list = []
+    for world in curr_pickle:
+
+        print("Objects: ", len(world[0]) )
+        #extract objects
+        objects = []
+        for object in world[0]:
+            objects.append(get_unpickled_object(object))
+
+        print("Char: ", len(world[1]))
+        #extract char
+        characters = []
+        for character in world[1]:
+            characters.append(get_unpickled_character(character))
+
+        print("Setting: ", len(world[2]))
+        #extract setting
+        settings = []
+        for setting in world[2]:
+            settings.append(get_unpickled_setting(setting))
+
+        print("Events: ", len(world[3]))
+        #extract event
+        events = []
+        for event in world[3]:
+            events.append(get_unpickled_event(event))
+
+        print("Emotion Event: ", len(world[4]))
+        #extract emotion event
+        emotion_events = []
+        for emotion_event in world[4]:
+            emotion_events.append(get_unpickled_emotion_event(emotion_event))
+
+        # curr_world = World()
+
+        curr_world = World(objects = objects,
+              characters = characters,
+              settings = settings,
+              event_chains = events,
+              emotion_events = emotion_events)
+
+        print(curr_world)
+        world_list.append(curr_world)
+    return world_list
+
+
+
+def get_unpickled_object(pickled_object):
+    attributes = []
+
+    for attribute in pickled_object.attribute:
+        attributes.append(get_unpickled_attribute(attribute))
+
+    settings = []
+    for setting in pickled_object.setting:
+        settings.append(get_unpickled_setting(setting))
+
+    return Object(id = pickled_object.id,
+                  name = pickled_object.name,
+                  attribute= attributes,
+                  in_setting= settings,
+                  mention_count= pickled_object.mention_count)
+
+def get_unpickled_attribute(pickled_attribute):
+    return Attribute(pickled_attribute.relation,
+                     pickled_attribute.description,
+                     pickled_attribute.is_negated,
+                     keyword=pickled_attribute.keyword)
+
+def get_unpickled_setting(pickled_setting):
+    return Setting(pickled_setting.type, pickled_setting.value)
+
+def get_unpickled_character(pickled_character):
+    types = []
+    for type in pickled_character.type:
+        types.append(get_unpickled_attribute(type))
+
+    settings = []
+    for setting in pickled_character.in_setting:
+        settings.append(get_unpickled_setting(setting))
+
+    return Character(id = pickled_character.id,
+                     name = pickled_character.name,
+                     type=[],
+                     attribute = types,
+                     in_setting = settings,
+                     mention_count = pickled_character.mention_count,
+                     gender = pickled_character.gender)
+
+def get_unpickled_char_obj (pickled):
+    print("picked thing is: ", type(pickled))
+    if pickled is not None:
+        if pickled.pickled_char_obj == 'Object':
+            return get_unpickled_object(pickled)
+        elif pickled.pickled_char_obj == 'Character':
+            return get_unpickled_character(pickled)
+    return None
+
+def get_unpickled_event(pickled_event):
+    if pickled_event.type == EVENT_CREATION or pickled_event.type == EVENT_DESCRIPTION:
+        attributes = []
+        for attribute in pickled_event.attributes:
+            attributes.append(get_unpickled_attribute(attribute))
+
+        return CreationEvent(pickled_event.sequence_number,
+                             get_unpickled_char_obj(pickled_event.subject),
+                             attributes)
+
+    elif pickled_event.type == EVENT_ACTION:
+        return ActionEvent(pickled_event.sequence_number,
+                           get_unpickled_char_obj(pickled_event.subject),
+                           pickled_event.verb,
+                           get_unpickled_char_obj(pickled_event.direct_object),
+                           pickled_event.adverb,
+                           pickled_event.preposition,
+                           get_unpickled_char_obj(pickled_event.object_of_preposition))
+
+
+def get_unpickled_emotion_event(pickled_event):
+    return EmotionActionEvent(get_unpickled_event(pickled_event),
+                              emotion =pickled_event.emotion,
+                              af=pickled_event.af,
+                              de=pickled_event.de,
+                              of=pickled_event.of,
+                              oa=pickled_event.oa,
+                              sp=pickled_event.sp,
+                              sr=pickled_event.sr,
+                              op=pickled_event.op,
+                              pros=pickled_event.pros,
+                              stat=pickled_event.stat,
+                              unexp=pickled_event.unexp,
+                              sa=pickled_event.sa,
+                              vr=pickled_event.vr,
+                              ed=pickled_event.ed,
+                              eoa=pickled_event.eoa,
+                              edev=pickled_event.edev,
+                              ef=pickled_event.ef)
+
+curr_pickle = test_read_pickle('../logs/user world/pepper')
+
+pickled_world = convert_pickle_to_world(curr_pickle)
+print(pickled_world)

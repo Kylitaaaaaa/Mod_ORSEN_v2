@@ -37,6 +37,9 @@ class ORSEN:
         self.turn_count = 1
         self.prereqs = []
         self.prereqs_pointer = [0, 0]
+        # self.dialogue_planner.reset_state()
+        self.dialogue_planner.dialogue_history = []
+
 
     def add_prereq(self, prereq):
         self.prereqs.append(prereq)
@@ -250,6 +253,7 @@ class ORSEN:
             self.perform_text_understanding(response)
 
             print("LAST FETCHED IS: ", len(self.world.last_fetched))
+            Logger.log_occ_values_basic(response)
             detected_event = self.dialogue_planner.get_latest_event(self.world.last_fetched)
             if detected_event is not None and detected_event.type == EVENT_EMOTION:
                 print("ADDED EMOTION EVENT: ", detected_event.sequence_number)

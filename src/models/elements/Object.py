@@ -110,4 +110,5 @@ class Object:
         pickled_object.setting = setting
 
         pickled_object.mention_count = self.mention_count
+        pickled_object.pickled_char_obj = 'Object'
         return pickled_object

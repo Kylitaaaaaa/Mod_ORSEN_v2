@@ -40,3 +40,9 @@ class Event():
     def get_pickled_event(self):
         pass
 
+    def get_pickled_char_obj(self, unpickled):
+        if type(unpickled) == Object:
+            return unpickled.get_pickled_object()
+        elif type(unpickled) == Character:
+            return unpickled.get_pickled_character()
+
