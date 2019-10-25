@@ -199,6 +199,9 @@ print("---------Launching ORSEN---------")
 is_engaged = True
 while is_engaged:
     orsen.initialize_story_prerequisites()
+    orsen.world.reset_world()
+    orsen.dialogue_planner.reset_new_world()
+
     print("Let's make another story! You go first")
     start_storytelling()
 
