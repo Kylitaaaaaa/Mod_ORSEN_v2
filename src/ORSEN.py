@@ -31,10 +31,10 @@ class ORSEN:
         ###EDEN
         self.occ_manager = OCCManager()
         self.is_end = False
-        self.world = None
+        # self.world = None
 
     def initialize_story_prerequisites(self):
-        self.world = None
+        # self.world = None
         self.world = World()
         self.turn_count = 1
         self.prereqs = []
@@ -320,8 +320,13 @@ class ORSEN:
         return response
 
     def is_end_story(self, response):
+        # if self.is_end or \
+        #         response.lower() in IS_END or \
+        #         (self.dialogue_planner.get_last_dialogue_move() is not None and self.dialogue_planner.get_last_dialogue_move().dialogue_type == DIALOGUE_TYPE_E_END):
+        #     return True
+
         if self.is_end or \
-                response.lower() in IS_END or \
                 (self.dialogue_planner.get_last_dialogue_move() is not None and self.dialogue_planner.get_last_dialogue_move().dialogue_type == DIALOGUE_TYPE_E_END):
             return True
+
         return False

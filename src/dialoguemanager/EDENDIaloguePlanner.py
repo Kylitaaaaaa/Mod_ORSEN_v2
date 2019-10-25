@@ -80,7 +80,8 @@ class EDENDialoguePlanner(DialoguePlanner):
 
     ###checks only dialogue that does not need to go through text understanding
     def check_trigger_phrases(self, event_chain =[]):
-        if self.response in IS_END:
+        # if self.response in IS_END:
+        if self.response in IS_END and not self.ongoing_c_pumping:
             return DIALOGUE_TYPE_E_END
         return ""
 
@@ -100,7 +101,12 @@ class EDENDialoguePlanner(DialoguePlanner):
                     next_move = DIALOGUE_TYPE_EVALUATION
                 else:
                     next_move = DIALOGUE_TYPE_D_PUMPING
-            elif self.ongoing_c_pumping and self.response.lower() in IS_DONE_EXPLAINING:
+            elif last_move.dialogue_type == DIALOGUE_TYPE_E_PUMPING and self.response.lower() in IS_DONE_EXPLAINING:
+                if destructive:
+                    self.ongoing_c_pumping = False
+                return DIALOGUE_TYPE_PUMPING_GENERAL
+            # elif self.ongoing_c_pumping and self.response.lower() in IS_DONE_EXPLAINING:
+            elif self.ongoing_c_pumping and self.response.lower() in IS_END:
                 if destructive:
                     self.ongoing_c_pumping = False
                 if emotion_event is not None:

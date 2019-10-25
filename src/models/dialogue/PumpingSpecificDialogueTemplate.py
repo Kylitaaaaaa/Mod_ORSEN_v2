@@ -15,7 +15,7 @@ class PumpingSpecificDialogueTemplate(DialogueTemplate):
             curr_index = response.index(self.nodes[i])
             if self.blanks[i] == 'Character':
                 to_insert = event.get_characters_involved()[0].name
-            elif self.blanks[i] == 'Object':
+            elif self.blanks[i] == 'Object' or self.blanks[i] == 'Item':
                 to_insert = event.get_objects_involved()[0].name
             elif self.blanks[i] == 'Event':
                 to_insert = event.subject.name + " " + str(event.verb.lemma_)
