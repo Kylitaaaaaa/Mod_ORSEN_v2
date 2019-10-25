@@ -25,7 +25,7 @@ class Pickle:
                 f.close()
         except Exception as e:
             new_dict = None
-            print("Error ", str(e), " happened")
+            print("Error in reading pickle file: ", str(e))
 
             if new_dict is not None:
                 to_pickle = new_dict
@@ -37,7 +37,7 @@ class Pickle:
                 pickle.dump(to_pickle, f)
                 f.close()
         except Exception as e:
-            print("Error ", str(e), " happened")
+            print("Error in writing pickle file:  ", str(e))
 
     @staticmethod
     def pickle_world_rb(pickle_filepath):

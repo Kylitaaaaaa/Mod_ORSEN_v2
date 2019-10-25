@@ -1,6 +1,6 @@
 from src.dbo.user import DBOUser
 from src.models.user import User
-from src import Logger, IS_AFFIRM, IS_DENY, IS_END, UserHandler
+from src import Logger, IS_AFFIRM, IS_DENY, IS_END, UserHandler, Pickle
 from src.ORSEN import ORSEN
 from src.textunderstanding.InputDecoder import InputDecoder
 from src.googlehome import json_reply
@@ -17,6 +17,7 @@ status = "login_signup"
 name = ""
 code = ""
 have_account = ""
+pickle_filepath = '../Mod_ORSEN_v2/logs/user world/'
 
 def account_status(user_input):
     global have_account
@@ -34,7 +35,7 @@ def login_signup():
         return signup()
         
 def login():
-    global status, dbo_user
+    global status, dbo_user, pickle_filepath
 
     temp_user = dbo_user.get_specific_user(name, code)
 
@@ -44,13 +45,15 @@ def login():
     else:
         # UserHandler.get_instance().set_global_curr_user(temp_user)
         status = "storytelling"
+        pickle_filepath = pickle_filepath + name
         return "Hi! Welcome back " + name + " . Let's make a story. You start!"
 
 def signup():
-    global status, dbo_user
+    global status, dbo_user, pickle_filepath
 
     temp_user = dbo_user.add_user(User(-1, name, code))
     status = "storytelling"
+    pickle_filepath = pickle_filepath + name
     return "Alright" + name + ", let's make a story. You start!"
 
 def is_end_story_func(response):
@@ -70,15 +73,19 @@ print("---------Launching ORSEN---------")
 orsen = ORSEN()
 
 
+
+
 @app.route('/orsen', methods=["POST"])
 def driver():
 
     global status, name, code, have_account
+    global pickle_filepath
 
     requestJson = request.get_json()
     focus = requestJson["inputs"][0]
     user_input = requestJson["inputs"][0]["rawInputs"][0]["query"]
     data = {}
+
 
     # Greet the User
     if focus["intent"] == "actions.intent.MAIN":
@@ -137,9 +144,17 @@ def driver():
                 print("IM AT END STORY FIRST")
 
             if is_end_story:
+                try:
+                    Pickle.pickle_world_wb(pickle_filepath, orsen.world.get_pickled_world())
+                    print("TRYING TO STORE PICKLE")
+                except Exception as e:
+                    print("Error: ", e)
+
                 orsen_response = orsen_response + " Do you want to make a new story?"
                 print("IM AT END STORY STATUS")
                 status = "create_another_story"
+
+
         
         # elif status == "repeat_story":
         #     orsen_response = ""
@@ -159,7 +174,7 @@ def driver():
 
                 orsen_response = "Ok! Let's make another story! You go first"
                 status = "storytelling"
-            else: 
+            else:
                 orsen_response = "Ok! Goodbye."
                 status = "end_session"
     
