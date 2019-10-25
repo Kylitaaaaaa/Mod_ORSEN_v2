@@ -1,3 +1,5 @@
+import time
+
 from EDEN.constants import EVENT_EMOTION
 from EDEN.models import Emotion
 from src.dataprocessor import Annotator
@@ -32,6 +34,8 @@ class ORSEN:
         self.occ_manager = OCCManager()
         self.is_end = False
         # self.world = None
+        self.user_start_time = time.time()
+        self.user_end_time = time.time()
 
     def initialize_story_prerequisites(self):
         # self.world = None
@@ -60,7 +64,18 @@ class ORSEN:
         return True
 
     def get_response(self, response, move_to_execute = ""):
-        return self.perform_dialogue_manager(response, preselected_move=move_to_execute)
+        self.user_end_time = time.time()
+
+        Logger.log_conversation("USER LATENCY TIME (seconds): " + str(self.user_end_time - self.user_start_time))
+
+        start_time = time.time()
+
+        orsen_reply = self.perform_dialogue_manager(response, preselected_move=move_to_execute)
+
+        Logger.log_conversation("ORSEN LATENCY TIME (seconds): " + str(time.time() - start_time))
+
+        self.user_start_time = time.time()
+        return orsen_reply
 
 
     def perform_text_understanding(self, response):

@@ -8,6 +8,7 @@ from flask import Flask
 from flask import jsonify
 from flask import request
 from flask import json
+import time
 
 # change status to "login_signup" creates/logins users at the start
 # change status to "start_storytelling" does not creates/logins users at the start. 
@@ -70,6 +71,7 @@ Logger.setup_loggers()
 print("---------Launching ORSEN---------")
 orsen = ORSEN()
 
+
 @app.route('/orsen', methods=["POST"])
 def driver():
 
@@ -120,6 +122,7 @@ def driver():
         
         # STORYTELLING
         elif status == "storytelling":
+
             if UserHandler.get_instance().curr_user is None:
                 Logger.log_conversation("User : " + str(user_input))
             else:
@@ -136,14 +139,14 @@ def driver():
                 orsen_response = "Thank you for the story! Do you want to hear it again?"
                 status = "repeat_story"
         
-        elif status == "repeat_story":
-            orsen_response = ""
-            if user_input.lower() in IS_AFFIRM:
-                # TODO Connect to back end, get repetition 
-                orsen_response = orsen.repeat_story()
-                # orsen_response = "Repeating Story..."
-            orsen_response += " Do you want to create another story?"
-            status = "create_another_story"
+        # elif status == "repeat_story":
+        #     orsen_response = ""
+        #     if user_input.lower() in IS_AFFIRM:
+        #         # TODO Connect to back end, get repetition
+        #         orsen_response = orsen.repeat_story()
+        #         # orsen_response = "Repeating Story..."
+        #     orsen_response += " Do you want to create another story?"
+        #     status = "create_another_story"
         
         elif status == "create_another_story":
             if user_input.lower() in IS_AFFIRM:
