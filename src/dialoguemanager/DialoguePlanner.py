@@ -56,6 +56,7 @@ class DialoguePlanner:
         self.is_usable = [False] * len(DIALOGUE_LIST)
 
     def setup_templates_is_usable(self, move_to_execute=""):
+        self.usable_templates = []
         #sets usable dialogue moves based on previous dialogue move -- modify check_based_prev_move
         self.init_set_dialogue_moves_usable(move_to_execute)
 

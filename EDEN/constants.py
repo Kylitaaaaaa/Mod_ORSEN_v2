@@ -133,7 +133,7 @@ OCC_SIMPLIFY_SATISFACTION = [OCC_HOPE, OCC_SATISFACTION]
 
 #change to disciplinary emotions
 DISCIPLINARY_EMOTIONS = [OCC_HATE,
-                         OCC_DISTRESS]
+                         OCC_ANGER]
 
 # NEGATIVE_EMOTIONS = [OCC_DISTRESS,
 #                      OCC_SORRY_FOR,

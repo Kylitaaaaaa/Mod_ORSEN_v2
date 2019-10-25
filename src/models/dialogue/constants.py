@@ -31,7 +31,8 @@ from src.knowledgeacquisition.followup import SuggestingDialogueTemplate
 #                  EEndDialogueTemplate()
 #                  ]
 
-DIALOGUE_LIST = [PumpingGeneralDialogueTemplate()
+DIALOGUE_LIST = [PumpingGeneralDialogueTemplate(),
+                 PumpingSpecificDialogueTemplate()
                  # CPumpingDialogueTemplate(),
                  # DCorrectingDialogueTemplate(),
                  # DPraiseDialogueTemplate(),

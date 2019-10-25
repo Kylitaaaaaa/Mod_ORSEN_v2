@@ -457,7 +457,9 @@ class OCCManager():
 
     """
     Prospect (pros)
+        
         Checks whether an event involves a conscious expectation that it will occur in the future (Verb Emotion -- Prospect Polarity)
+        
         
         Threshold = 3.5
     """

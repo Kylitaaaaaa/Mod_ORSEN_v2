@@ -51,10 +51,10 @@ class EDENDialoguePlanner(DialoguePlanner):
             next_move = self.check_affirm_deny(destructive)
         return next_move
 
-    def choose_dialogue(self):
-        for i in range(len(DIALOGUE_LIST)):
-            if DIALOGUE_LIST[i].get_type() == DIALOGUE_TYPE_PUMPING_GENERAL:
-                return i
+    # def choose_dialogue(self):
+    #     for i in range(len(DIALOGUE_LIST)):
+    #         if DIALOGUE_LIST[i].get_type() == DIALOGUE_TYPE_PUMPING_GENERAL:
+    #             return i
 
     ###checks only dialogue that does not need to go through text understanding
     def check_trigger_phrases(self, event_chain =[]):
@@ -124,8 +124,8 @@ class EDENDialoguePlanner(DialoguePlanner):
             if detected_event is not None and curr_event is not None:
                 if detected_event.type == EVENT_EMOTION and detected_event.emotion == curr_event.emotion:
                     return DIALOGUE_TYPE_E_EMPHASIS
-                else:
-                    return DIALOGUE_TYPE_PUMPING_GENERAL
+                # else:
+                #     return DIALOGUE_TYPE_PUMPING_GENERAL
         return ""
 
 
@@ -150,6 +150,8 @@ class EDENDialoguePlanner(DialoguePlanner):
                 if self.curr_event.type == EVENT_EMOTION:
                     set_to_true.append(DIALOGUE_TYPE_E_LABEL)
                 else:
+                    if len(self.get_usable_templates(DIALOGUE_TYPE_PUMPING_SPECIFIC)) > 0:
+                        set_to_true.append(DIALOGUE_TYPE_PUMPING_SPECIFIC)
                     set_to_true.append(DIALOGUE_TYPE_PUMPING_GENERAL)
         else:
             set_to_true.append(preselected_move)
