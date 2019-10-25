@@ -31,8 +31,10 @@ class ORSEN:
         ###EDEN
         self.occ_manager = OCCManager()
         self.is_end = False
+        self.world = None
 
     def initialize_story_prerequisites(self):
+        self.world = None
         self.world = World()
         self.turn_count = 1
         self.prereqs = []
@@ -238,9 +240,9 @@ class ORSEN:
             move_to_execute = preselected_move
             print("----------PRESELECTED: ", move_to_execute)
 
-        elif self.dialogue_planner.check_auto_response(destructive = False) != "":
+        elif self.dialogue_planner.check_auto_response(destructive = False, emotion_event = self.world.curr_emotion_event) != "":
             # check if trigger phrases, affirm, deny responses
-            move_to_execute = self.dialogue_planner.check_auto_response()
+            move_to_execute = self.dialogue_planner.check_auto_response(emotion_event = self.world.curr_emotion_event)
             print("----------AUTO: ", move_to_execute)
 
         # regardless if model is done or not, undergo text understanding
@@ -273,8 +275,12 @@ class ORSEN:
                 else:
                     move_to_execute = ""
                     self.dialogue_planner.curr_event = self.world.curr_event
+
                 print("----------NO MOVE SELECTED: ", move_to_execute)
             else:
+                #for emphasis
+                self.dialogue_planner.curr_event = self.world.curr_emotion_event
+
                 move_to_execute = new_move_from_old
 
         self.dialogue_planner.perform_dialogue_planner(move_to_execute)

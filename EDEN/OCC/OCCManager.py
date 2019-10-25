@@ -47,6 +47,38 @@ class OCCManager():
         self.edev = edev
         self.ef = ef
 
+    def reset_occ(self, af="", de="", of="", oa="", sr ="", sp ="", op="", pros="", stat="", unexp=False, sa="", vr=False, ed="", eoa="", edev="", ef=""):
+        self.curr_event = None
+        self.response = ""
+        self.dbo_concept = DBOConceptGlobalImpl()
+
+        self.emotion = None
+
+        # setup OCC Values
+        """Agent-Based"""
+        self.af = af
+        self.de = de
+
+        """Object-Based"""
+        self.of = of
+        self.oa = oa
+
+        """Event-Based"""
+        self.sr = sr
+        self.sp = sp
+        self.op = op
+        self.pros = pros
+        self.stat = stat
+        self.unexp = unexp
+        self.sa = sa
+        self.vr = vr
+
+        """Intensity"""
+        self.ed = ed
+        self.eoa = eoa
+        self.edev = edev
+        self.ef = ef
+
     def set_values(self, af="", de="", of="", oa="", sr ="", sp ="", op="", pros="", stat="", unexp=False, sa="", vr=False, ed="", eoa="", edev="", ef=""):
         """Agent-Based"""
         self.af = af

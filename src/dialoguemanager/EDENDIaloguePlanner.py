@@ -1,8 +1,11 @@
 from EDEN.OCC import OCCManager
 from EDEN.constants import *
 from src import *
+from src.dbo.dialogue import DBODialogueTemplate
 from src.dialoguemanager import DialoguePlanner
 from src.models.dialogue.constants import DIALOGUE_LIST, DialogueHistoryTemplate, EDEN_DIALOGUE_LIST
+import time
+import numpy as np
 
 class EDENDialoguePlanner(DialoguePlanner):
 
@@ -10,6 +13,25 @@ class EDENDialoguePlanner(DialoguePlanner):
         super().__init__()
         self.occ_manager = OCCManager()
         self.ongoing_c_pumping = False
+
+    def reset_new_world(self):
+        self.chosen_dialogue_move = None
+        self.chosen_dialogue_template = []
+        self.chosen_move_index = -1
+        self.curr_event = None
+        self.dialogue_history = []
+        self.dialogue_template = DBODialogueTemplate('templates')
+        self.frequency_count = np.zeros(len(DIALOGUE_LIST))
+        self.is_usable = [False] * len(DIALOGUE_LIST)
+        self.move_index = -1
+        self.num_action_events = 0
+        #occ manager
+        self.ongoing_c_pumping = False
+        self.response = ""
+        self.seed_time = time.time()
+        self.usable_templates = []
+        np.random.seed(DEFAULT_SEED)
+        self.occ_manager.reset_occ()
 
     def perform_dialogue_planner(self, dialogue_move=""):
         #still no triggered phrase
@@ -43,12 +65,12 @@ class EDENDialoguePlanner(DialoguePlanner):
         self.print_dialogue_list()
         return self.chosen_dialogue_move
 
-    def check_auto_response(self, destructive = True):
+    def check_auto_response(self, destructive = True, emotion_event = None):
         next_move = self.check_trigger_phrases()
         if next_move != "":
             return next_move
         else:
-            next_move = self.check_affirm_deny(destructive)
+            next_move = self.check_affirm_deny(destructive, emotion_event)
         return next_move
 
     # def choose_dialogue(self):
@@ -62,36 +84,41 @@ class EDENDialoguePlanner(DialoguePlanner):
             return DIALOGUE_TYPE_E_END
         return ""
 
-    def check_affirm_deny(self, destructive = True):
+    def check_affirm_deny(self, destructive = True, emotion_event = None):
         # check if last dialogue move has yes or no:
         last_move = self.get_last_dialogue_move()
-        second_to_last_move = self.get_second_to_last_dialogue_move
+        next_move = ""
         if last_move is not None:
             if last_move.dialogue_type == DIALOGUE_TYPE_E_LABEL:
                 if self.response in IS_AFFIRM:
                     self.ongoing_c_pumping = True
-                    return DIALOGUE_TYPE_C_PUMPING
+                    next_move = DIALOGUE_TYPE_C_PUMPING
                 else:
-                    return DIALOGUE_TYPE_E_PUMPING
+                    next_move = DIALOGUE_TYPE_E_PUMPING
             elif last_move.dialogue_type == DIALOGUE_TYPE_D_CORRECTING:
                 if self.response in IS_AFFIRM:
-                    return DIALOGUE_TYPE_EVALUATION
+                    next_move = DIALOGUE_TYPE_EVALUATION
                 else:
-                    return DIALOGUE_TYPE_D_PUMPING
+                    next_move = DIALOGUE_TYPE_D_PUMPING
             elif self.ongoing_c_pumping and self.response.lower() in IS_DONE_EXPLAINING:
                 if destructive:
                     self.ongoing_c_pumping = False
-                if self.curr_event.emotion is not None:
+                if emotion_event is not None:
+                # if self.curr_event.emotion is not None:
                     # check if emotion should be disciplined
-                    if self.curr_event.emotion in DISCIPLINARY_EMOTIONS:
-                        return DIALOGUE_TYPE_D_CORRECTING
+                    # if self.curr_event.emotion in DISCIPLINARY_EMOTIONS:
+                    if emotion_event.emotion in DISCIPLINARY_EMOTIONS:
+                        next_move = DIALOGUE_TYPE_D_CORRECTING
                     else:
                         # check if emotion is + or -
-                        if self.curr_event.emotion in POSITIVE_EMOTIONS:
-                            return DIALOGUE_TYPE_D_PRAISE
+                        # if self.curr_event.emotion in POSITIVE_EMOTIONS:
+                        if emotion_event.emotion in POSITIVE_EMOTIONS:
+                            next_move = DIALOGUE_TYPE_D_PRAISE
                         else:
-                            return DIALOGUE_TYPE_EVALUATION
-        return ""
+                            next_move = DIALOGUE_TYPE_EVALUATION
+            if next_move !="" and destructive:
+                self.curr_event = emotion_event
+        return next_move
 
     def check_based_prev_move(self, destructive = True):
         last_move = self.get_last_dialogue_move()
@@ -147,7 +174,7 @@ class EDENDialoguePlanner(DialoguePlanner):
             if move_to_execute != "":
                 set_to_true.append(move_to_execute)
             else:
-                if self.curr_event.type == EVENT_EMOTION:
+                if self.curr_event is not None and self.curr_event.type == EVENT_EMOTION:
                     set_to_true.append(DIALOGUE_TYPE_E_LABEL)
                 else:
                     if len(self.get_usable_templates(DIALOGUE_TYPE_PUMPING_SPECIFIC)) > 0:

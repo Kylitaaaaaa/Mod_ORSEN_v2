@@ -43,6 +43,18 @@ class World:
         self.last_fetched = []
         self.emotion_events = []
 
+    def reset_world(self):
+        self.objects = []
+        self.characters = []
+        self.settings = []
+        self.event_chains = []
+        self.sentence_references = []
+        self.dialogue_move_history = []
+        self.curr_event = None
+        self.curr_emotion_event = None
+        self.last_fetched = []
+        self.emotion_events = []
+
     def add_event(self, event, sentence):
         event.sequence_number = len(self.event_chains) + 1
 
