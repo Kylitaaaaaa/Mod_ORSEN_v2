@@ -54,9 +54,7 @@ def signup():
     return "Alright" + name + ", let's make a story. You start!"
 
 def is_end_story_func(response):
-    if response.lower() in IS_END:
-        return True
-    return False
+    return orsen.is_end_story(response)
 
 # Initialize Google Home
 app = Flask(__name__)
@@ -135,9 +133,13 @@ def driver():
                 orsen_response = orsen.get_response(user_input)
                 # orsen_response = "STORY TIME"
                 Logger.log_conversation("ORSEN: " + str(orsen_response))
-            else:
-                orsen_response = "Thank you for the story! Do you want to hear it again?"
-                status = "repeat_story"
+                is_end_story = is_end_story_func(user_input)
+                print("IM AT END STORY FIRST")
+
+            if is_end_story:
+                orsen_response = orsen_response + " Do you want to make a new story?"
+                print("IM AT END STORY STATUS")
+                status = "create_another_story"
         
         # elif status == "repeat_story":
         #     orsen_response = ""
@@ -149,10 +151,15 @@ def driver():
         #     status = "create_another_story"
         
         elif status == "create_another_story":
+            print("IM AT CREATE NEW STORY")
             if user_input.lower() in IS_AFFIRM:
+                orsen.initialize_story_prerequisites()
+                orsen.world.reset_world()
+                orsen.dialogue_planner.reset_new_world()
+
                 orsen_response = "Ok! Let's make another story! You go first"
                 status = "storytelling"
-            else:
+            else: 
                 orsen_response = "Ok! Goodbye."
                 status = "end_session"
     
