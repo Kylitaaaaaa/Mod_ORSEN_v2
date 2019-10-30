@@ -139,7 +139,7 @@ Logger.setup_loggers()
 
 #Retrieve User Details --- User objects
 print("---------Retrieving User Details---------")
-login_signup()
+# login_signup()
 print("done")
 
 # pickle_filepath = '../logs/user world/' + datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S") + "-" + UserHandler.get_instance().curr_user.name
@@ -202,7 +202,12 @@ while is_engaged:
     orsen.world.reset_world()
     orsen.dialogue_planner.reset_new_world()
 
-    print("Let's make another story! You go first")
+    temp_welcome = orsen.get_response(move_to_execute = orsen.dialogue_planner.get_welcome_message_type())
+    print(temp_welcome)
+
+
+
+    # print("Let's make another story! You go first")
     start_storytelling()
 
     #save story world

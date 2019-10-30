@@ -26,7 +26,7 @@ class ORSEN:
         self.extractor = EizenExtractor()
 
         # self.dialogue_planner = DialoguePlanner()
-        self.dialogue_planner = DialoguePlannerBuilder.build(EDEN)
+        self.dialogue_planner = DialoguePlannerBuilder.build(CURR_ORSEN_VERSION)
         self.content_determination = ContentDetermination()
         self.initialize_story_prerequisites()
 
@@ -63,7 +63,7 @@ class ORSEN:
             return False
         return True
 
-    def get_response(self, response, move_to_execute = ""):
+    def get_response(self, response="", move_to_execute = ""):
         self.user_end_time = time.time()
 
         Logger.log_conversation("USER LATENCY TIME (seconds): " + str(self.user_end_time - self.user_start_time))

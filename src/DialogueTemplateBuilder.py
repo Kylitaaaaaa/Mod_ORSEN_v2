@@ -61,6 +61,10 @@ class DialogueTemplateBuilder:
       elif dialogue_type == DIALOGUE_TYPE_E_EMPHASIS:
          return EEmphasisDialogueTemplate(id, templates, relations, blanks, nodes, dependent_nodes)
 
+      ##WELCOME MESSAGE
+      elif dialogue_type == DIALOGUE_TYPE_EDEN_WELCOME:
+         return EDENWelcomeDialogueTemplate(id, templates, relations, blanks, nodes, dependent_nodes)
+
 
 
       else:

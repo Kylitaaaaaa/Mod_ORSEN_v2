@@ -8,7 +8,7 @@ import datetime
 
 from src.models import World
 from src.models.elements import Object, Attribute, Setting, Character
-
+import time
 
 def test_eden():
     response = ["I loved you too much to let you die, dear sister, but your heart was failing you, so I gave you mine.",
@@ -398,7 +398,137 @@ def get_unpickled_emotion_event(pickled_event):
                               edev=pickled_event.edev,
                               ef=pickled_event.ef)
 
-curr_pickle = test_read_pickle('../logs/user world/pepper')
+"""LOG EXTRACTOR"""
+def extract_convo(file_path):
+    file_path = file_path + 'conv.txt'
+    user_resp = []
+    orsen_resp = []
+    user_orsen_resp = []
 
-pickled_world = convert_pickle_to_world(curr_pickle)
-print(pickled_world)
+    user_lat = []
+    orsen_lat = []
+    user_orsen_lat = []
+
+    f = open(file_path, "r")
+    for X in f:
+        if "???: " in X:
+            user_resp.append(X.split("???: ", 1)[1].replace('\n', ''))
+            user_orsen_resp.append(X.split("???: ", 1)[1].replace('\n', ''))
+        elif "ORSEN: " in X:
+            orsen_resp.append(X.split("ORSEN: ", 1)[1].replace('\n', ''))
+            user_orsen_resp.append(X.split("ORSEN: ", 1)[1].replace('\n', ''))
+        elif "USER LATENCY TIME (seconds): " in X:
+            user_lat.append(float(X.split("USER LATENCY TIME (seconds): ", 1)[1].replace('\n', '')))
+            user_orsen_lat.append(float(X.split("USER LATENCY TIME (seconds): ", 1)[1].replace('\n', '')))
+        elif "ORSEN LATENCY TIME (seconds): " in X:
+            orsen_lat.append(float(X.split("ORSEN LATENCY TIME (seconds): ", 1)[1].replace('\n', '')))
+            user_orsen_lat.append(float(X.split("ORSEN LATENCY TIME (seconds): ", 1)[1].replace('\n', '')))
+
+    # print("===PRINTING USER RESPONSES===")
+    # print_list(user_resp)
+    # print("===PRINTING ORSEN RESPONSES===")
+    # print_list(orsen_resp)
+    # print("===PRINTING USER LATENCY===")
+    # print_list(user_lat)
+    # print("===PRINTING ORSEN LATENCY===")
+    # print_list(orsen_lat)
+    print("===PRINTING USER ORSEN RESPONSES===")
+    print_list(user_orsen_resp)
+    # print("===PRINTING USER ORSEN LATENCY===")
+    # print_list(user_orsen_lat)
+
+    return user_resp, orsen_resp, user_orsen_resp, user_lat, orsen_lat
+    # return user_orsen_resp
+
+def print_list(list):
+    for X in list:
+        print(X)
+
+
+def get_time(file_path):
+    file_path = file_path + 'conv.txt'
+    user_orsen_lat = []
+
+    f = open(file_path, "r")
+    for X in f:
+        if " - ???: " in X:
+            temp_time = X.split(" - ???:", 1)[0]
+            user_orsen_lat.append(time.strptime(temp_time, '%m-%d-%y %H:%M:%S'))
+        elif " - ORSEN:" in X:
+            temp_time = X.split(" - ORSEN:", 1)[0]
+            user_orsen_lat.append(time.strptime(temp_time, '%m-%d-%y %H:%M:%S'))
+
+
+    user_lat = []
+    for i in range (len(user_orsen_lat)):
+        if i < len(user_orsen_lat)-1:
+            user_lat.append(time.mktime(user_orsen_lat[i+1]) - time.mktime(user_orsen_lat[i]))
+
+    print_list(user_lat)
+
+
+main_file_path = '/Users/kylesantos/Desktop/oct 20 testing/'
+# file_paths = ['1 zairah/',
+#               '2 Renhart/',
+#               '3 Maricar/',
+#               '4 Jhanness/',
+#               '5 Jim/',
+#               '6 Shad/',
+#               '7 Clarenz/',
+#               '8 Harvy/',
+#               '9 Lian/',
+#               '10 Jhanissa 1/',
+#               '10 Jhanissa 2/'
+#               ]
+
+file_paths = ['1 James/',
+              '2 Abeng/',
+              '3 Jim 1/',
+              '3 Jim 2/',
+              '4 Vincent/',
+              '5 Harvy/'
+              ]
+
+for X in file_paths:
+    print(" === " + X + " === ")
+    # user_resp, orsen_resp, user_orsen_resp, user_lat, orsen_lat = extract_convo(main_file_path + X)
+    get_time(main_file_path + X)
+
+
+
+
+
+# print("\n\n=====Zairah=====")
+# extract_emo_class("/Users/kylesantos/Desktop/oct 26 testing/1 zairah/")
+#
+# print("\n\n=====Renhart=====")
+# # extract_emo_class("/Users/kylesantos/Desktop/oct 26 testing/2 Renhart/")
+# #
+# print("\n\n=====Maricar=====")
+# extract_emo_class("/Users/kylesantos/Desktop/oct 26 testing/3 Maricar/")
+# #
+# print("\n\n=====Jhanness=====")
+# extract_emo_class("/Users/kylesantos/Desktop/oct 26 testing/4 Jhanness/")
+#
+# print("\n\n=====Jim=====")
+# extract_emo_class("/Users/kylesantos/Desktop/oct 26 testing/5 Jim/")
+#
+# print("\n\n=====Shad=====")
+# extract_emo_class("/Users/kylesantos/Desktop/oct 26 testing/6 Shad/")
+#
+#
+# print("\n\n=====Clarenz=====")
+# extract_emo_class("/Users/kylesantos/Desktop/oct 26 testing/7 Clarenz/")
+#
+# print("\n\n=====Harvy=====")
+# extract_emo_class("/Users/kylesantos/Desktop/oct 26 testing/8 Harvy/")
+#
+# print("\n\n=====Lian=====")
+# extract_emo_class("/Users/kylesantos/Desktop/oct 26 testing/9 Lian/")
+#
+# print("\n\n=====Jhanissa 1=====")
+# extract_emo_class("/Users/kylesantos/Desktop/oct 26 testing/10 Jhanissa 1/")
+#
+# print("\n\n=====Jhanissa 2=====")
+# extract_emo_class("/Users/kylesantos/Desktop/oct 26 testing/10 Jhanissa 2/")
+

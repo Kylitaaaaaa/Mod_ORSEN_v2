@@ -235,3 +235,5 @@ class EDENDialoguePlanner(DialoguePlanner):
             return DIALOGUE_TYPE_E_END
         return ""
 
+    def get_welcome_message_type(self):
+        return DIALOGUE_TYPE_EDEN_WELCOME
