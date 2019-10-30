@@ -317,6 +317,10 @@ class ORSEN:
             else:
                 response = response + \
                            "\n" + emotion_story
+
+        if self.dialogue_planner.get_second_to_last_dialogue_move() is not None and \
+                self.dialogue_planner.get_second_to_last_dialogue_move().dialogue_type == DIALOGUE_TYPE_E_FOLLOWUP:
+            response = "Thank you for clarifying that. " + response
         #update event chain with new emotion
         if move_to_execute == DIALOGUE_TYPE_C_PUMPING:
             self.world.curr_emotion_event.emotion = self.dialogue_planner.curr_event.emotion

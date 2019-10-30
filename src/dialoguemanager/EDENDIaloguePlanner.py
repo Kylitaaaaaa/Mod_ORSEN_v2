@@ -104,7 +104,8 @@ class EDENDialoguePlanner(DialoguePlanner):
             elif last_move.dialogue_type == DIALOGUE_TYPE_E_PUMPING and self.response.lower() in IS_DONE_EXPLAINING:
                 if destructive:
                     self.ongoing_c_pumping = False
-                return DIALOGUE_TYPE_PUMPING_GENERAL
+                # return DIALOGUE_TYPE_PUMPING_GENERAL
+                return DIALOGUE_TYPE_E_FOLLOWUP
             # elif self.ongoing_c_pumping and self.response.lower() in IS_DONE_EXPLAINING:
             elif self.ongoing_c_pumping and self.response.lower() in IS_END:
                 if destructive:
@@ -147,6 +148,8 @@ class EDENDialoguePlanner(DialoguePlanner):
                 return DIALOGUE_TYPE_EVALUATION
             elif last_move.dialogue_type == DIALOGUE_TYPE_EVALUATION:
                 return DIALOGUE_TYPE_RECOLLECTION
+            elif last_move.dialogue_type == DIALOGUE_TYPE_E_FOLLOWUP:
+                return DIALOGUE_TYPE_PUMPING_GENERAL
 
         else:
             print("NO PREVIOUS DIALOGUE")
