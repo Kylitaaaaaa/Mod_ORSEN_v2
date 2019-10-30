@@ -206,7 +206,7 @@ class EDENDialoguePlanner(DialoguePlanner):
                 temp_emotion = self.occ_manager.get_occ_emotion(curr_event, self.response)
                 if temp_emotion is not None and len(temp_emotion) > 0:
                     for X in temp_emotion:
-                        if X.emotion not in emotions_found:
+                        if not self.is_emotion_exist(X.emotion, emotions_found):
                             emotions_found.append(X)
         #emotion found
         if len(emotions_found) > 0:
@@ -225,6 +225,13 @@ class EDENDialoguePlanner(DialoguePlanner):
                 return last_fetched[len(last_fetched)-1]
         return None
         # return []
+
+    def is_emotion_exist(self, emotion_to_check, emotion_list):
+        if len(emotion_list) > 0:
+            for curr_emotion in emotion_list:
+                if curr_emotion.emotion == emotion_to_check:
+                    return True
+        return False
 
     def is_repeat_story(self, move_to_execute):
         if move_to_execute == DIALOGUE_TYPE_RECOLLECTION:
