@@ -10,6 +10,8 @@ from src.models import World
 from src.models.elements import Object, Attribute, Setting, Character
 import time
 
+occ_manager = OCCManager()
+
 def test_eden():
     response = ["I loved you too much to let you die, dear sister, but your heart was failing you, so I gave you mine.",
                 "He started worrying if he was important and decided he wanted to ask the people he knew if they thought he was important",
@@ -79,7 +81,7 @@ def test_pickle():
 
 
 def test_occ_model():
-    occ_manager = OCCManager()
+    # occ_manager = OCCManager()
 
     #shame
     occ_manager.set_values(de=DE_SELF,
@@ -251,11 +253,16 @@ def test_occ_model():
     print_emotion(OCC_SURPRISE, occ_manager.choose_emotion())
 
 
-def print_emotion(expected_emotion, chosen_emotion):
-    if chosen_emotion is not None:
-        print("EXPECTING: ", expected_emotion, " : ", chosen_emotion.emotion)
+def print_emotion(expected_emotion, chosen_emotion_list):
+    print("==== EXPECTING: ", expected_emotion, "====")
+    if len(chosen_emotion_list) > 0:
+        str = ""
+        for emotion in chosen_emotion_list:
+            str = str + "\t" + emotion.emotion
+        print("CANDIDATE EMOTIONS ARE: ", str)
+        print("SELECTED EMOTION: ", occ_manager.get_final_emotion(chosen_emotion_list).emotion)
     else:
-        print("EXPECTING: ", expected_emotion, " : ", chosen_emotion)
+        print("NO EMOTION FOUND")
     print("===============================")
 
 
@@ -467,7 +474,7 @@ def get_time(file_path):
     print_list(user_lat)
 
 
-main_file_path = '/Users/kylesantos/Desktop/oct 20 testing/'
+# main_file_path = '/Users/kylesantos/Desktop/oct 20 testing/'
 # file_paths = ['1 zairah/',
 #               '2 Renhart/',
 #               '3 Maricar/',
@@ -481,18 +488,18 @@ main_file_path = '/Users/kylesantos/Desktop/oct 20 testing/'
 #               '10 Jhanissa 2/'
 #               ]
 
-file_paths = ['1 James/',
-              '2 Abeng/',
-              '3 Jim 1/',
-              '3 Jim 2/',
-              '4 Vincent/',
-              '5 Harvy/'
-              ]
-
-for X in file_paths:
-    print(" === " + X + " === ")
-    # user_resp, orsen_resp, user_orsen_resp, user_lat, orsen_lat = extract_convo(main_file_path + X)
-    get_time(main_file_path + X)
+# file_paths = ['1 James/',
+#               '2 Abeng/',
+#               '3 Jim 1/',
+#               '3 Jim 2/',
+#               '4 Vincent/',
+#               '5 Harvy/'
+#               ]
+#
+# for X in file_paths:
+#     print(" === " + X + " === ")
+#     # user_resp, orsen_resp, user_orsen_resp, user_lat, orsen_lat = extract_convo(main_file_path + X)
+#     get_time(main_file_path + X)
 
 
 
@@ -532,3 +539,4 @@ for X in file_paths:
 # print("\n\n=====Jhanissa 2=====")
 # extract_emo_class("/Users/kylesantos/Desktop/oct 26 testing/10 Jhanissa 2/")
 
+test_occ_model()

@@ -198,16 +198,27 @@ class EDENDialoguePlanner(DialoguePlanner):
         emotions_found = []
         for i in range(0, len(last_fetched)):
             curr_event = last_fetched[i]
-            # check if description later
-            if curr_event.type == EVENT_ACTION:
-                # reset occ values
-                self.occ_manager.set_values()
-                # get emotion list (str)
-                temp_emotion = self.occ_manager.get_occ_emotion(curr_event, self.response)
-                if temp_emotion is not None and len(temp_emotion) > 0:
-                    for X in temp_emotion:
-                        if not self.is_emotion_exist(X.emotion, emotions_found):
-                            emotions_found.append(X)
+
+            # reset occ values
+            self.occ_manager.set_values()
+            # get emotion list (str)
+            temp_emotion = self.occ_manager.get_occ_emotion(curr_event, self.response)
+            if temp_emotion is not None and len(temp_emotion) > 0:
+                for X in temp_emotion:
+                    if not self.is_emotion_exist(X.emotion, emotions_found):
+                        emotions_found.append(X)
+
+
+            # # check if description later
+            # if curr_event.type == EVENT_ACTION:
+            #     # reset occ values
+            #     self.occ_manager.set_values()
+            #     # get emotion list (str)
+            #     temp_emotion = self.occ_manager.get_occ_emotion(curr_event, self.response)
+            #     if temp_emotion is not None and len(temp_emotion) > 0:
+            #         for X in temp_emotion:
+            #             if not self.is_emotion_exist(X.emotion, emotions_found):
+            #                 emotions_found.append(X)
         #emotion found
         if len(emotions_found) > 0:
             # self.world.add_emotion_event(emotions_found)
@@ -215,9 +226,13 @@ class EDENDialoguePlanner(DialoguePlanner):
             listToStr = ' '.join([str(curr_emotion.emotion) for curr_emotion in emotions_found])
             Logger.log_occ_values("SIMPLIFIED EMOTIONS: " + listToStr)
 
-            Logger.log_occ_values("CHOSEN EMOTION: " + emotions_found[len(emotions_found)-1].emotion)
+            final_emotion = self.occ_manager.get_final_emotion(emotions_found)
 
-            return emotions_found[len(emotions_found)-1]
+            # Logger.log_occ_values("CHOSEN EMOTION: " + emotions_found[len(emotions_found)-1].emotion)
+            Logger.log_occ_values("CHOSEN EMOTION: " + final_emotion.emotion)
+
+            # return emotions_found[len(emotions_found)-1]
+            return final_emotion
 
         #no emotion found
         else:

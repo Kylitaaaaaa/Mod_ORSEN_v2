@@ -4,7 +4,7 @@ from EDEN.db import DBOEmotion
 import spacy
 
 from EDEN.models import Emotion
-from EDEN.models.EmotionEventTemplateBuilder import EmotionEventTemplateBuilder
+from EDEN.models.EmotionEventTemplateBuilder import EmotionEventTemplateBuilder, EVENT_DESCRIPTION
 from src.dbo.concept import DBOConcept, DBOConceptGlobalImpl
 from src.models.elements import Character
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
@@ -104,27 +104,56 @@ class OCCManager():
         self.edev = edev
         self.ef = ef
 
-    def get_occ_emotion(self, curr_action_event, response):
+    # def get_occ_emotion(self, curr_action_event, response):
+    def get_occ_emotion(self, event_to_eval, response):
         # setup event to evaluate
-        self.curr_event = curr_action_event
+        self.curr_event = event_to_eval
 
-        # setup response
-        self.response = response
+        if event_to_eval.type == EVENT_ACTION:
+            # setup response
+            self.response = response
 
-        print("CHECKING AT OCC: ", curr_action_event.sequence_number)
-        # setup emotion
-        self.emotion = self.get_emotion(str(curr_action_event.verb.lemma_))
+            print("CHECKING AT OCC: ", event_to_eval.sequence_number)
+            # setup emotion
+            self.emotion = self.get_emotion(str(event_to_eval.verb.lemma_))
+
+            if self.emotion is None:
+                Logger.log_occ_values(
+                    "EVALUATING: " + str(event_to_eval.sequence_number) + " : " + self.get_vader_event_string())
+                Logger.log_occ_values("NO EMOTION FOUND")
+                return None
+
+            self.set_state()
+
+            chosen_emotion = self.choose_emotion(event_to_eval, self.get_event_valence())
+        elif event_to_eval.type == EVENT_DESCRIPTION:
+            # self.set_state()
+            chosen_emotion = self.get_attribute_emotion(event_to_eval)
+            if len(chosen_emotion) == 0:
+                return None
 
 
-        if self.emotion is None:
-            Logger.log_occ_values(
-                "EVALUATING: " + str(curr_action_event.sequence_number) + " : " + self.get_vader_event_string())
-            Logger.log_occ_values("NO EMOTION FOUND")
-            return None
 
-        self.set_state()
-
-        chosen_emotion = self.choose_emotion(curr_action_event, self.get_event_valence())
+        # # setup event to evaluate
+        # # self.curr_event = curr_action_event
+        #
+        # # setup response
+        # self.response = response
+        #
+        # print("CHECKING AT OCC: ", curr_action_event.sequence_number)
+        # # setup emotion
+        # self.emotion = self.get_emotion(str(curr_action_event.verb.lemma_))
+        #
+        #
+        # if self.emotion is None:
+        #     Logger.log_occ_values(
+        #         "EVALUATING: " + str(curr_action_event.sequence_number) + " : " + self.get_vader_event_string())
+        #     Logger.log_occ_values("NO EMOTION FOUND")
+        #     return None
+        #
+        # self.set_state()
+        #
+        # chosen_emotion = self.choose_emotion(curr_action_event, self.get_event_valence())
 
 
 
@@ -243,14 +272,20 @@ class OCCManager():
         simplified_emotions = []
         for X in emotions:
             candidate = X
-            if X in OCC_SIMPLIFY_ANGER:
-                candidate = OCC_ANGER
-            elif X in OCC_SIMPLIFY_FEAR_CONFIRMED:
-                candidate = OCC_FEARS_CONFIRMED
-            elif X in OCC_SIMPLIFY_GRATITUDE:
-                candidate = OCC_GRATITUDE
+
+            if X in OCC_SIMPLIFY_SHAME:
+                candidate = OCC_SHAME
             elif X in OCC_SIMPLIFY_SATISFACTION:
                 candidate = OCC_SATISFACTION
+
+            # if X in OCC_SIMPLIFY_ANGER:
+            #     candidate = OCC_ANGER
+            # elif X in OCC_SIMPLIFY_FEAR_CONFIRMED:
+            #     candidate = OCC_FEARS_CONFIRMED
+            # elif X in OCC_SIMPLIFY_GRATITUDE:
+            #     candidate = OCC_GRATITUDE
+            # elif X in OCC_SIMPLIFY_SATISFACTION:
+            #     candidate = OCC_SATISFACTION
 
             #check if not yet in simplified list
             if candidate not in simplified_emotions:
@@ -693,3 +728,95 @@ class OCCManager():
 
     def get_event_valence(self):
         return self.get_vader_sentiment(self.get_vader_event_string())
+
+    def get_final_emotion(self, emotion_list):
+        ##iter 1 and 2
+        # if len(emotion_list) > 1:
+        #     return emotion_list[len(emotion_list)-1]
+        # return emotion_list[0]
+
+        ##iter 3
+
+        pos_list = self.get_positive_emotions(emotion_list)
+        neg_list = self.get_negative_emotions(emotion_list)
+
+        if len(pos_list) == len(neg_list):
+            return emotion_list[len(emotion_list)-1]
+        elif len(pos_list) > len(neg_list):
+            return pos_list[len(pos_list)-1]
+        else:
+            return neg_list[len(neg_list)-1]
+
+
+
+    def get_positive_emotions(self, emotion_list):
+        pos_list = []
+        for emotion in emotion_list:
+            if emotion.emotion in POSITIVE_EMOTIONS:
+                pos_list.append(emotion)
+
+        return pos_list
+
+    def get_negative_emotions(self, emotion_list):
+        neg_list = []
+        for emotion in emotion_list:
+            if emotion.emotion in NEGATIVE_EMOTIONS:
+                neg_list.append(emotion)
+
+        return neg_list
+
+    def get_attribute_emotion(self, event_to_eval):
+        emotion_list = []
+        for attribute in event_to_eval.attributes:
+            attribute_desc = str(attribute.description)
+
+            if attribute_desc in OCC_SYNONYM_DISTRESS:
+                emotion_list.append(OCC_DISTRESS)
+            if attribute_desc in OCC_SYNONYM_SORRY_FOR:
+                emotion_list.append(OCC_SORRY_FOR)
+            if attribute_desc in OCC_SYNONYM_RESENTMENT:
+                emotion_list.append(OCC_RESENTMENT)
+            if attribute_desc in OCC_SYNONYM_HOPE:
+                emotion_list.append(OCC_HOPE)
+            if attribute_desc in OCC_SYNONYM_FEAR:
+                emotion_list.append(OCC_FEAR)
+            if attribute_desc in OCC_SYNONYM_SATISFACTION:
+                emotion_list.append(OCC_SATISFACTION)
+            if attribute_desc in OCC_SYNONYM_FEARS_CONFIRMED:
+                emotion_list.append(OCC_FEARS_CONFIRMED)
+            if attribute_desc in OCC_SYNONYM_RELIEF:
+                emotion_list.append(OCC_RELIEF)
+            if attribute_desc in OCC_SYNONYM_DISAPPOINTMENT:
+                emotion_list.append(OCC_DISAPPOINTMENT)
+            if attribute_desc in OCC_SYNONYM_PRIDE:
+                emotion_list.append(OCC_PRIDE)
+            if attribute_desc in OCC_SYNONYM_SHAME:
+                emotion_list.append(OCC_SHAME)
+            if attribute_desc in OCC_SYNONYM_ADMIRATION:
+                emotion_list.append(OCC_ADMIRATION)
+            if attribute_desc in OCC_SYNONYM_LOVE:
+                emotion_list.append(OCC_LOVE)
+            if attribute_desc in OCC_SYNONYM_HATE:
+                emotion_list.append(OCC_HATE)
+            if attribute_desc in OCC_SYNONYM_GRATIFICATION:
+                emotion_list.append(OCC_GRATIFICATION)
+            if attribute_desc in OCC_SYNONYM_REMORSE:
+                emotion_list.append(OCC_REMORSE)
+            if attribute_desc in OCC_SYNONYM_GRATITUDE:
+                emotion_list.append(OCC_GRATIFICATION)
+            if attribute_desc in OCC_SYNONYM_ANGER:
+                emotion_list.append(OCC_ANGER)
+            if attribute_desc in OCC_SYNONYM_SHOCK:
+                emotion_list.append(OCC_SHOCK)
+            if attribute_desc in OCC_SYNONYM_SURPRISE:
+                emotion_list.append(OCC_SURPRISE)
+            if attribute_desc in OCC_SYNONYM_JOY:
+                emotion_list.append(OCC_JOY)
+
+        simplified_emotion_str = self.simplify_emotions(emotions=emotion_list)
+        final_emotion_list = []
+        for X in simplified_emotion_str:
+            final_emotion_list.append(EmotionEventTemplateBuilder.build(event_to_eval,
+                                                                        emotion=X))
+
+        return final_emotion_list

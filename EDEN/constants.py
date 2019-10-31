@@ -129,15 +129,15 @@ OCC_DISTRESS = "upset"
 OCC_SORRY_FOR = "sorry"
 OCC_RESENTMENT = "irritated"
 # OCC_GLOATING = "GLOATING"
-OCC_HOPE = "hope"
-OCC_FEAR = "fear"
+OCC_HOPE = "hopeful"
+OCC_FEAR = "anxious"
 OCC_SATISFACTION = "satisfied"
 OCC_FEARS_CONFIRMED = "scared"
 OCC_RELIEF = "relieved"
 OCC_DISAPPOINTMENT = "disappointed"
-OCC_PRIDE = "pride"
-OCC_SHAME = "shame"
-OCC_ADMIRATION = "admiration"
+OCC_PRIDE = "proud"
+OCC_SHAME = "guilty"
+OCC_ADMIRATION = "admired"
 # OCC_REPROACH = "REPROACH"
 # OCC_REPROACH = "DISGRACE"
 OCC_LOVE = "love"
@@ -152,26 +152,44 @@ OCC_SURPRISE = "surprised"
 OCC_JOY = "happy"
 
 """SIMPLIFIED EMOTIONS"""
-OCC_SIMPLIFY_ANGER = [OCC_SHAME, OCC_REMORSE, OCC_ANGER]
-OCC_SIMPLIFY_FEAR_CONFIRMED = [OCC_FEARS_CONFIRMED, OCC_FEAR]
-OCC_SIMPLIFY_GRATITUDE = [OCC_PRIDE, OCC_ADMIRATION, OCC_GRATIFICATION, OCC_GRATITUDE]
-OCC_SIMPLIFY_SATISFACTION = [OCC_HOPE, OCC_SATISFACTION]
+#EDEN iter 2
+# OCC_SIMPLIFY_ANGER = [OCC_SHAME, OCC_REMORSE, OCC_ANGER]
+# OCC_SIMPLIFY_FEAR_CONFIRMED = [OCC_FEARS_CONFIRMED, OCC_FEAR]
+# OCC_SIMPLIFY_GRATITUDE = [OCC_PRIDE, OCC_ADMIRATION, OCC_GRATIFICATION, OCC_GRATITUDE]
+# OCC_SIMPLIFY_SATISFACTION = [OCC_HOPE, OCC_SATISFACTION]
+
+#EDEN iter 3
+OCC_SIMPLIFY_SHAME = [OCC_SHAME, OCC_REMORSE]
+OCC_SIMPLIFY_SATISFACTION = [OCC_GRATIFICATION, OCC_SATISFACTION]
+
+"""EMOTION SYNONYMS"""
+OCC_SYNONYM_DISTRESS =["upset", "distress", "distressed"]
+OCC_SYNONYM_SORRY_FOR =["sorry", "sorry for"]
+OCC_SYNONYM_RESENTMENT =["irritated", "resent", "resentment", "annoyed"]
+OCC_SYNONYM_HOPE =["hopeful", "hope"]
+OCC_SYNONYM_FEAR =["anxious"]
+OCC_SYNONYM_SATISFACTION =["satisfied", "satisfaction"]
+OCC_SYNONYM_FEARS_CONFIRMED =["scared", "fears confirmed", "fear"]
+OCC_SYNONYM_RELIEF =["relieved", "relief"]
+OCC_SYNONYM_DISAPPOINTMENT =["disappointed", "disappointed"]
+OCC_SYNONYM_PRIDE =["proud", "pride"]
+OCC_SYNONYM_SHAME =["guilty", "shame"]
+OCC_SYNONYM_ADMIRATION =["admired", "admiration"]
+OCC_SYNONYM_LOVE =["love", "loved"]
+OCC_SYNONYM_HATE =["hate"]
+OCC_SYNONYM_GRATIFICATION =["gratification"]
+OCC_SYNONYM_REMORSE =["remorse"]
+OCC_SYNONYM_GRATITUDE =["thankful", "gratitude"]
+OCC_SYNONYM_ANGER =["angry", "mad", "anger"]
+OCC_SYNONYM_SHOCK =["shocked", "shock"]
+OCC_SYNONYM_SURPRISE =["surprised", "surprise"]
+OCC_SYNONYM_JOY =["happy", "joy"]
+
+
 
 #change to disciplinary emotions
 DISCIPLINARY_EMOTIONS = [OCC_HATE,
                          OCC_ANGER]
-
-# NEGATIVE_EMOTIONS = [OCC_DISTRESS,
-#                      OCC_SORRY_FOR,
-#                      OCC_RESENTMENT,
-#                      OCC_FEAR,
-#                      OCC_FEARS_CONFIRMED,
-#                      OCC_DISAPPOINTMENT,
-#                      OCC_SHAME,
-#                      OCC_HATE,
-#                      OCC_REMORSE,
-#                      OCC_ANGER,
-#                      OCC_SHOCK]
 
 NEGATIVE_EMOTIONS = [OCC_SORRY_FOR,
                      OCC_RESENTMENT,
@@ -182,7 +200,8 @@ NEGATIVE_EMOTIONS = [OCC_SORRY_FOR,
                      OCC_HATE,
                      OCC_REMORSE,
                      OCC_ANGER,
-                     OCC_SHOCK]
+                     OCC_SHOCK,
+                     OCC_DISTRESS]
 
 POSITIVE_EMOTIONS = [OCC_HOPE,
                      OCC_SATISFACTION,
