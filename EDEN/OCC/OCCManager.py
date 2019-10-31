@@ -768,50 +768,9 @@ class OCCManager():
     def get_attribute_emotion(self, event_to_eval):
         emotion_list = []
         for attribute in event_to_eval.attributes:
-            attribute_desc = str(attribute.description)
-
-            if attribute_desc in OCC_SYNONYM_DISTRESS:
-                emotion_list.append(OCC_DISTRESS)
-            if attribute_desc in OCC_SYNONYM_SORRY_FOR:
-                emotion_list.append(OCC_SORRY_FOR)
-            if attribute_desc in OCC_SYNONYM_RESENTMENT:
-                emotion_list.append(OCC_RESENTMENT)
-            if attribute_desc in OCC_SYNONYM_HOPE:
-                emotion_list.append(OCC_HOPE)
-            if attribute_desc in OCC_SYNONYM_FEAR:
-                emotion_list.append(OCC_FEAR)
-            if attribute_desc in OCC_SYNONYM_SATISFACTION:
-                emotion_list.append(OCC_SATISFACTION)
-            if attribute_desc in OCC_SYNONYM_FEARS_CONFIRMED:
-                emotion_list.append(OCC_FEARS_CONFIRMED)
-            if attribute_desc in OCC_SYNONYM_RELIEF:
-                emotion_list.append(OCC_RELIEF)
-            if attribute_desc in OCC_SYNONYM_DISAPPOINTMENT:
-                emotion_list.append(OCC_DISAPPOINTMENT)
-            if attribute_desc in OCC_SYNONYM_PRIDE:
-                emotion_list.append(OCC_PRIDE)
-            if attribute_desc in OCC_SYNONYM_SHAME:
-                emotion_list.append(OCC_SHAME)
-            if attribute_desc in OCC_SYNONYM_ADMIRATION:
-                emotion_list.append(OCC_ADMIRATION)
-            if attribute_desc in OCC_SYNONYM_LOVE:
-                emotion_list.append(OCC_LOVE)
-            if attribute_desc in OCC_SYNONYM_HATE:
-                emotion_list.append(OCC_HATE)
-            if attribute_desc in OCC_SYNONYM_GRATIFICATION:
-                emotion_list.append(OCC_GRATIFICATION)
-            if attribute_desc in OCC_SYNONYM_REMORSE:
-                emotion_list.append(OCC_REMORSE)
-            if attribute_desc in OCC_SYNONYM_GRATITUDE:
-                emotion_list.append(OCC_GRATIFICATION)
-            if attribute_desc in OCC_SYNONYM_ANGER:
-                emotion_list.append(OCC_ANGER)
-            if attribute_desc in OCC_SYNONYM_SHOCK:
-                emotion_list.append(OCC_SHOCK)
-            if attribute_desc in OCC_SYNONYM_SURPRISE:
-                emotion_list.append(OCC_SURPRISE)
-            if attribute_desc in OCC_SYNONYM_JOY:
-                emotion_list.append(OCC_JOY)
+            retrieved_emotion = self.get_emotion_by_synonym(str(attribute.description))
+            if retrieved_emotion != "":
+                emotion_list.append(self.get_emotion_by_synonym(str(attribute.description)))
 
         simplified_emotion_str = self.simplify_emotions(emotions=emotion_list)
         final_emotion_list = []
@@ -820,3 +779,48 @@ class OCCManager():
                                                                         emotion=X))
 
         return final_emotion_list
+
+    def get_emotion_by_synonym(self, term_to_eval):
+        if term_to_eval in OCC_SYNONYM_DISTRESS:
+            return OCC_DISTRESS
+        if term_to_eval in OCC_SYNONYM_SORRY_FOR:
+            return OCC_SORRY_FOR
+        if term_to_eval in OCC_SYNONYM_RESENTMENT:
+            return OCC_RESENTMENT
+        if term_to_eval in OCC_SYNONYM_HOPE:
+            return OCC_HOPE
+        if term_to_eval in OCC_SYNONYM_FEAR:
+            return OCC_FEAR
+        if term_to_eval in OCC_SYNONYM_SATISFACTION:
+            return OCC_SATISFACTION
+        if term_to_eval in OCC_SYNONYM_FEARS_CONFIRMED:
+            return OCC_FEARS_CONFIRMED
+        if term_to_eval in OCC_SYNONYM_RELIEF:
+            return OCC_RELIEF
+        if term_to_eval in OCC_SYNONYM_DISAPPOINTMENT:
+            return OCC_DISAPPOINTMENT
+        if term_to_eval in OCC_SYNONYM_PRIDE:
+            return OCC_PRIDE
+        if term_to_eval in OCC_SYNONYM_SHAME:
+            return OCC_SHAME
+        if term_to_eval in OCC_SYNONYM_ADMIRATION:
+            return OCC_ADMIRATION
+        if term_to_eval in OCC_SYNONYM_LOVE:
+            return OCC_LOVE
+        if term_to_eval in OCC_SYNONYM_HATE:
+            return OCC_HATE
+        if term_to_eval in OCC_SYNONYM_GRATIFICATION:
+            return OCC_GRATIFICATION
+        if term_to_eval in OCC_SYNONYM_REMORSE:
+            return OCC_REMORSE
+        if term_to_eval in OCC_SYNONYM_GRATITUDE:
+            return OCC_GRATIFICATION
+        if term_to_eval in OCC_SYNONYM_ANGER:
+            return OCC_ANGER
+        if term_to_eval in OCC_SYNONYM_SHOCK:
+            return OCC_SHOCK
+        if term_to_eval in OCC_SYNONYM_SURPRISE:
+            return OCC_SURPRISE
+        if term_to_eval in OCC_SYNONYM_JOY:
+            return OCC_JOY
+        return ""

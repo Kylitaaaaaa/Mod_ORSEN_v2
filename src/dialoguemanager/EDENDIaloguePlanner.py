@@ -141,7 +141,13 @@ class EDENDialoguePlanner(DialoguePlanner):
                     print("SETTING CURR_EVENT_EMOTION TO: ", self.response.upper())
                     Logger.log_occ_values("UPDATING EMOTION TO: " +  self.response.upper())
 
-                    self.curr_event.emotion = self.response.upper()
+
+                    retrieved_emotion = self.occ_manager.get_emotion_by_synonym(self.response.lower()[:-1])
+                    if retrieved_emotion != "":
+                        self.curr_event.emotion = retrieved_emotion
+                    else:
+                        self.curr_event.emotion = self.response.upper()
+
                     self.ongoing_c_pumping = True
                 return DIALOGUE_TYPE_C_PUMPING
             elif last_move.dialogue_type == DIALOGUE_TYPE_D_PUMPING:
