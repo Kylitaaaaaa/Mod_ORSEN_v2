@@ -21,10 +21,8 @@ class DCorrectingDialogueTemplate(DialogueTemplate):
             to_insert = ""
             curr_index = response.index(self.nodes[i])
             if self.blanks[i] == 'Character':
-                if curr_emotion_event.event.get_characters_involved()[0].name.lower() == 'i':
-                    to_insert = 'you'
-                else:
-                    to_insert = curr_emotion_event.event.get_characters_involved()[0].name
+                to_insert = self.check_subject(curr_emotion_event.event.get_characters_involved()[0].name)
+
             response[curr_index] = to_insert
         return response
 

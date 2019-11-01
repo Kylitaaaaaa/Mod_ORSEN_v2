@@ -208,8 +208,19 @@ class DialogueTemplate(ABC):
 
         return word_rel
 
+    def check_subject(self, subj_to_check):
+        subj_to_check = subj_to_check.lower()
+
+        if subj_to_check == 'i' or subj_to_check == 'we' or subj_to_check == 'us':
+            return 'you'
+        elif subj_to_check == 'my':
+            return 'your'
+        return subj_to_check
+
     @staticmethod
     @abstractmethod
     def get_template_to_use(self):
         # check if it has usable templates
         return []
+
+

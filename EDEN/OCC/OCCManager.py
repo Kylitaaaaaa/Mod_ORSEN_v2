@@ -273,19 +273,19 @@ class OCCManager():
         for X in emotions:
             candidate = X
 
-            if X in OCC_SIMPLIFY_SHAME:
-                candidate = OCC_SHAME
-            elif X in OCC_SIMPLIFY_SATISFACTION:
-                candidate = OCC_SATISFACTION
-
-            # if X in OCC_SIMPLIFY_ANGER:
-            #     candidate = OCC_ANGER
-            # elif X in OCC_SIMPLIFY_FEAR_CONFIRMED:
-            #     candidate = OCC_FEARS_CONFIRMED
-            # elif X in OCC_SIMPLIFY_GRATITUDE:
-            #     candidate = OCC_GRATITUDE
+            # if X in OCC_SIMPLIFY_SHAME:
+            #     candidate = OCC_SHAME
             # elif X in OCC_SIMPLIFY_SATISFACTION:
             #     candidate = OCC_SATISFACTION
+
+            if X in OCC_SIMPLIFY_ANGER:
+                candidate = OCC_ANGER
+            elif X in OCC_SIMPLIFY_FEAR_CONFIRMED:
+                candidate = OCC_FEARS_CONFIRMED
+            elif X in OCC_SIMPLIFY_GRATITUDE:
+                candidate = OCC_GRATITUDE
+            elif X in OCC_SIMPLIFY_SATISFACTION:
+                candidate = OCC_SATISFACTION
 
             #check if not yet in simplified list
             if candidate not in simplified_emotions:

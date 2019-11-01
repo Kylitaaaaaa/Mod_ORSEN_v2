@@ -71,6 +71,11 @@ class ORSEN:
         start_time = time.time()
 
         orsen_reply = self.perform_dialogue_manager(response, preselected_move=move_to_execute)
+        # try:
+        #     orsen_reply = self.perform_dialogue_manager(response, preselected_move=move_to_execute)
+        # except Exception as e:
+        #     Logger.log_conversation("ERROR: " + str(e))
+        #     orsen_reply = "I see. What else can you say about that?"
 
         Logger.log_conversation("ORSEN LATENCY TIME (seconds): " + str(time.time() - start_time))
 
@@ -246,7 +251,7 @@ class ORSEN:
         move_to_execute = ""
 
         #set response in dialogue planner
-        self.dialogue_planner.response = response
+        self.dialogue_planner.response = response.lower()
         move_to_execute = ""
 
         # gets move to execute -- uses passed if not empty, asks dialogue planner to decide otherwise
@@ -305,6 +310,8 @@ class ORSEN:
         # send current event to ContentDetermination
         self.content_determination.set_state(move_to_execute, self.dialogue_planner.curr_event, available_templates)
         response, chosen_template = self.content_determination.perform_content_determination()
+
+
 
         """FINALIZE MOVES"""
 

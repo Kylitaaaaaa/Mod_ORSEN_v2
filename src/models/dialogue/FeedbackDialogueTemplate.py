@@ -20,7 +20,8 @@ class FeedbackDialogueTemplate(DialogueTemplate):
             to_insert = ""
             curr_index = response.index(self.nodes[i])
             if self.blanks[i] == 'Repeat':
-                to_insert = event.subject.name + " "
+                to_insert = self.check_subject(event.subject.name) + " "
+                # to_insert = event.subject.name + " "
                 if event.get_type() == EVENT_ACTION:
                     to_insert = to_insert + str(event.verb)
                 elif event.get_type() == EVENT_CREATION:

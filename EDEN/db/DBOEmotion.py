@@ -27,7 +27,7 @@ class DBOEmotion:
         # query = q.get_sql()
         # query = query.replace("\"", "")
 
-        query = 'SELECT * FROM %s WHERE term = "%s" OR synonym_1 = "%s" OR synonym_2 = "%s" OR synonym_3 = "%s"' % (self.table_name, term, term, term, term)
+        query = 'SELECT * FROM %s WHERE term = "%s" OR synonym_1 = "%s" OR synonym_2 = "%s" OR synonym_3 = "%s" LIMIT 20' % (self.table_name, term, term, term, term)
         print(query)
 
         results = SQLExecuter.execute_read_query(query, FETCH_ALL)
@@ -52,3 +52,44 @@ class DBOEmotion:
         print("DOne Printing dbo results")
 
         return curr_term
+
+
+    def get_all_terms(self):
+        # q = Query \
+        #     .from_(self.table_reference) \
+        #     .select("*") \
+        #     .where( (self.table_reference.term == term) | (self.table_reference.synonym_1 == term) | (self.table_reference.synonym_2 == term) | (self.table_reference.synonym_3 == term) )
+        #
+        # query = q.get_sql()
+        # query = query.replace("\"", "")
+
+        query = 'SELECT * FROM %s' % self.table_name
+        print(query)
+
+        results = SQLExecuter.execute_read_query(query, FETCH_ALL)
+
+
+
+        if results is None:
+            return None
+
+        if len(results) ==0:
+            return None
+
+        for X in results:
+            self.get_term()
+            print(X[1])
+
+        #
+        # curr_term = Emotion(term=term)
+
+        # curr_term = NRC_Emotion(term=term)
+        #
+        # print("Printing dbo results: ", type(results))
+        # print(results)
+        # for X in results:
+        #     curr_term.add_values(X)
+        #     print(X)
+        # print("DOne Printing dbo results")
+        #
+        # return curr_term

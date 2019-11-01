@@ -14,16 +14,19 @@ class PumpingSpecificDialogueTemplate(DialogueTemplate):
             to_insert = ""
             curr_index = response.index(self.nodes[i])
             if self.blanks[i] == 'Character':
-                if event.get_characters_involved()[0].name.lower() == 'i':
-                    to_insert = 'you'
-                else:
-                    to_insert = event.get_characters_involved()[0].name
+                to_insert = self.check_subject(event.get_characters_involved()[0].name)
+                # if event.get_characters_involved()[0].name.lower() == 'i':
+                #     to_insert = 'you'
+                # else:
+                #     to_insert = event.get_characters_involved()[0].name
             elif self.blanks[i] == 'Object' or self.blanks[i] == 'Item':
                 to_insert = event.get_objects_involved()[0].name
             elif self.blanks[i] == 'Event':
-                to_insert = event.subject.name + " " + str(event.verb.lemma_)
+                to_insert = self.check_subject(event.subject.name) + " " + str(event.verb.lemma_)
+                # to_insert = event.subject.name + " " + str(event.verb.lemma_)
             elif self.blanks[i] == 'Repeat':
-                to_insert = event.subject.name + " "
+                to_insert = self.check_subject(event.subject.name) + " "
+                # to_insert = event.subject.name + " "
                 if event.get_type() == EVENT_ACTION:
                     to_insert = to_insert + str(event.verb)
                 elif event.get_type() == EVENT_CREATION:

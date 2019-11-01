@@ -63,6 +63,9 @@ class EDENDialoguePlanner(DialoguePlanner):
         self.dialogue_history.append(DialogueHistoryTemplate(dialogue_type=self.chosen_dialogue_move))
         print("FINAL DIALOGUE LIST: ", self.chosen_dialogue_move)
         self.print_dialogue_list()
+
+        Logger.log_conversation("CHOSEN DIALOGUE MOVE: " + self.chosen_dialogue_move)
+
         return self.chosen_dialogue_move
 
     def check_auto_response(self, destructive = True, emotion_event = None):

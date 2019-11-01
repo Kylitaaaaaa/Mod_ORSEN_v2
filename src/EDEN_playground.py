@@ -1,5 +1,6 @@
 from EDEN.OCC import OCCManager
 from EDEN.constants import *
+from EDEN.db import DBOEmotion
 from EDEN.models import EmotionActionEvent
 from src.ORSEN import ORSEN, EVENT_CREATION, CreationEvent, EVENT_DESCRIPTION, EVENT_ACTION, ActionEvent
 from src import Logger
@@ -10,7 +11,10 @@ from src.models import World
 from src.models.elements import Object, Attribute, Setting, Character
 import time
 
+
+
 occ_manager = OCCManager()
+orsen = ORSEN()
 
 def test_eden():
     response = ["I loved you too much to let you die, dear sister, but your heart was failing you, so I gave you mine.",
@@ -32,11 +36,11 @@ def test_eden():
     # response = ["I thought he might miss the flight but I suddenly found him on the plane."]
 
     Logger.setup_loggers()
-    orsen = ORSEN()
+
 
     for X in response:
         orsen.perform_text_understanding(X)
-        emotion = orsen.get_emotion(X)
+        # emotion = orsen.get_emotion(X)
 
 
 
@@ -473,6 +477,10 @@ def get_time(file_path):
 
     print_list(user_lat)
 
+def test_dataset():
+    dbo_emotion = DBOEmotion('nrc_emotion')
+    dbo_emotion.get_all_terms()
+
 
 # main_file_path = '/Users/kylesantos/Desktop/oct 20 testing/'
 # file_paths = ['1 zairah/',
@@ -539,4 +547,4 @@ def get_time(file_path):
 # print("\n\n=====Jhanissa 2=====")
 # extract_emo_class("/Users/kylesantos/Desktop/oct 26 testing/10 Jhanissa 2/")
 
-test_occ_model()
+test_eden()
