@@ -1,14 +1,17 @@
-from src import ORSEN2, EDEN
-from src.dialoguemanager.EDENDIaloguePlanner import EDENDialoguePlanner
-from src.dialoguemanager.ORSEN2DialoguePlanner import ORSEN2DialoguePlanner
-
+from src.constants import *
+from src.dialoguemanager import EDENDialoguePlanner
+from src.dialoguemanager import ORSEN2DialoguePlanner
 
 class DialoguePlannerBuilder:
 
    @staticmethod
    def build(orsen_type):
-      if orsen_type == ORSEN2:
-          return ORSEN2DialoguePlanner()
+        planner = None
 
-      elif orsen_type == EDEN:
-          return EDENDialoguePlanner()
+        if orsen_type == ORSEN2:
+            planner = ORSEN2DialoguePlanner()
+
+        elif orsen_type == EDEN:
+            planner = EDENDialoguePlanner()
+
+        return planner

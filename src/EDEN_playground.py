@@ -1,20 +1,20 @@
-from EDEN.OCC import OCCManager
 from EDEN.constants import *
+from src.constants import *
+
 from EDEN.db import DBOEmotion
 from EDEN.models import EmotionActionEvent
-from src.ORSEN import ORSEN, EVENT_CREATION, CreationEvent, EVENT_DESCRIPTION, EVENT_ACTION, ActionEvent
-from src import Logger
-import pickle
-import datetime
 
+from src import Logger, ORSEN
 from src.models import World
 from src.models.elements import Object, Attribute, Setting, Character
+from src.models.events import ActionEvent, CreationEvent, DescriptionEvent
+
+import pickle
+import datetime
 import time
 
 
 
-occ_manager = OCCManager()
-orsen = ORSEN()
 
 def test_eden():
     response = ["I loved you too much to let you die, dear sister, but your heart was failing you, so I gave you mine.",
@@ -547,4 +547,7 @@ def test_dataset():
 # print("\n\n=====Jhanissa 2=====")
 # extract_emo_class("/Users/kylesantos/Desktop/oct 26 testing/10 Jhanissa 2/")
 
+# occ_manager = OCCManager()
+orsen = ORSEN()
+occ_manager = orsen.occ_manager
 test_eden()

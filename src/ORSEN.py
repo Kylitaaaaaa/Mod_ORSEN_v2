@@ -1,21 +1,17 @@
-import time
-
-from EDEN.constants import EVENT_EMOTION
-from EDEN.models import Emotion
-from src.dataprocessor import Annotator
-from src.dialoguemanager import DialoguePlannerBuilder
-from src.models import World
-from src.models.elements import Attribute, Setting
-from src.models.elements import Object, Character
-from src.textunderstanding import InputDecoder, EizenExtractor
+from EDEN.constants import *
 from src.constants import *
-from . import Logger
-from src.textunderstanding.InputDecoder import InputDecoder
-from src.dialoguemanager import *
-from src.models.events import *
-from EDEN.OCC import OCCManager
 
+from EDEN.models import Emotion
 
+from src import Logger
+from src.dataprocessor import Annotator
+from src.dialoguemanager import DialoguePlannerBuilder, ContentDetermination
+from src.models import World
+from src.models.events import ActionEvent, CreationEvent, DescriptionEvent
+from src.models.elements import Attribute, Setting, Object, Character
+from src.textunderstanding import InputDecoder, EizenExtractor
+
+import time
 
 class ORSEN:
 
@@ -30,8 +26,11 @@ class ORSEN:
         self.content_determination = ContentDetermination()
         self.initialize_story_prerequisites()
 
+        if CURR_ORSEN_VERSION == 'EDEN':
+            self.occ_manager = self.dialogue_planner.occ_manager
         ###EDEN
-        self.occ_manager = OCCManager()
+        # self.occ_manager = OCCManager()
+
         self.is_end = False
         # self.world = None
         self.user_start_time = time.time()

@@ -1,20 +1,22 @@
 from EDEN.constants import *
+from src.constants import *
+
 from EDEN.db import DBOEmotion
+from EDEN.models import Emotion, EmotionEventTemplateBuilder
 
-import spacy
+from src import Logger
 
-from EDEN.models import Emotion
-from EDEN.models.EmotionEventTemplateBuilder import EmotionEventTemplateBuilder, EVENT_DESCRIPTION
 from src.dbo.concept import DBOConcept, DBOConceptGlobalImpl
 from src.models.elements import Character
+
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
-from src import Logger, EVENT_ACTION
+
+import spacy
 
 nlp = spacy.load("en_core_web_sm")
 
 class OCCManager():
     def __init__(self, af="", de="", of="", oa="", sr ="", sp ="", op="", pros="", stat="", unexp=False, sa="", vr=False, ed="", eoa="", edev="", ef=""):
-        super().__init__()
         # self.curr_action_event = None
         self.curr_event = None
         self.response = ""
