@@ -113,6 +113,8 @@ class OCCManager():
         self.curr_event = event_to_eval
 
         if event_to_eval.type == EVENT_ACTION:
+            Logger.log_occ_values(
+                "EVALUATING ACTION: " + str(event_to_eval.sequence_number) + " : " + self.get_vader_event_string())
             # setup response
             self.response = response
 
@@ -121,11 +123,8 @@ class OCCManager():
             self.emotion = self.get_emotion(str(event_to_eval.verb.lemma_))
 
             if self.emotion is None:
-                Logger.log_occ_values(
-                    "EVALUATING: " + str(event_to_eval.sequence_number) + " : " + self.get_vader_event_string())
                 Logger.log_occ_values("NO EMOTION FOUND")
                 return None
-
             self.set_state()
 
             chosen_emotion = self.choose_emotion(event_to_eval, self.get_event_valence())
@@ -771,9 +770,13 @@ class OCCManager():
     def get_attribute_emotion(self, event_to_eval):
         emotion_list = []
         for attribute in event_to_eval.attributes:
+            Logger.log_occ_values(
+                "EVALUATING DESC ATTRIBUTE: " + str(attribute.description))
             retrieved_emotion = self.get_emotion_by_synonym(str(attribute.description))
             if retrieved_emotion != "":
                 emotion_list.append(self.get_emotion_by_synonym(str(attribute.description)))
+            else:
+                Logger.log_occ_values("NO EMOTION FOUND")
 
         simplified_emotion_str = self.simplify_emotions(emotions=emotion_list)
         final_emotion_list = []

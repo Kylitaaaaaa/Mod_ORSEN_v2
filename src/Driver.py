@@ -211,7 +211,10 @@ while is_engaged:
     start_storytelling()
 
     #save story world
-    Pickle.pickle_world_wb(pickle_filepath, orsen.world.get_pickled_world())
+    try:
+        Pickle.pickle_world_wb(pickle_filepath, orsen.world.get_pickled_world())
+    except Exception as e:
+        Logger.log_conversation("ERROR: " + str(e))
 
     print("Do you want to make another story?")
     user_input = get_input()

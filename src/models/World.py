@@ -1,4 +1,5 @@
 from src import *
+from src import Logger
 
 
 class World:
@@ -107,28 +108,43 @@ class World:
 
         #pickle objects
         pickled_objects = []
-        for X in self.objects:
-            pickled_objects.append(X.get_pickled_object())
+        try:
+            for X in self.objects:
+                pickled_objects.append(X.get_pickled_object())
+        except Exception as e:
+            Logger.log_conversation("ERROR: " + str(e))
 
         # pickle characters
         pickled_characters = []
-        for X in self.characters:
-            pickled_characters.append(X.get_pickled_character())
+        try:
+            for X in self.characters:
+                pickled_characters.append(X.get_pickled_character())
+        except Exception as e:
+            Logger.log_conversation("ERROR: " + str(e))
 
         # pickle setting
         pickled_settings = []
-        for X in self.settings:
-            pickled_settings.append(X.get_pickled_setting())
+        try:
+            for X in self.settings:
+                pickled_settings.append(X.get_pickled_setting())
+        except Exception as e:
+            Logger.log_conversation("ERROR: " + str(e))
 
         # pickle event
         pickled_event_chain = []
-        for X in self.event_chains:
-            pickled_event_chain.append(X.get_pickled_event())
+        try:
+            for X in self.event_chains:
+                pickled_event_chain.append(X.get_pickled_event())
+        except Exception as e:
+            Logger.log_conversation("ERROR: " + str(e))
 
         # pickle emotion event
         pickled_emotion_event = []
-        for X in self.emotion_events:
-            pickled_emotion_event.append(X.get_pickled_emotion_event())
+        try:
+            for X in self.emotion_events:
+                pickled_emotion_event.append(X.get_pickled_emotion_event())
+        except Exception as e:
+            Logger.log_conversation("ERROR: " + str(e))
 
         pickled_world.append(pickled_objects)
         pickled_world.append(pickled_characters)
