@@ -98,6 +98,11 @@ class Logger:
     # logging.warning('This will get logged to a file')
 
     @staticmethod
+    def log_event_response_eval(content):
+        logger = logging.getLogger(EVENT_CHAIN_LOG)
+        logger.info("  >> EVALUATING: "+ content)
+
+    @staticmethod
     def log_occ_values(content):
         logger = logging.getLogger(EMOTION_CLASSIFICATION)
         logger.info(content)

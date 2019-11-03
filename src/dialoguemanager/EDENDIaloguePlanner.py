@@ -145,7 +145,7 @@ class EDENDialoguePlanner(DialoguePlanner):
                     Logger.log_occ_values("UPDATING EMOTION TO: " +  self.response.upper())
 
 
-                    retrieved_emotion = self.occ_manager.get_emotion_by_synonym(self.response.lower()[:-1])
+                    retrieved_emotion = self.occ_manager.get_emotion_by_synonym(self.response.lower())
                     if retrieved_emotion != "":
                         self.curr_event.emotion = retrieved_emotion
                     else:

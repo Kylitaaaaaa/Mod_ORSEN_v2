@@ -70,6 +70,10 @@ class ORSEN:
 
         start_time = time.time()
 
+        print("=====USER RESPONSE IS: " + response)
+        if response != "":
+            Logger.log_event_response_eval(response)
+
         orsen_reply = self.perform_dialogue_manager(response, preselected_move=move_to_execute)
         # try:
         #     orsen_reply = self.perform_dialogue_manager(response, preselected_move=move_to_execute)

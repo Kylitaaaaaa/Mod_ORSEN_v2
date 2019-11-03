@@ -3,6 +3,8 @@ from EDEN.db import DBOEmotion
 
 import spacy
 
+import re
+
 from EDEN.models import Emotion
 from EDEN.models.EmotionEventTemplateBuilder import EmotionEventTemplateBuilder, EVENT_DESCRIPTION
 from src.dbo.concept import DBOConcept, DBOConceptGlobalImpl
@@ -106,6 +108,7 @@ class OCCManager():
 
     # def get_occ_emotion(self, curr_action_event, response):
     def get_occ_emotion(self, event_to_eval, response):
+        chosen_emotion = None
         # setup event to evaluate
         self.curr_event = event_to_eval
 
@@ -129,8 +132,8 @@ class OCCManager():
         elif event_to_eval.type == EVENT_DESCRIPTION:
             # self.set_state()
             chosen_emotion = self.get_attribute_emotion(event_to_eval)
-            if len(chosen_emotion) == 0:
-                return None
+        # if len(chosen_emotion) == 0:
+        #     return None
 
 
 
@@ -780,7 +783,17 @@ class OCCManager():
 
         return final_emotion_list
 
+    def remove_punctuation(pattern, phrase):
+        pattern = ['[^!.?]+']
+        for pat in pattern:
+            return (re.findall(pat, phrase))
+            return ('\n')
+
     def get_emotion_by_synonym(self, term_to_eval):
+        #remove punctuations
+        term_to_eval = "".join(self.remove_punctuation(term_to_eval))
+        print("UPDATED USER RESPONSE: ", term_to_eval)
+
         if term_to_eval in OCC_SYNONYM_DISTRESS:
             return OCC_DISTRESS
         if term_to_eval in OCC_SYNONYM_SORRY_FOR:
