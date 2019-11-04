@@ -64,7 +64,13 @@ class ORSEN:
             """" 
             Executing Dialogue Manager 
             """""
-            result = ORSEN.perform_dialogue_manager(self)
+            # result = ORSEN.perform_dialogue_manager(self)
+            # Try Catch
+            try:
+                result = ORSEN.perform_dialogue_manager(self)
+            except Exception as e:
+                Logger.log_conversation("ERROR: " + str(e))
+                result = "I see. What else can you say about that?"
 
         else:
             #TODO: insert KA stuff here
@@ -93,7 +99,13 @@ class ORSEN:
                 self.world.curr_event = self.world.event_chains[len(self.world.event_chains)-1]
 
             #if prompt
-            result = ORSEN.perform_dialogue_manager(self, triggered_move)
+            # result = ORSEN.perform_dialogue_manager(self, triggered_move)
+            # Try Catch
+            try:
+                result = ORSEN.perform_dialogue_manager(self)
+            except Exception as e:
+                Logger.log_conversation("ERROR: " + str(e))
+                result = "I see. What else can you say about that?"
 
         self.dialogue_planner.reset_state()
 

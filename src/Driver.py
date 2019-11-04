@@ -117,7 +117,7 @@ def start_storytelling():
 # Initialize loggers
 Logger.setup_loggers()
 
-#Retrieve User Details --- User objects
+# Retrieve User Details --- User objects
 print("---------Retrieving User Details---------")
 login_signup()
 print("done")
