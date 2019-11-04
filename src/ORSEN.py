@@ -8,7 +8,7 @@ from . import Logger
 from src.textunderstanding.InputDecoder import InputDecoder
 from src.dialoguemanager import *
 from src.models.events import *
-
+import time
 
 class ORSEN:
 
@@ -21,6 +21,8 @@ class ORSEN:
         self.dialogue_planner = DialoguePlanner()
         self.content_determination = ContentDetermination()
         self.initialize_story_prerequisites()
+        self.user_start_time = time.time()
+        self.user_end_time = time.time()
 
     def initialize_story_prerequisites(self):
         self.world = World()
@@ -47,6 +49,10 @@ class ORSEN:
     def get_response(self, response):
         Logger.log_dialogue_model(response)
         Logger.log_dialogue_model("Entering ORSEN.get_response()")
+
+        self.user_end_time = time.time()
+        Logger.log_conversation("USER LATENCY TIME (seconds): " + str(self.user_end_time - self.user_start_time))
+        start_time = time.time()
 
         """"
         Check for trigger phrases 
@@ -108,6 +114,9 @@ class ORSEN:
                 result = "I see. What else can you say about that?"
 
         self.dialogue_planner.reset_state()
+
+        Logger.log_conversation("ORSEN LATENCY TIME (seconds): " + str(time.time() - start_time))
+        self.user_start_time = time.time()
 
         return result
 

@@ -5,7 +5,8 @@ from src.dataprocessor.coreference import SpacyCoreference
 from src import Logger
 
 import spacy
-nlp = spacy.load('en_core_web_sm')
+# [Celina] I changed it to sm for testing only
+nlp = spacy.load('en_core_web_lg')
 
 class InputDecoder:
     __instance = None
