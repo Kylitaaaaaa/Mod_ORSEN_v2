@@ -37,7 +37,8 @@ class EizenExtractor(object):
     MODE_LISTING = "list"
     MODE_CONCATENATING = "concatenate"
 
-    def __init__(self, model_to_use="en_core_web_lg"):
+    #Ni change ko to sm yung en_core_web kasi ang bagal ng lg
+    def __init__(self, model_to_use="en_core_web_sm"):
         print("Last compatibility version check: %s.\n" % (LAST_CHECK_DATE))
 
         print("Checking spaCy version: %s" % (spacy.__version__))
