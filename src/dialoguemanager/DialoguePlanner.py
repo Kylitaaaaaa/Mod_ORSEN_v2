@@ -54,6 +54,8 @@ class DialoguePlanner:
         self.is_usable = []
         self.is_usable = [False] * len(DIALOGUE_LIST)
 
+        self.usable_templates = []
+
     def perform_dialogue_planner(self, dialogue_move=""):
         if dialogue_move == "":
             self.setup_templates_is_usable()
@@ -78,16 +80,14 @@ class DialoguePlanner:
 
         return self.chosen_dialogue_move
 
-
-
     def setup_templates_is_usable(self):
         self.init_set_dialogue_moves_usable()
-
         # fetch all usable dialogue templates
         for i in range(len(DIALOGUE_LIST)):
             #check if dialogue move is initially valid
             to_check = DIALOGUE_LIST[i]
             Logger.log_dialogue_model_basic(to_check)
+            
             if self.is_usable[i]:
                 # check if dialogue has templates
                 self.usable_templates.append(self.get_usable_templates(DIALOGUE_LIST[i].get_type()))
@@ -107,16 +107,15 @@ class DialoguePlanner:
         set_to_true = []
 
         set_to_true.append(DIALOGUE_TYPE_HINTING)
-        
+        #set_to_true.append(DIALOGUE_TYPE_PUMPING_SPECIFIC)
 
-        # print("NUM ACTION EVENTS ARE: ", self.num_action_events)
-        # if self.num_action_events <= 1:
-        #     print("HERE NUM EVENTS AT <= 1")
-            
+        #print("HMM", self.get_num_usage(DIALOGUE_TYPE_FEEDBACK) + self.get_num_usage(DIALOGUE_TYPE_PUMPING_GENERAL))
+
+        # if self.num_action_events <= 3:
         #     set_to_true.append(DIALOGUE_TYPE_FEEDBACK)
         #     set_to_true.append(DIALOGUE_TYPE_PUMPING_GENERAL)
 
-        # elif self.get_num_usage(DIALOGUE_TYPE_FEEDBACK) == 3 or self.get_num_usage(DIALOGUE_TYPE_PUMPING_GENERAL) == 3:
+        # elif self.get_num_usage(DIALOGUE_TYPE_FEEDBACK) + self.get_num_usage(DIALOGUE_TYPE_PUMPING_GENERAL) == 3:
         #     set_to_true.append(DIALOGUE_TYPE_PUMPING_SPECIFIC)
         #     set_to_true.append(DIALOGUE_TYPE_PUMPING_GENERAL)
 
@@ -184,6 +183,7 @@ class DialoguePlanner:
 
         candidates = np.argwhere(probability == np.amax(probability))
         candidates = candidates.flatten().tolist()
+        print("Candidates")
         print(candidates)
 
         # np.random.seed(int(self.seed_time))
@@ -192,11 +192,13 @@ class DialoguePlanner:
         return choice
 
     def choose_dialogue(self):
-
         moves_to_eval = self.get_valid_moves_index()
         weights_to_eval = self.get_weights_from_index(moves_to_eval)
 
         dialogue_move_index = self.select_dialogue_from_weights(weights_to_eval)
+        print("THH", moves_to_eval)
+        print("THH", weights_to_eval)
+        print("THH", dialogue_move_index)
 
         return moves_to_eval[dialogue_move_index]
 
@@ -208,6 +210,8 @@ class DialoguePlanner:
 
     def get_valid_moves_index(self):
         valid_moves = []
+        print("WHy uwu")
+        print(self.is_usable)
         for i in range(len(self.is_usable)):
             if self.is_usable[i]:
                 valid_moves.append(i)
@@ -245,6 +249,7 @@ class DialoguePlanner:
 
     def print_dialogue_list(self):
         print("\n\nCHOSEN DIALOGUE MOVE: ", self.chosen_dialogue_move)
+        Logger.log_dialogue_model_basic_example("FINAL CHOSEN DIALOGUE MOVE: " + str(self.chosen_dialogue_move))
 
         print("move", "\t", "is_usable")
         for i in range(len(DIALOGUE_LIST)):
