@@ -526,39 +526,60 @@ class EizenExtractor(object):
 
     def extract_keywordless_relation(self, template, token):
         # print("Checking %s against %s (dep_ of %s)" % (template.first, token.text, token.dep_))
-        if template.first == token.dep_:
+        if token.text not in HELPING_VERBS:
+            if template.first == token.dep_:
 
-            second_pass = False
-            third_pass = False
-            if template.third.strip() == "":
-                third_pass = True
+                second_pass = False
+                # third_pass = False
+                # if template.third.strip() == "":
+                #     third_pass = True
 
-            relation = Relation()
-            relation.keyword = template.keyword
-            relation.keyword_type = template.keyword_type
-            relation.relation = template.relation
-            relation.is_flipped = template.is_flipped
+                relation = Relation()
+                relation.keyword = template.keyword
+                relation.keyword_type = template.keyword_type
+                relation.relation = template.relation
+                relation.is_flipped = template.is_flipped
 
-            relation.first_token = token
+                relation.first_token = token
 
-            for child in token.children:
+                for child in token.children:
 
-                if template.second == child.dep_ or second_pass == True:
-                    # print("In second with token %s(%s):" % (child, child.dep_))
+                    if template.second == child.dep_: # or second_pass == True:
+                        # print("In second with token %s(%s):" % (child, child.dep_))
 
-                    if template.third.strip is not "":
-                        if template.third == child.dep_:
+                        # if template.third.strip is not "":
+                        #     if template.third == child.dep_:
 
-                            if third_pass == False:
-                                third_pass = True
-                                relation.third_token = child
+                        #         if third_pass == False:
+                        #             third_pass = True
+                        #             relation.third_token = child
 
-                    if second_pass == False:
-                        second_pass = True
-                        relation.second_token = child
+                        if second_pass == False:
+                            second_pass = True
+                            relation.second_token = child
+                            return relation
 
-            if second_pass and third_pass:
-                return relation
+                # if second_pass and third_pass:
+            elif template.second == token.dep_:
+
+                first_pass = False
+
+                relation = Relation()
+                relation.keyword = template.keyword
+                relation.keyword_type = template.keyword_type
+                relation.relation = template.relation
+                relation.is_flipped = template.is_flipped
+
+                relation.second_token = token
+
+                for child in token.children:
+
+                    if template.first == child.dep_:
+
+                        if first_pass == False:
+                            first_pass = True
+                            relation.first_token = child
+                            return relation
 
         return None
 
@@ -582,6 +603,8 @@ class EizenExtractor(object):
         extracted = self.extract_relation_via_template(template, token)
         if extracted is not None:
             relations.append(extracted)
+        for relation in relations:
+            self.add_relation_to_concepts_if_not_existing(relation)
 
         # if event_type == EVENT_DESCRIPTION:
         #     print(template.relation)
@@ -684,7 +707,7 @@ class EizenExtractor(object):
             Logger.log_information_extraction_basic("Extracted relations:")
             for i in range(len(extraction_templates)):
                 extracted_relations = self.get_relations_from_sentence(EVENT_DESCRIPTION, extraction_templates[i], token, subjects, ents)
-                if extracted_relations is not None:
+                if extracted_relations:
                     relations.extend(extracted_relations)
 
         return relations

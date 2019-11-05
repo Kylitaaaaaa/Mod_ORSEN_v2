@@ -106,16 +106,22 @@ class DialoguePlanner:
         # check which dialogue moves are usable
         set_to_true = []
 
-        if self.num_action_events <= 3:
-            set_to_true.append(DIALOGUE_TYPE_FEEDBACK)
-            set_to_true.append(DIALOGUE_TYPE_PUMPING_GENERAL)
+        set_to_true.append(DIALOGUE_TYPE_HINTING)
+        
 
-        elif self.get_num_usage(DIALOGUE_TYPE_FEEDBACK) == 3 or self.get_num_usage(DIALOGUE_TYPE_PUMPING_GENERAL) == 3:
-            set_to_true.append(DIALOGUE_TYPE_PUMPING_SPECIFIC)
-            set_to_true.append(DIALOGUE_TYPE_PUMPING_GENERAL)
+        # print("NUM ACTION EVENTS ARE: ", self.num_action_events)
+        # if self.num_action_events <= 1:
+        #     print("HERE NUM EVENTS AT <= 1")
+            
+        #     set_to_true.append(DIALOGUE_TYPE_FEEDBACK)
+        #     set_to_true.append(DIALOGUE_TYPE_PUMPING_GENERAL)
 
-        else:
-            set_to_true = [True for i in range(len(DIALOGUE_LIST))]
+        # elif self.get_num_usage(DIALOGUE_TYPE_FEEDBACK) == 3 or self.get_num_usage(DIALOGUE_TYPE_PUMPING_GENERAL) == 3:
+        #     set_to_true.append(DIALOGUE_TYPE_PUMPING_SPECIFIC)
+        #     set_to_true.append(DIALOGUE_TYPE_PUMPING_GENERAL)
+
+        # else:
+        #     set_to_true = [True for i in range(len(DIALOGUE_LIST))]
         self.set_dialogue_list_true(set_to_true)
 
     def set_dialogue_list_true(self, set_to_true):

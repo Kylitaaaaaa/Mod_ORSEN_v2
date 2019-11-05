@@ -1,4 +1,4 @@
-from src.models.dialogue import DialogueTemplate
+from . import DialogueTemplate
 from src.constants import DIALOGUE_TYPE_SUGGESTING
 import copy
 
@@ -21,12 +21,7 @@ class SuggestingDialogueTemplate(DialogueTemplate):
                     to_insert = self.relations_blanks[i].first
 
                 response[curr_index] = to_insert
-        response.insert(0, "What if ") # should we remove this?
         return response
-
-    def is_usable(self, to_check=[]):
-        # TODO fix fill_blank implementation
-        pass
 
     def get_template_to_use(self):
         # check if it has usable templates

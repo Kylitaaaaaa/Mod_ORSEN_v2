@@ -27,7 +27,7 @@ paste to 2 "url" keys under "conversations"
 
 second cmd run:
 
-gactions update --action_package D:\orsen\orsen_processor\orsen_actions.json --project orsen-5d787
+gactions update --action_package D:\Desktop\Jilyan\Academics\College\THESIS\ORSEN\Mod_ORSEN_v2\src\googlehome\orsen_actions.json --project orsen-c059a
 
 expected output:
 

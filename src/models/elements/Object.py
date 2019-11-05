@@ -13,7 +13,7 @@ class Object:
         self.mention_count = mention_count
 
     def add_in_setting(self, setting):
-        self.in_setting.add(setting)
+        self.in_setting.append(setting)
 
     def __str__(self):
         my_string = "Entity " + self.id + " (" + self.name + ")\n" 

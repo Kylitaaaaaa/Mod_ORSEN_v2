@@ -12,7 +12,7 @@ LAST_CHECK_DATE = "July 26, 2019"
 """ DATABASE CREDENTIALS """
 LOCATION = "localhost"
 USERNAME = "root"
-PASSWORD = "1234"
+PASSWORD = "1qw23er45"
 SCHEMA = "orsen_kb"
 
 """ SQL COMMANDS """

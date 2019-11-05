@@ -11,6 +11,12 @@ class HintingDialogueTemplate(DialogueTemplate):
     def fill_blank(self, fill):
         response = copy.deepcopy(self.template)
 
+        print("inside fill_blank()")
+        print("id", self.id)
+        print("tp", self.template)
+        print("rl", self.relation)
+        print("dn", self.dependent_nodes)
+    
         for i in range(len(self.dependent_nodes)):
             to_insert = ""
             if self.dependent_nodes[i] is not None:
@@ -19,8 +25,13 @@ class HintingDialogueTemplate(DialogueTemplate):
                     to_insert = self.relations_blanks[i].name
                 else:
                     to_insert = self.relations_blanks[i].first
-
+                
+                print("Inserting", to_insert)
                 response[curr_index] = to_insert
+            
+            print("iteration", i, "of", range(len(self.dependent_nodes)))
+            print("\t", response)
+
         return response
 
     def get_template_to_use(self):

@@ -65,7 +65,7 @@ class ORSEN:
             Executes text understanding part. This includes the extraction of important information in the text input 
             (using previous sentences as context). This also including breaking the sentences into different event entities.  
             """""
-            ORSEN.perform_text_understanding(self, response)
+            sentence_references = ORSEN.perform_text_understanding(self, response)
 
             """" 
             Executing Dialogue Manager 
@@ -77,6 +77,11 @@ class ORSEN:
             except Exception as e:
                 Logger.log_conversation("ERROR: " + str(e))
                 result = "I see. What else can you say about that?"
+
+            """
+            Execute Knowledge Acquisition
+            """
+            
 
         else:
             #TODO: insert KA stuff here
@@ -280,6 +285,8 @@ class ORSEN:
 
         for i in range(len(current_setting_list)):
             self.world.add_setting(setting)
+
+        return sentence_references
 
     def perform_dialogue_manager(self, move_to_execute=""):
         # curr_event = None
