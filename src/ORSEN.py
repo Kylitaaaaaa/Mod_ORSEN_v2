@@ -47,11 +47,12 @@ class ORSEN:
         return True
 
     def get_response(self, response):
-        Logger.log_dialogue_model(response)
+        Logger.log_dialogue_model("\n======= NEW UTTERANCE =======")
+        Logger.log_dialogue_model("USER INPUT: " + response)
         Logger.log_dialogue_model("Entering ORSEN.get_response()")
 
         self.user_end_time = time.time()
-        Logger.log_conversation("USER LATENCY TIME (seconds): " + str(self.user_end_time - self.user_start_time))
+        Logger.log_conversation("=== USER LATENCY TIME (seconds): " + str(self.user_end_time - self.user_start_time) + " ===")
         start_time = time.time()
 
         """"
@@ -76,7 +77,9 @@ class ORSEN:
                 result = ORSEN.perform_dialogue_manager(self)
             except Exception as e:
                 Logger.log_conversation("ERROR: " + str(e))
+                Logger.log_dialogue_model("ERROR: " + str(e))
                 result = "I see. What else can you say about that?"
+                Logger.log_dialogue_model("FINAL CHOSEN RESPONSE " + result)
 
         else:
             #TODO: insert KA stuff here
@@ -111,11 +114,13 @@ class ORSEN:
                 result = ORSEN.perform_dialogue_manager(self)
             except Exception as e:
                 Logger.log_conversation("ERROR: " + str(e))
+                Logger.log_dialogue_model("ERROR: " + str(e))
                 result = "I see. What else can you say about that?"
+                Logger.log_dialogue_model("FINAL CHOSEN RESPONSE " + result)
 
         self.dialogue_planner.reset_state()
 
-        Logger.log_conversation("ORSEN LATENCY TIME (seconds): " + str(time.time() - start_time))
+        Logger.log_conversation("=== ORSEN LATENCY TIME (seconds): " + str(time.time() - start_time) + " ===")
         self.user_start_time = time.time()
 
         return result
@@ -303,9 +308,9 @@ class ORSEN:
         #setting template details
         print("CHOSEN TEMPLATE: ", type(chosen_template))
         print(chosen_template)
+        Logger.log_dialogue_model_basic("FINAL CHOSEN RESPONSE: " + str(chosen_template))
 
         self.dialogue_planner.set_template_details_history(chosen_template)
-
 
         return response
 

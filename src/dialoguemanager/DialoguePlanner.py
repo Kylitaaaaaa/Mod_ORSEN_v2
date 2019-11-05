@@ -110,7 +110,7 @@ class DialoguePlanner:
             set_to_true.append(DIALOGUE_TYPE_FEEDBACK)
             set_to_true.append(DIALOGUE_TYPE_PUMPING_GENERAL)
 
-        elif self.get_num_usage(DIALOGUE_TYPE_FEEDBACK) == 3 or self.get_num_usage(DIALOGUE_TYPE_PUMPING_GENERAL) == 3:
+        elif self.get_num_usage(DIALOGUE_TYPE_FEEDBACK) + self.get_num_usage(DIALOGUE_TYPE_PUMPING_GENERAL) == 3:
             set_to_true.append(DIALOGUE_TYPE_PUMPING_SPECIFIC)
             set_to_true.append(DIALOGUE_TYPE_PUMPING_GENERAL)
 
@@ -239,6 +239,7 @@ class DialoguePlanner:
 
     def print_dialogue_list(self):
         print("\n\nCHOSEN DIALOGUE MOVE: ", self.chosen_dialogue_move)
+        Logger.log_dialogue_model_basic_example("FINAL CHOSEN DIALOGUE MOVE: " + str(self.chosen_dialogue_move))
 
         print("move", "\t", "is_usable")
         for i in range(len(DIALOGUE_LIST)):
