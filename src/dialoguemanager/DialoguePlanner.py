@@ -54,6 +54,8 @@ class DialoguePlanner:
         self.is_usable = []
         self.is_usable = [False] * len(DIALOGUE_LIST)
 
+        self.usable_templates = []
+
     def perform_dialogue_planner(self, dialogue_move=""):
         if dialogue_move == "":
             self.setup_templates_is_usable()
@@ -78,16 +80,14 @@ class DialoguePlanner:
 
         return self.chosen_dialogue_move
 
-
-
     def setup_templates_is_usable(self):
         self.init_set_dialogue_moves_usable()
-
         # fetch all usable dialogue templates
         for i in range(len(DIALOGUE_LIST)):
             #check if dialogue move is initially valid
             to_check = DIALOGUE_LIST[i]
             Logger.log_dialogue_model_basic(to_check)
+            
             if self.is_usable[i]:
                 # check if dialogue has templates
                 self.usable_templates.append(self.get_usable_templates(DIALOGUE_LIST[i].get_type()))
@@ -105,6 +105,10 @@ class DialoguePlanner:
     def init_set_dialogue_moves_usable(self):
         # check which dialogue moves are usable
         set_to_true = []
+
+        # set_to_true.append(DIALOGUE_TYPE_PUMPING_SPECIFIC)
+
+        print("HMM", self.get_num_usage(DIALOGUE_TYPE_FEEDBACK) + self.get_num_usage(DIALOGUE_TYPE_PUMPING_GENERAL))
 
         if self.num_action_events <= 3:
             set_to_true.append(DIALOGUE_TYPE_FEEDBACK)
