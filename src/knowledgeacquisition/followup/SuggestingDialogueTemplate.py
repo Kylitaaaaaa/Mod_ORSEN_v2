@@ -8,7 +8,7 @@ class SuggestingDialogueTemplate(DialogueTemplate):
     def __init__(self, id=-1, template=[], relation=[], blanks=[], nodes=[], dependent_nodes=[]):
         DialogueTemplate.__init__(self, id, DIALOGUE_TYPE_SUGGESTING, template, relation, blanks, nodes, dependent_nodes);
 
-    def fill_blank(self, fill):
+    def fill_blanks(self, fill):
         response = copy.deepcopy(self.template)
 
         for i in range(len(self.dependent_nodes)):

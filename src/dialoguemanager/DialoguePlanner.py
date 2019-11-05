@@ -106,20 +106,21 @@ class DialoguePlanner:
         # check which dialogue moves are usable
         set_to_true = []
 
-        # set_to_true.append(DIALOGUE_TYPE_PUMPING_SPECIFIC)
+        set_to_true.append(DIALOGUE_TYPE_HINTING)
+        #set_to_true.append(DIALOGUE_TYPE_PUMPING_SPECIFIC)
 
-        print("HMM", self.get_num_usage(DIALOGUE_TYPE_FEEDBACK) + self.get_num_usage(DIALOGUE_TYPE_PUMPING_GENERAL))
+        #print("HMM", self.get_num_usage(DIALOGUE_TYPE_FEEDBACK) + self.get_num_usage(DIALOGUE_TYPE_PUMPING_GENERAL))
 
-        if self.num_action_events <= 3:
-            set_to_true.append(DIALOGUE_TYPE_FEEDBACK)
-            set_to_true.append(DIALOGUE_TYPE_PUMPING_GENERAL)
+        # if self.num_action_events <= 3:
+        #     set_to_true.append(DIALOGUE_TYPE_FEEDBACK)
+        #     set_to_true.append(DIALOGUE_TYPE_PUMPING_GENERAL)
 
-        elif self.get_num_usage(DIALOGUE_TYPE_FEEDBACK) + self.get_num_usage(DIALOGUE_TYPE_PUMPING_GENERAL) == 3:
-            set_to_true.append(DIALOGUE_TYPE_PUMPING_SPECIFIC)
-            set_to_true.append(DIALOGUE_TYPE_PUMPING_GENERAL)
+        # elif self.get_num_usage(DIALOGUE_TYPE_FEEDBACK) + self.get_num_usage(DIALOGUE_TYPE_PUMPING_GENERAL) == 3:
+        #     set_to_true.append(DIALOGUE_TYPE_PUMPING_SPECIFIC)
+        #     set_to_true.append(DIALOGUE_TYPE_PUMPING_GENERAL)
 
-        else:
-            set_to_true = [True for i in range(len(DIALOGUE_LIST))]
+        # else:
+        #     set_to_true = [True for i in range(len(DIALOGUE_LIST))]
         self.set_dialogue_list_true(set_to_true)
 
     def set_dialogue_list_true(self, set_to_true):
@@ -182,6 +183,7 @@ class DialoguePlanner:
 
         candidates = np.argwhere(probability == np.amax(probability))
         candidates = candidates.flatten().tolist()
+        print("Candidates")
         print(candidates)
 
         # np.random.seed(int(self.seed_time))
@@ -190,11 +192,13 @@ class DialoguePlanner:
         return choice
 
     def choose_dialogue(self):
-
         moves_to_eval = self.get_valid_moves_index()
         weights_to_eval = self.get_weights_from_index(moves_to_eval)
 
         dialogue_move_index = self.select_dialogue_from_weights(weights_to_eval)
+        print("THH", moves_to_eval)
+        print("THH", weights_to_eval)
+        print("THH", dialogue_move_index)
 
         return moves_to_eval[dialogue_move_index]
 
@@ -206,6 +210,8 @@ class DialoguePlanner:
 
     def get_valid_moves_index(self):
         valid_moves = []
+        print("WHy uwu")
+        print(self.is_usable)
         for i in range(len(self.is_usable)):
             if self.is_usable[i]:
                 valid_moves.append(i)
