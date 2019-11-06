@@ -1,6 +1,7 @@
 import numpy as np
 
 from src import DEFAULT_SEED
+from src.constants import DIALOGUE_TYPE_KNOWLEDGE_ACQUISITION_PUMPING #[Celina]
 
 
 class ContentDetermination:
@@ -21,7 +22,7 @@ class ContentDetermination:
         self.curr_event = []
         self.usable_template_list = []
 
-    def perform_content_determination(self):
+    def perform_content_determination(self, dialogue_history):
         print("FETCHING: ", self.move_to_execute)
 
         #choose template
@@ -31,13 +32,20 @@ class ContentDetermination:
         #fill template to use
         if len(chosen_template.template) == 1:
             response = chosen_template.template[0]
+        # [CELINA] Added the dialogue history for this part
+        elif self.move_to_execute == DIALOGUE_TYPE_KNOWLEDGE_ACQUISITION_PUMPING:
+            response = chosen_template.fill_blanks(dialogue_history)
         else:
             response = chosen_template.fill_blanks(self.curr_event)
+        
+        print("TYPEE", type(response))
 
         if type(response) is not type("dump"):
             str_response = ' '.join(response)
+            print("DUMPP")
             # TODO replace multiple occurences of spaces with only one space.
         else:
+            print("OTHER DUMPP")
             str_response = response
         print("RESPONSE IS: ", str_response)
 

@@ -13,10 +13,13 @@ class SuggestingDialogueTemplate(DialogueTemplate):
 
         for i in range(len(self.dependent_nodes)):
             to_insert = ""
+            print("??", self.blanks[i])
             if self.dependent_nodes[i] is not None:
                 curr_index = response.index(self.dependent_nodes[i])
                 if self.blanks[i] == 'Object' or self.blanks[i] == 'Character':
                     to_insert = self.relations_blanks[0][i].name
+                elif self.blanks[i] == 'IsA':
+                    to_insert = self.relations_blanks[0][i].first
                 else:
                     to_insert = self.relations_blanks[0][i].second
 

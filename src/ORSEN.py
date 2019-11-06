@@ -102,7 +102,9 @@ class ORSEN:
                 triggered_move = DIALOGUE_TYPE_FOLLOW_UP
                 pass
             elif triggered_move == DIALOGUE_TYPE_FOLLOW_UP_DONT_LIKE:
-                triggered_move = DIALOGUE_TYPE_PUMPING_GENERAL
+                # triggered_move = DIALOGUE_TYPE_PUMPING_GENERAL
+                triggered_move = DIALOGUE_TYPE_KNOWLEDGE_ACQUISITION_PUMPING
+                # TODO KA get the sentence?
             elif triggered_move == DIALOGUE_TYPE_FOLLOW_UP_WRONG:
                 #deduct score then general pumping
                 print("DEDUCT")
@@ -116,7 +118,9 @@ class ORSEN:
                     for X in suggestion_word_relation:
                         self.extractor.remove_relation_to_concepts_if_not_valid(X)
                         print("UWU")
-                triggered_move = DIALOGUE_TYPE_PUMPING_GENERAL
+                # triggered_move = DIALOGUE_TYPE_PUMPING_GENERAL
+                triggered_move = DIALOGUE_TYPE_KNOWLEDGE_ACQUISITION_PUMPING
+                # TODO KA get the sentence?
 
             elif triggered_move == DIALOGUE_TYPE_PUMPING_SPECIFIC:
                 self.world.curr_event = self.world.event_chains[len(self.world.event_chains)-1]
@@ -317,7 +321,8 @@ class ORSEN:
 
         # send current event to ContentDetermination
         self.content_determination.set_state(move_to_execute, curr_event, available_templates)
-        response, chosen_template = self.content_determination.perform_content_determination()
+        # [CELINA] I added self.dialogue_planner.dialogue_history sa parameter for the KA part
+        response, chosen_template = self.content_determination.perform_content_determination(self.dialogue_planner.dialogue_history)
 
         #setting template details
         print("CHOSEN TEMPLATE: ", type(chosen_template))

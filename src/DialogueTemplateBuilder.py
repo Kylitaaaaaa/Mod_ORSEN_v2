@@ -37,6 +37,11 @@ class DialogueTemplateBuilder:
     
       elif dialogue_type == DIALOGUE_TYPE_FOLLOW_UP:
          return FollowUpDialogueTemplate(id, templates, relations, blanks, nodes, dependent_nodes)
+    
+      #TODO: Add the suggestion_affirm here
+        
+      elif dialogue_type == DIALOGUE_TYPE_KNOWLEDGE_ACQUISITION_PUMPING:
+         return KnowledgeAcquisitionPumpingDialogueTemplate(id, templates, relations, blanks, nodes, dependent_nodes)
 
 
       elif dialogue_type == DIALOGUE_TYPE_INPUT_MISHEARD:

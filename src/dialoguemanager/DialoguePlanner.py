@@ -5,7 +5,8 @@ import time
 
 from src import Logger, DIALOGUE_TYPE_FEEDBACK, DIALOGUE_TYPE_PUMPING_GENERAL, DIALOGUE_TYPE_HINTING, DEFAULT_SEED, \
     DIALOGUE_TYPE_SUGGESTING, DIALOGUE_TYPE_FOLLOW_UP, IS_AFFIRM, IS_DONT_LIKE, IS_WRONG, \
-    DIALOGUE_TYPE_FOLLOW_UP_DONT_LIKE, DIALOGUE_TYPE_FOLLOW_UP_WRONG, IS_DENY, DIALOGUE_TYPE_SUGGESTING_AFFIRM
+    DIALOGUE_TYPE_FOLLOW_UP_DONT_LIKE, DIALOGUE_TYPE_FOLLOW_UP_WRONG, IS_DENY, DIALOGUE_TYPE_SUGGESTING_AFFIRM, \
+    DIALOGUE_TYPE_KNOWLEDGE_ACQUISITION_PUMPING
 from src.models.dialogue import DialogueHistoryTemplate
 from src.models.dialogue.constants import *
 from src.dbo.dialogue.DBODialogueTemplate import DBODialogueTemplate, PUMPING_TRIGGER, PROMPT_TRIGGER, \
@@ -246,6 +247,8 @@ class DialoguePlanner:
                 elif response in IS_WRONG:
                     print("DEDUCT 0")
                     return DIALOGUE_TYPE_FOLLOW_UP_WRONG
+            elif last_move.dialogue_type == DIALOGUE_TYPE_KNOWLEDGE_ACQUISITION_PUMPING:
+                return DIALOGUE_TYPE_SUGGESTING_AFFIRM
 
             #TODO Add response for multiple choice type                
 

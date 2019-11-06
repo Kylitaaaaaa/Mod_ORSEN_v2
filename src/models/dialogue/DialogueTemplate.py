@@ -90,7 +90,7 @@ class DialogueTemplate(ABC):
                 print("AUAUAUA", temp_list)
             elif self.blanks[i] == 'IsA':
                 # check <index> <isA> weekday
-                temp_list = self.dbo_concept.get_concept_by_second_relation(self.relation[i][1], self.relation[i][2])
+                temp_list = self.dbo_concept.get_concept_by_second_relation(self.relation[i][2], self.relation[i][1])
             else:
                 #check <index> <relation> <index>
                 # print("PP0", blank_list)
@@ -100,6 +100,7 @@ class DialogueTemplate(ABC):
             if len(temp_list) > 0:
                 # print("PP2", blank_list)
                 blank_list = self.update_list(blank_list, temp_list)
+                print("SS", blank_list)
                 # print("PP3", blank_list)
             else:
                 print("NO RELATIONS FOUND")
@@ -113,6 +114,7 @@ class DialogueTemplate(ABC):
 
     def update_list(self, init_list, to_add_list):
         final_list = []
+        #CELINA NOTES: Why may "[]" yun X? [X]
 
         #if first input
         if len(init_list) == 0:
@@ -120,13 +122,24 @@ class DialogueTemplate(ABC):
                 final_list.append([X])
             return final_list
 
+        print(init_list)
+        print(to_add_list)
+
         for X in init_list:
             for Y in to_add_list:
-                if len(Y) > 0:
+                print("YEHET", type(Y))
+                if type(Y) == Object or type(Y) == Character:
                     temp_list = []
                     temp_list.extend(X)
-                    temp_list.extend(Y)
+                    temp_list.append(Y)
                     final_list.append(temp_list)
+                elif type(Y) == list:
+                    if len(Y) > 0:
+                        temp_list = []
+                        temp_list.extend(X)
+                        temp_list.extend(Y)
+                        final_list.append(temp_list)
+        print("FF", final_list)
         return final_list
 
 
@@ -140,24 +153,31 @@ class DialogueTemplate(ABC):
         elif element_type == 'Object':
             element_list = curr_event.get_objects_involved()
 
-        print(element_list)
-
-        # [Celina] idk if dapat may randomizer dito
-        temp_list.append(np.random.choice(element_list))
-
         updated_list = []
-        for X in element_list:
-            concept_list = []
-            concept_list = self.dbo_concept.get_specific_concept(X.name, 'IsA', element_type)
-            if concept_list is not None:
-                # updated_list.append(X)
-                temp_list.append(X)
+        if len(element_list) != 0:
+            print("Element List: ", element_list)
 
-        # original code line commented out below
-        # updated_list.append(element_list)
+            # [Celina] idk if dapat may randomizer dito
+            temp_list.append(np.random.choice(element_list))
+
+            for X in element_list:
+                concept_list = []
+                concept_list = self.dbo_concept.get_specific_concept(X.name, 'IsA', element_type)
+                if concept_list is not None:
+                    temp_list.append(X)
 
         # [Celina] idk if dapat may randomizer dito
-        updated_list.append(np.random.choice(temp_list))
+        if len(temp_list) != 0:
+            updated_list.append(np.random.choice(temp_list))
+
+        # Original code below
+        # updated_list = []
+        # for X in element_list:
+        #     concept_list = []
+        #     concept_list = self.dbo_concept.get_specific_concept(X.name, 'IsA', element_type)
+        #     if concept_list is not None:
+        #         updated_list.append(X)
+
         return updated_list
 
     def get_rel_list(self, init_list, relation):
