@@ -7,6 +7,7 @@ class DialogueHistoryTemplate:
         self.word_relation = word_relation
 
     def set_template_details(self, chosen_template):
+        self.dialogue_type = chosen_template.dialogue_type
         self.template_id = chosen_template.id
         self.template = chosen_template.template
         self.word_relation = chosen_template.get_word_relations()

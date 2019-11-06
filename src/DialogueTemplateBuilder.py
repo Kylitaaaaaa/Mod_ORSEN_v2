@@ -1,4 +1,4 @@
-from src.knowledgeacquisition.followup.SuggestingDialogueTemplate import SuggestingDialogueTemplate
+from src.knowledgeacquisition.followup import *
 from src.models.dialogue import *
 from src.constants import *
 
@@ -34,6 +34,9 @@ class DialogueTemplateBuilder:
 
       elif dialogue_type == DIALOGUE_TYPE_PUMPING_SPECIFIC:
          return PumpingSpecificDialogueTemplate(id, templates, relations, blanks, nodes, dependent_nodes)
+    
+      elif dialogue_type == DIALOGUE_TYPE_FOLLOW_UP:
+         return FollowUpDialogueTemplate(id, templates, relations, blanks, nodes, dependent_nodes)
 
 
       elif dialogue_type == DIALOGUE_TYPE_INPUT_MISHEARD:

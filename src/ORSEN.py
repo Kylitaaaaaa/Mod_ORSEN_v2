@@ -59,6 +59,7 @@ class ORSEN:
         Check for trigger phrases 
         """""
         triggered_move = self.dialogue_planner.check_trigger_phrases(response, self.world.event_chains) #TODO: REMOVE AFTER TESTING
+        print("POOPY", triggered_move)
 
         if triggered_move is None:
             #if not pump
@@ -86,22 +87,35 @@ class ORSEN:
             if triggered_move == DIALOGUE_TYPE_SUGGESTING_AFFIRM:
                 #add score then general pumping
                 last_dialogue = self.dialogue_planner.get_last_dialogue_move()
+                # print("YEET")
+
                 if last_dialogue is not None:
                     for X in last_dialogue.word_relation:
+                        # print("WOOT")
+                        # print(X)
                         self.extractor.add_relation_to_concepts_if_not_existing(X)
-                triggered_move = DIALOGUE_TYPE_PUMPING_GENERAL
+                # triggered_move = DIALOGUE_TYPE_PUMPING_GENERAL
+                triggered_move = DIALOGUE_TYPE_SUGGESTING_AFFIRM
                 pass
             elif triggered_move == DIALOGUE_TYPE_FOLLOW_UP:
                 # Why dont u like it or is it wrong -- called from database
+                triggered_move = DIALOGUE_TYPE_FOLLOW_UP
                 pass
             elif triggered_move == DIALOGUE_TYPE_FOLLOW_UP_DONT_LIKE:
                 triggered_move = DIALOGUE_TYPE_PUMPING_GENERAL
             elif triggered_move == DIALOGUE_TYPE_FOLLOW_UP_WRONG:
                 #deduct score then general pumping
+                print("DEDUCT")
                 last_dialogue = self.dialogue_planner.get_last_dialogue_move()
+                print(last_dialogue.dialogue_type)
+
+                suggestion_word_relation = self.dialogue_planner.get_suggestion_word_rel()
+                print(suggestion_word_relation)
                 if last_dialogue is not None:
-                    for X in last_dialogue.word_relation:
+                    print("OWO")
+                    for X in suggestion_word_relation:
                         self.extractor.remove_relation_to_concepts_if_not_valid(X)
+                        print("UWU")
                 triggered_move = DIALOGUE_TYPE_PUMPING_GENERAL
 
             elif triggered_move == DIALOGUE_TYPE_PUMPING_SPECIFIC:
@@ -309,7 +323,8 @@ class ORSEN:
         print("CHOSEN TEMPLATE: ", type(chosen_template))
         print(chosen_template)
         Logger.log_dialogue_model_basic("FINAL CHOSEN RESPONSE: " + str(chosen_template))
-
+        print(chosen_template.dialogue_type)
+        print("SETTING DH")
         self.dialogue_planner.set_template_details_history(chosen_template)
 
         return response

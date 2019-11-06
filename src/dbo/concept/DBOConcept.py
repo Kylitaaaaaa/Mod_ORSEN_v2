@@ -168,6 +168,34 @@ class DBOConcept(ABC):
         for r in result:
             concepts.append(self.concept_type(*r))
         return concepts
+    
+    """
+            General code to get a concept based on a first word and relation (e.g. isA, capableOf)
+
+            Input:  first, relation
+            Output: LIST of concept object based on concept type
+    """
+
+    def get_concept_by_first_relation(self, first, relation):
+        q = Query \
+            .from_(self.table_reference) \
+            .select("*") \
+            .where(
+            ((self.table_reference.first == first)) & (
+                    self.table_reference.relation == relation)
+        )
+
+        query = q.get_sql()
+        query = query.replace("\"", "")
+        print(query)
+
+        result = SQLExecuter.execute_read_query(query, FETCH_ALL)
+        if result is None: return None
+
+        concepts = []
+        for r in result:
+            concepts.append(self.concept_type(*r))
+        return concepts
 
     """
             General code to get a concept based on a second word and relation (e.g. isA, capableOf)
@@ -176,7 +204,7 @@ class DBOConcept(ABC):
             Output: LIST of concept object based on concept type
         """
 
-    def get_concept_by_second_relation(self, relation, second):
+    def get_concept_by_second_relation(self, second, relation):
         q = Query \
             .from_(self.table_reference) \
             .select("*") \

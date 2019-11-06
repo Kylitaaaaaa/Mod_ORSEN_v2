@@ -10,16 +10,15 @@ class HintingDialogueTemplate(DialogueTemplate):
 
     def fill_blanks(self, fill):
         response = copy.deepcopy(self.template)
-        print("Hi")
 
         for i in range(len(self.dependent_nodes)):
             to_insert = ""
             if self.dependent_nodes[i] is not None:
                 curr_index = response.index(self.dependent_nodes[i])
-                if self.blanks[i] == 'Object' or 'Character':
-                    to_insert = self.relations_blanks[i].name
+                if self.blanks[i] == 'Object' or self.blanks[i] == 'Character':
+                    to_insert = self.relations_blanks[0][i].name
                 else:
-                    to_insert = self.relations_blanks[i].first
+                    to_insert = self.relations_blanks[0][i].second
 
                 response[curr_index] = to_insert
         return response

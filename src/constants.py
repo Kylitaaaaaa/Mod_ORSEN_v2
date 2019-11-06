@@ -25,8 +25,8 @@ IS_DENY = ['no', 'no.', 'nope', 'nope.']
 IS_END = ['bye', 'bye.', 'the end', 'the end.']
 
 """ORSEN2 RESPONSES"""
-IS_DONT_LIKE = ['dont like']
-IS_WRONG = ['wrong']
+IS_DONT_LIKE = ['dont like', 'dont like.', 'don\'t like', 'don\'t like.']
+IS_WRONG = ['wrong', 'wrong.']
 
 """ CONSTANT VALUES CONTROL """
 
@@ -71,7 +71,7 @@ DIALOGUE_TYPE_PUMPING_SPECIFIC = "specific"
 THE_END = "end"
 
 #JUVEYANCE
-DIALOGUE_TYPE_SUGGESTING = "suggesting"
+DIALOGUE_TYPE_SUGGESTING = "suggesting1"
 
 DIALOGUE_TYPE_SUGGESTING_AFFIRM = "suggesting_affirm"
 DIALOGUE_TYPE_FOLLOW_UP = "follow_up"

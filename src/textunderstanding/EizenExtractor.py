@@ -632,6 +632,8 @@ class EizenExtractor(object):
                         Logger.log_information_extraction_basic("Increasing the score of " + concept.one_line_print() + " from " + str(concept.score) + " to " + str(concept.score+1))
 
     def remove_relation_to_concepts_if_not_valid(self, relation):
+        print("HIHI")
+        print(relation)
         local_concept_manager = DBOConceptLocalImpl()
 
         concept = local_concept_manager.get_specific_concept(first=str(relation.first_token),
