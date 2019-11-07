@@ -2,6 +2,7 @@ import numpy as np
 
 from src import DEFAULT_SEED
 from src.constants import DIALOGUE_TYPE_KNOWLEDGE_ACQUISITION_PUMPING #[Celina]
+from src.Logger import Logger
 
 
 class ContentDetermination:
@@ -23,6 +24,7 @@ class ContentDetermination:
         self.usable_template_list = []
 
     def perform_content_determination(self, dialogue_history):
+        Logger.log_dialogue_model("Filling up the template")
         print("FETCHING: ", self.move_to_execute)
 
         #choose template
@@ -37,15 +39,11 @@ class ContentDetermination:
             response = chosen_template.fill_blanks(dialogue_history)
         else:
             response = chosen_template.fill_blanks(self.curr_event)
-        
-        print("TYPEE", type(response))
 
         if type(response) is not type("dump"):
             str_response = ' '.join(response)
-            print("DUMPP")
             # TODO replace multiple occurences of spaces with only one space.
         else:
-            print("OTHER DUMPP")
             str_response = response
         print("RESPONSE IS: ", str_response)
 

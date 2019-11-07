@@ -1,6 +1,7 @@
 from src.knowledgeacquisition.followup import KnowledgeAcquisitionPumpingDialogueTemplate
 from src.models.dialogue import DialogueTemplate
 from src.constants import DIALOGUE_TYPE_KNOWLEDGE_ACQUISITION_PUMPING
+from src.Logger import Logger
 
 class KnowledgeAcquisitionPumpingDialogueTemplate(DialogueTemplate):
 
@@ -29,6 +30,8 @@ class KnowledgeAcquisitionPumpingDialogueTemplate(DialogueTemplate):
             elif suggestion_blanks[x].second_token == "object":
                 if self.blanks[0] == 'Object':
                     subject = suggestion_blanks[x].first_token
+        
+        Logger.log_dialogue_model_basic("Subject: " + subject)
 
         response = [x.replace("1", subject) for x in response]
         print("HMM KA", response)

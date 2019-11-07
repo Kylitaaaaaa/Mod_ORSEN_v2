@@ -3,6 +3,7 @@ from src.constants import DIALOGUE_TYPE_PROMPT
 
 from src.dbo.concept import *
 import copy
+from src.Logger import Logger
 
 
 
@@ -19,6 +20,7 @@ class PromptDialogueTemplate(DialogueTemplate):
         response = copy.deepcopy(self.template)
         for i in range (len(self.nodes)):
             to_insert = rand_concept.first
+            Logger.log_dialogue_model_basic(str(to_insert))
             curr_index = response.index(self.nodes[i])
             response[curr_index] = to_insert
 
