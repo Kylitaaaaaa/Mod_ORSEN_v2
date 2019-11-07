@@ -12,6 +12,12 @@ class HintingDialogueTemplate(DialogueTemplate):
     def fill_blanks(self, fill):
         response = copy.deepcopy(self.template)
 
+        print("inside fill_blank()")
+        print("id", self.id)
+        print("tp", self.template)
+        print("rl", self.relation)
+        print("dn", self.dependent_nodes)
+    
         for i in range(len(self.dependent_nodes)):
             to_insert = ""
             Logger.log_dialogue_model_basic("Current Blank: " + self.blanks[i])
@@ -27,8 +33,11 @@ class HintingDialogueTemplate(DialogueTemplate):
                 else:
                     to_insert = self.relations_blanks[0][i].second
                     Logger.log_dialogue_model_basic(str(self.relations_blanks[0][i].second))
-
                 response[curr_index] = to_insert
+            
+            print("iteration", i, "of", range(len(self.dependent_nodes)))
+            print("\t", response)
+
         return response
 
     def get_template_to_use(self):

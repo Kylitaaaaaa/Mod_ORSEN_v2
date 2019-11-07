@@ -30,6 +30,7 @@ class SuggestingDialogueTemplate(DialogueTemplate):
                     Logger.log_dialogue_model_basic(str(self.relations_blanks[0][i].second))
 
                 response[curr_index] = to_insert
+
         return response
 
     def get_template_to_use(self):
