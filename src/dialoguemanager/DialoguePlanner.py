@@ -135,7 +135,8 @@ class DialoguePlanner:
             set_to_true.append(DIALOGUE_TYPE_PUMPING_GENERAL)
 
         else:
-            set_to_true = [True for i in range(len(DIALOGUE_LIST))]
+            # set_to_true = [True for i in range(len(DIALOGUE_LIST))]
+            set_to_true = ['feedback', 'general', 'specific', 'hinting', 'suggesting']
             
         self.set_dialogue_list_true(set_to_true)
 

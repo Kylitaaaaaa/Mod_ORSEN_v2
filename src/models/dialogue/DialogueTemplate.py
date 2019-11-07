@@ -94,9 +94,10 @@ class DialogueTemplate(ABC):
                     Logger.log_dialogue_model_basic_example(str(temp_list[x]))
                 
                 updated_list =[]
-                updated_list.append(np.random.choice(temp_list))
-                Logger.log_dialogue_model_basic_example("Chosen Relation: ")
-                Logger.log_dialogue_model_basic_example(str(updated_list[0]))
+                if (len(updated_list) > 0):
+                    updated_list.append(np.random.choice(temp_list))
+                    Logger.log_dialogue_model_basic_example("Chosen Relation: ")
+                    Logger.log_dialogue_model_basic_example(str(updated_list[0]))
 
                 temp_list = updated_list
             else:
@@ -212,8 +213,9 @@ class DialogueTemplate(ABC):
         # for x in range(len(updated_list)):
         #     Logger.log_dialogue_model_basic_example(str(updated_list[x]))
 
-        Logger.log_dialogue_model_basic_example("Chosen Object Character: ")
-        Logger.log_dialogue_model_basic_example(str(updated_list[0]))
+        if len(updated_list) != 0:
+            Logger.log_dialogue_model_basic_example("Chosen Object Character: ")
+            Logger.log_dialogue_model_basic_example(str(updated_list[0]))
 
         return updated_list
 
@@ -237,15 +239,17 @@ class DialogueTemplate(ABC):
                     temp_list.append(self.dbo_concept.get_concept_by_first_relation(curr_refer.first, relation[1]))    
         
         Logger.log_dialogue_model_basic_example("List of all Valid Relations: ")
-        for x in range(len(temp_list[0])):
-            Logger.log_dialogue_model_basic_example(str(temp_list[0][x]))
+        if (len(temp_list)) > 0:
+            for x in range(len(temp_list[0])):
+                Logger.log_dialogue_model_basic_example(str(temp_list[0][x]))
         
         # return temp_list
         
         updated_list =[]
-        updated_list.append(np.random.choice(temp_list[0]))
-        Logger.log_dialogue_model_basic_example("Chosen Relation: ")
-        Logger.log_dialogue_model_basic_example(str(updated_list[0]))
+        if (len(updated_list)) > 0:
+            updated_list.append(np.random.choice(temp_list[0]))
+            Logger.log_dialogue_model_basic_example("Chosen Relation: ")
+            Logger.log_dialogue_model_basic_example(str(updated_list[0]))
 
         return updated_list
 
