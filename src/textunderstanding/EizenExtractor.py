@@ -655,27 +655,31 @@ class EizenExtractor(object):
                         Logger.log_information_extraction_basic("Increasing the score of " + concept.one_line_print() + " from " + str(concept.score) + " to " + str(concept.score+1))
 
     def remove_relation_to_concepts_if_not_valid(self, relation):
+        print("HIHI")
+        print(relation)
         local_concept_manager = DBOConceptLocalImpl()
 
         concept = local_concept_manager.get_specific_concept(first=str(relation.first_token),
                                                              relation=str(relation.relation),
                                                              second=str(relation.second_token))
+        user = UserHandler.get_instance().curr_user
         if concept is None:
             pass
         else:
-            Logger.log_information_extraction_basic("Decrementing concept: "
-                                                    + concept.one_line_print())
+            if str(concept.user_id) != str(user.id):
+                Logger.log_information_extraction_basic("Decrementing concept: "
+                                                        + concept.one_line_print())
 
-            if concept.score <= (MIGRATION_SCORE_THRESHOLD*-1) - 1:
-                # pass
-                local_concept_manager.delete_concept(concept.id)
-                Logger.log_information_extraction_basic(
-                    "Deleting the concept " + concept.one_line_print() + " from local.")
-            else:
-                local_concept_manager.update_score(concept.id, concept.score - 1)
-                Logger.log_information_extraction_basic(
-                    "Decreasing the score of " + concept.one_line_print() + " from " + str(concept.score) + " to " + str(
-                        concept.score - 1))
+                if concept.score <= (MIGRATION_SCORE_THRESHOLD*-1) - 1:
+                    # pass
+                    local_concept_manager.delete_concept(concept.id)
+                    Logger.log_information_extraction_basic(
+                        "Deleting the concept " + concept.one_line_print() + " from local.")
+                else:
+                    local_concept_manager.update_score(concept.id, concept.score - 1)
+                    Logger.log_information_extraction_basic(
+                        "Decreasing the score of " + concept.one_line_print() + " from " + str(concept.score) + " to " + str(
+                            concept.score - 1))
 
 
     def extract_event_attribute(self, sentence, event_type_flag=True):

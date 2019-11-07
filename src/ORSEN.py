@@ -59,6 +59,7 @@ class ORSEN:
         Check for trigger phrases 
         """""
         triggered_move = self.dialogue_planner.check_trigger_phrases(response, self.world.event_chains) #TODO: REMOVE AFTER TESTING
+        print("POOPY", triggered_move)
 
         if triggered_move is None:
             #if not pump
@@ -71,15 +72,15 @@ class ORSEN:
             """" 
             Executing Dialogue Manager 
             """""
-            result = ORSEN.perform_dialogue_manager(self)
+            # result = ORSEN.perform_dialogue_manager(self)
             # Try Catch
-            # try:
-            #     result = ORSEN.perform_dialogue_manager(self)
-            # except Exception as e:
-            #     Logger.log_conversation("ERROR: " + str(e))
-            #     Logger.log_dialogue_model("ERROR: " + str(e))
-            #     result = "I see. What else can you say about that?"
-            #     Logger.log_dialogue_model("FINAL CHOSEN RESPONSE " + result)
+            try:
+                result = ORSEN.perform_dialogue_manager(self)
+            except Exception as e:
+                Logger.log_conversation("ERROR: " + str(e))
+                Logger.log_dialogue_model("ERROR: " + str(e))
+                result = "I see. What else can you say about that?"
+                Logger.log_dialogue_model("FINAL CHOSEN RESPONSE " + result)
 
             """
             Execute Knowledge Acquisition
@@ -91,37 +92,48 @@ class ORSEN:
             if triggered_move == DIALOGUE_TYPE_SUGGESTING_AFFIRM:
                 #add score then general pumping
                 last_dialogue = self.dialogue_planner.get_last_dialogue_move()
+
                 if last_dialogue is not None:
                     for X in last_dialogue.word_relation:
                         self.extractor.add_relation_to_concepts_if_not_existing(X)
-                triggered_move = DIALOGUE_TYPE_PUMPING_GENERAL
+                # triggered_move = DIALOGUE_TYPE_PUMPING_GENERAL
+                triggered_move = DIALOGUE_TYPE_SUGGESTING_AFFIRM
                 pass
             elif triggered_move == DIALOGUE_TYPE_FOLLOW_UP:
                 # Why dont u like it or is it wrong -- called from database
+                triggered_move = DIALOGUE_TYPE_FOLLOW_UP
                 pass
             elif triggered_move == DIALOGUE_TYPE_FOLLOW_UP_DONT_LIKE:
-                triggered_move = DIALOGUE_TYPE_PUMPING_GENERAL
+                # triggered_move = DIALOGUE_TYPE_PUMPING_GENERAL
+                triggered_move = DIALOGUE_TYPE_KNOWLEDGE_ACQUISITION_PUMPING
+                # TODO KA get the sentence?
             elif triggered_move == DIALOGUE_TYPE_FOLLOW_UP_WRONG:
                 #deduct score then general pumping
                 last_dialogue = self.dialogue_planner.get_last_dialogue_move()
+                print(last_dialogue.dialogue_type)
+
+                suggestion_word_relation = self.dialogue_planner.get_suggestion_word_rel()
+                print(suggestion_word_relation)
                 if last_dialogue is not None:
-                    for X in last_dialogue.word_relation:
+                    for X in suggestion_word_relation:
                         self.extractor.remove_relation_to_concepts_if_not_valid(X)
-                triggered_move = DIALOGUE_TYPE_PUMPING_GENERAL
+                # triggered_move = DIALOGUE_TYPE_PUMPING_GENERAL
+                triggered_move = DIALOGUE_TYPE_KNOWLEDGE_ACQUISITION_PUMPING
+                # TODO KA get the sentence?
 
             elif triggered_move == DIALOGUE_TYPE_PUMPING_SPECIFIC:
                 self.world.curr_event = self.world.event_chains[len(self.world.event_chains)-1]
 
             #if prompt
-            result = ORSEN.perform_dialogue_manager(self, triggered_move)
+            # result = ORSEN.perform_dialogue_manager(self, triggered_move)
             # Try Catch
-            # try:
-            #     result = ORSEN.perform_dialogue_manager(self, triggered_move)
-            # except Exception as e:
-            #     Logger.log_conversation("ERROR: " + str(e))
-            #     Logger.log_dialogue_model("ERROR: " + str(e))
-            #     result = "I see. What else can you say about that?"
-            #     Logger.log_dialogue_model("FINAL CHOSEN RESPONSE " + result)
+            try:
+                result = ORSEN.perform_dialogue_manager(self, triggered_move)
+            except Exception as e:
+                Logger.log_conversation("ERROR: " + str(e))
+                Logger.log_dialogue_model("ERROR: " + str(e))
+                result = "I see. What else can you say about that?"
+                Logger.log_dialogue_model("FINAL CHOSEN RESPONSE " + result)
 
         self.dialogue_planner.reset_state()
 
@@ -298,6 +310,11 @@ class ORSEN:
         curr_event = self.world.curr_event
         print("THIS IS THE CURRENT EVENT")
         print(curr_event)
+
+        Logger.log_dialogue_model("Entering perform_dialogue_manager")
+        Logger.log_dialogue_model_basic("THIS IS THE CURRENT EVENT:")
+        Logger.log_dialogue_model(curr_event)
+
         self.dialogue_planner.set_state(curr_event, self.world.get_num_action_events())
 
         # move_to_execute == DIALOGUE_TYPE_HINTING #TODO remove if done
@@ -310,14 +327,16 @@ class ORSEN:
 
         # send current event to ContentDetermination
         self.content_determination.set_state(move_to_execute, curr_event, available_templates)
-        response, chosen_template = self.content_determination.perform_content_determination()
+        # [CELINA] I added self.dialogue_planner.dialogue_history sa parameter for the KA part
+        response, chosen_template = self.content_determination.perform_content_determination(self.dialogue_planner.dialogue_history)
 
         #setting template details
         print("CHOSEN TEMPLATE: ", type(chosen_template))
-        print(chosen_template)
-        Logger.log_dialogue_model_basic("FINAL CHOSEN RESPONSE: " + str(chosen_template))
-
+        print("FINAL CHOSEN TEMPLATE: ", chosen_template)
         self.dialogue_planner.set_template_details_history(chosen_template)
+
+        Logger.log_dialogue_model_basic("FINAL CHOSEN TEMPLATE: " + str(chosen_template))
+        Logger.log_dialogue_model_basic("FINAL CHOSEN RESPONSE: " + str(response))
 
         return response
 

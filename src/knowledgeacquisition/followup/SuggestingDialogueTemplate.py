@@ -1,5 +1,7 @@
 from src.models.dialogue import DialogueTemplate
 from src.constants import DIALOGUE_TYPE_SUGGESTING
+from src.Logger import Logger
+
 import copy
 
 
@@ -13,20 +15,23 @@ class SuggestingDialogueTemplate(DialogueTemplate):
 
         for i in range(len(self.dependent_nodes)):
             to_insert = ""
+            Logger.log_dialogue_model_basic("Current Blank: " + self.blanks[i])
+
             if self.dependent_nodes[i] is not None:
                 curr_index = response.index(self.dependent_nodes[i])
-                if self.blanks[i] == 'Object' or 'Character':
-                    to_insert = self.relations_blanks[i].name
+                if self.blanks[i] == 'Object' or self.blanks[i] == 'Character':
+                    to_insert = self.relations_blanks[0][i].name
+                    Logger.log_dialogue_model_basic(str(self.relations_blanks[0][i].name))
+                elif self.blanks[i] == 'IsA':
+                    to_insert = self.relations_blanks[0][i].first
+                    Logger.log_dialogue_model_basic(str(self.relations_blanks[0][i].first))
                 else:
-                    to_insert = self.relations_blanks[i].first
+                    to_insert = self.relations_blanks[0][i].second
+                    Logger.log_dialogue_model_basic(str(self.relations_blanks[0][i].second))
 
                 response[curr_index] = to_insert
-        response.insert(0, "What if ") # should we remove this?
-        return response
 
-    def is_usable(self, to_check=[]):
-        # TODO fix fill_blank implementation
-        pass
+        return response
 
     def get_template_to_use(self):
         # check if it has usable templates

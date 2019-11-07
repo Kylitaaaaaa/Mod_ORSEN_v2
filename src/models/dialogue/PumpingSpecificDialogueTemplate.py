@@ -1,5 +1,6 @@
 from . import DialogueTemplate
 from src.constants import DIALOGUE_TYPE_PUMPING_SPECIFIC
+from src.Logger import Logger
 
 
 class PumpingSpecificDialogueTemplate(DialogueTemplate):
@@ -13,12 +14,17 @@ class PumpingSpecificDialogueTemplate(DialogueTemplate):
         for i in range (len(self.nodes)):
             to_insert = ""
             curr_index = response.index(self.nodes[i])
+            Logger.log_dialogue_model_basic("Current Blank: " + self.blanks[i])
+            
             if self.blanks[i] == 'Character':
                 to_insert = event.get_characters_involved()[0].name
+                Logger.log_dialogue_model_basic(str(event.get_characters_involved()[0].name))
             elif self.blanks[i] == 'Object':
                 to_insert = event.get_objects_involved()[0].name
+                Logger.log_dialogue_model_basic(str(event.get_objects_involved()[0].name))
             elif self.blanks[i] == 'Event':
                 to_insert = event.subject.name + " " + str(event.verb.lemma_)
+                Logger.log_dialogue_model_basic(str(event.subject.name + " " + str(event.verb.lemma_)))
            
             response[curr_index] = to_insert
 

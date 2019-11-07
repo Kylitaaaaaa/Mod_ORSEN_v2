@@ -1,3 +1,6 @@
 from .SuggestingDialogueTemplate import SuggestingDialogueTemplate
 from .FollowUpDialogueTemplate import  FollowUpDialogueTemplate
 from .FollowUpConfirmDialogueTemplate import FollowUpConfirmDialogueTemplate
+from .KnowledgeAcquisitionPumpingDialogueTemplate import KnowledgeAcquisitionPumpingDialogueTemplate
+
+#TODO Add the multiple choice follow up

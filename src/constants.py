@@ -25,8 +25,8 @@ IS_DENY = ['no', 'no.', 'nope', 'nope.']
 IS_END = ['bye', 'bye.', 'the end', 'the end.']
 
 """ORSEN2 RESPONSES"""
-IS_DONT_LIKE = ['dont like']
-IS_WRONG = ['wrong']
+IS_DONT_LIKE = ['dont like', 'dont like.', 'don\'t like', 'don\'t like.']
+IS_WRONG = ['wrong', 'wrong.']
 
 """ CONSTANT VALUES CONTROL """
 
@@ -79,7 +79,7 @@ DIALOGUE_TYPE_FOLLOW_UP = "follow_up"
 DIALOGUE_TYPE_FOLLOW_UP_DONT_LIKE = "follow_up_dont_like"
 DIALOGUE_TYPE_FOLLOW_UP_WRONG = "follow_up_wrong"
 
-
+DIALOGUE_TYPE_KNOWLEDGE_ACQUISITION_PUMPING = "knowledge_acquisition_pumping"
 
 DIALOGUE_TYPE_INPUT_MISHEARD = "INPUT_MISHEARD"
 DIALOGUE_TYPE_UNKNOWN = "UNKNOWN"

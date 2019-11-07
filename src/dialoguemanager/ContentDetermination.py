@@ -1,6 +1,8 @@
 import numpy as np
 
 from src import DEFAULT_SEED
+from src.constants import DIALOGUE_TYPE_KNOWLEDGE_ACQUISITION_PUMPING #[Celina]
+from src.Logger import Logger
 
 
 class ContentDetermination:
@@ -21,7 +23,8 @@ class ContentDetermination:
         self.curr_event = []
         self.usable_template_list = []
 
-    def perform_content_determination(self):
+    def perform_content_determination(self, dialogue_history):
+        Logger.log_dialogue_model("Filling up the template")
         print("FETCHING: ", self.move_to_execute)
 
         #choose template
@@ -32,7 +35,11 @@ class ContentDetermination:
         # if template has no fillable blanks, enter this particular if statement
         if len(chosen_template.template) == 1:
             response = chosen_template.template[0]
-            print("RETURNING A NON FILLABLE TEMPLATE")
+            
+        # [CELINA] Added the dialogue history for this part
+        elif self.move_to_execute == DIALOGUE_TYPE_KNOWLEDGE_ACQUISITION_PUMPING:
+            response = chosen_template.fill_blanks(dialogue_history)
+
         else:
             print("=============")
             print(self.curr_event)

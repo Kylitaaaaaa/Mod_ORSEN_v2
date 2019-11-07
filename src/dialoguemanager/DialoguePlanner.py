@@ -5,7 +5,8 @@ import time
 
 from src import Logger, DIALOGUE_TYPE_FEEDBACK, DIALOGUE_TYPE_PUMPING_GENERAL, DIALOGUE_TYPE_HINTING, DEFAULT_SEED, \
     DIALOGUE_TYPE_SUGGESTING, DIALOGUE_TYPE_FOLLOW_UP, IS_AFFIRM, IS_DONT_LIKE, IS_WRONG, \
-    DIALOGUE_TYPE_FOLLOW_UP_DONT_LIKE, DIALOGUE_TYPE_FOLLOW_UP_WRONG, IS_DENY, DIALOGUE_TYPE_SUGGESTING_AFFIRM
+    DIALOGUE_TYPE_FOLLOW_UP_DONT_LIKE, DIALOGUE_TYPE_FOLLOW_UP_WRONG, IS_DENY, DIALOGUE_TYPE_SUGGESTING_AFFIRM, \
+    DIALOGUE_TYPE_KNOWLEDGE_ACQUISITION_PUMPING
 from src.models.dialogue import DialogueHistoryTemplate
 from src.models.dialogue.constants import *
 from src.dbo.dialogue.DBODialogueTemplate import DBODialogueTemplate, PUMPING_TRIGGER, PROMPT_TRIGGER, \
@@ -57,11 +58,14 @@ class DialoguePlanner:
         self.usable_templates = []
 
     def perform_dialogue_planner(self, dialogue_move=""):
+        Logger.log_dialogue_model("Entering perform_dialogue_planner")
+
         if dialogue_move == "":
             self.setup_templates_is_usable()
-
+    
             Logger.log_dialogue_model_basic("Breakdown of values used:")
-            Logger.log_dialogue_model_basic_example(DIALOGUE_LIST)
+            for i in range(len(DIALOGUE_LIST)):
+                Logger.log_dialogue_model_basic_example(DIALOGUE_LIST[i])
             Logger.log_dialogue_model_basic_example(self.is_usable)
             Logger.log_dialogue_model_basic_example(self.frequency_count)
 
@@ -77,12 +81,26 @@ class DialoguePlanner:
         else:
             self.chosen_dialogue_move = dialogue_move
             self.chosen_dialogue_template = self.get_usable_templates(dialogue_move)
+            self.dialogue_history.append(DialogueHistoryTemplate(dialogue_type=self.chosen_dialogue_move))
+        
+        Logger.log_dialogue_model_basic("PRINT ALL DIALOGUE TURNS: ")
+        for x in range(len(self.dialogue_history)):
+            Logger.log_dialogue_model_basic_example("ORSEN turn " + str(x) + ": " + str(self.dialogue_history[x].dialogue_type))
+        
+        Logger.log_dialogue_model_basic("FINAL CHOSEN DIALOGUE MOVE: " + str(self.chosen_dialogue_move))
 
         return self.chosen_dialogue_move
 
     def setup_templates_is_usable(self):
         self.init_set_dialogue_moves_usable()
         # fetch all usable dialogue templates
+
+        # For Logging
+        Logger.log_dialogue_model_basic("Initial Valid Dialogue Moves:")
+        for i in range(len(DIALOGUE_LIST)):
+            Logger.log_dialogue_model_basic_example(DIALOGUE_LIST[i])
+        Logger.log_dialogue_model_basic_example(self.is_usable)
+
         for i in range(len(DIALOGUE_LIST)):
             #check if dialogue move is initially valid
             to_check = DIALOGUE_LIST[i]
@@ -100,27 +118,25 @@ class DialoguePlanner:
         # recheck dialogue moves given templates
         for i in range(len(DIALOGUE_LIST)):
             self.is_usable[i] = self.is_dialogue_usable(DIALOGUE_LIST[i].get_type(), self.usable_templates[i])
+        
+        print("UOL")
 
 
     def init_set_dialogue_moves_usable(self):
         # check which dialogue moves are usable
         set_to_true = []
 
-        set_to_true.append(DIALOGUE_TYPE_HINTING)
-        #set_to_true.append(DIALOGUE_TYPE_PUMPING_SPECIFIC)
+        if self.num_action_events <= 3:
+            set_to_true.append(DIALOGUE_TYPE_FEEDBACK)
+            set_to_true.append(DIALOGUE_TYPE_PUMPING_GENERAL)
 
-        #print("HMM", self.get_num_usage(DIALOGUE_TYPE_FEEDBACK) + self.get_num_usage(DIALOGUE_TYPE_PUMPING_GENERAL))
+        elif self.get_num_usage(DIALOGUE_TYPE_FEEDBACK) + self.get_num_usage(DIALOGUE_TYPE_PUMPING_GENERAL) == 3:
+            set_to_true.append(DIALOGUE_TYPE_PUMPING_SPECIFIC)
+            set_to_true.append(DIALOGUE_TYPE_PUMPING_GENERAL)
 
-        # if self.num_action_events <= 3:
-        #     set_to_true.append(DIALOGUE_TYPE_FEEDBACK)
-        #     set_to_true.append(DIALOGUE_TYPE_PUMPING_GENERAL)
-
-        # elif self.get_num_usage(DIALOGUE_TYPE_FEEDBACK) + self.get_num_usage(DIALOGUE_TYPE_PUMPING_GENERAL) == 3:
-        #     set_to_true.append(DIALOGUE_TYPE_PUMPING_SPECIFIC)
-        #     set_to_true.append(DIALOGUE_TYPE_PUMPING_GENERAL)
-
-        # else:
-        #     set_to_true = [True for i in range(len(DIALOGUE_LIST))]
+        else:
+            set_to_true = [True for i in range(len(DIALOGUE_LIST))]
+            
         self.set_dialogue_list_true(set_to_true)
 
     def set_dialogue_list_true(self, set_to_true):
@@ -147,11 +163,16 @@ class DialoguePlanner:
     def  get_usable_templates(self, move_to_execute):
         usable_template_list = []
 
+        Logger.log_dialogue_model_basic("Fetching all templates of: " + str(move_to_execute))
         template_list = self.dialogue_template.get_templates_of_type(move_to_execute)
+        for x in template_list:
+            Logger.log_dialogue_model_basic_example(x)
 
         # check which template is usable
         for X in template_list:
             print("Checking:", X)
+            Logger.log_dialogue_model("Checking template " + str(X))
+
             if X.is_usable(self.curr_event, self.get_num_usage(X.get_type())):
                 usable_template_list.append(X)
 
@@ -196,9 +217,6 @@ class DialoguePlanner:
         weights_to_eval = self.get_weights_from_index(moves_to_eval)
 
         dialogue_move_index = self.select_dialogue_from_weights(weights_to_eval)
-        print("THH", moves_to_eval)
-        print("THH", weights_to_eval)
-        print("THH", dialogue_move_index)
 
         return moves_to_eval[dialogue_move_index]
 
@@ -210,7 +228,6 @@ class DialoguePlanner:
 
     def get_valid_moves_index(self):
         valid_moves = []
-        print("WHy uwu")
         print(self.is_usable)
         for i in range(len(self.is_usable)):
             if self.is_usable[i]:
@@ -223,6 +240,9 @@ class DialoguePlanner:
         #get latest dialogue move
         last_move = self.get_last_dialogue_move()
         if last_move is not None:
+            print("EPIC", last_move.dialogue_type)
+
+        if last_move is not None:
             # check if prev move is suggestion
             if last_move.dialogue_type == DIALOGUE_TYPE_SUGGESTING:
                 if response in IS_AFFIRM:
@@ -231,10 +251,17 @@ class DialoguePlanner:
                     return DIALOGUE_TYPE_FOLLOW_UP
             #check if prev move is follow up
             elif last_move.dialogue_type == DIALOGUE_TYPE_FOLLOW_UP:
+                print("LAST MOVE IS FOLLOW UP")
                 if response in IS_DONT_LIKE:
+                    print("DON'T LIKE")
                     return DIALOGUE_TYPE_FOLLOW_UP_DONT_LIKE
-                if response in IS_WRONG:
+                elif response in IS_WRONG:
+                    print("DEDUCT 0")
                     return DIALOGUE_TYPE_FOLLOW_UP_WRONG
+            elif last_move.dialogue_type == DIALOGUE_TYPE_KNOWLEDGE_ACQUISITION_PUMPING:
+                return DIALOGUE_TYPE_SUGGESTING_AFFIRM
+
+            #TODO Add response for multiple choice type                
 
         if response in PUMPING_TRIGGER:
             if len(event_chain) > 0:
@@ -244,12 +271,11 @@ class DialoguePlanner:
             return DIALOGUE_TYPE_PROMPT
         return None
 
-    def set_template_details_history(self, chosen_template):
+    def set_template_details_history(self, chosen_template):        
         self.dialogue_history[len(self.dialogue_history) - 1].set_template_details(chosen_template)
 
     def print_dialogue_list(self):
         print("\n\nCHOSEN DIALOGUE MOVE: ", self.chosen_dialogue_move)
-        Logger.log_dialogue_model_basic_example("FINAL CHOSEN DIALOGUE MOVE: " + str(self.chosen_dialogue_move))
 
         print("move", "\t", "is_usable")
         for i in range(len(DIALOGUE_LIST)):
@@ -259,3 +285,10 @@ class DialoguePlanner:
         if len(self.dialogue_history) ==0:
             return None
         return self.dialogue_history[len(self.dialogue_history)-1]
+    
+    def get_suggestion_word_rel(self):
+        if len(self.dialogue_history) ==0:
+            return None
+        elif self.dialogue_history[len(self.dialogue_history)-2].dialogue_type == DIALOGUE_TYPE_SUGGESTING:
+            print(self.dialogue_history[len(self.dialogue_history)-2].dialogue_type)
+            return self.dialogue_history[len(self.dialogue_history)-2].word_relation
