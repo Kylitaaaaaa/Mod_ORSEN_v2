@@ -55,87 +55,96 @@ class ORSEN:
         Logger.log_conversation("=== USER LATENCY TIME (seconds): " + str(self.user_end_time - self.user_start_time) + " ===")
         start_time = time.time()
 
-        """"
-        Check for trigger phrases 
-        """""
-        triggered_move = self.dialogue_planner.check_trigger_phrases(response, self.world.event_chains) #TODO: REMOVE AFTER TESTING
-        print("POOPY", triggered_move)
-
-        if triggered_move is None:
-            #if not pump
+        tester = 0
+        if tester == 0:
+        # try:
             """"
-            Executes text understanding part. This includes the extraction of important information in the text input 
-            (using previous sentences as context). This also including breaking the sentences into different event entities.  
+            Check for trigger phrases 
             """""
-            sentence_references = ORSEN.perform_text_understanding(self, response)
+            triggered_move = self.dialogue_planner.check_trigger_phrases(response, self.world.event_chains) #TODO: REMOVE AFTER TESTING
+            print("POOPY", triggered_move)
 
-            """" 
-            Executing Dialogue Manager 
-            """""
-            # result = ORSEN.perform_dialogue_manager(self)
-            # Try Catch
-            try:
+            if triggered_move is None:
+                #if not pump
+                """"
+                Executes text understanding part. This includes the extraction of important information in the text input 
+                (using previous sentences as context). This also including breaking the sentences into different event entities.  
+                """""
+                sentence_references = ORSEN.perform_text_understanding(self, response)
+
+                """" 
+                Executing Dialogue Manager 
+                """""
                 result = ORSEN.perform_dialogue_manager(self)
-            except Exception as e:
-                Logger.log_conversation("ERROR: " + str(e))
-                Logger.log_dialogue_model("ERROR: " + str(e))
-                result = "I see. What else can you say about that?"
-                Logger.log_dialogue_model("FINAL CHOSEN RESPONSE " + result)
+                # Try Catch
+                # try:
+                #     result = ORSEN.perform_dialogue_manager(self)
+                # except Exception as e:
+                #     Logger.log_conversation("ERROR: " + str(e))
+                #     Logger.log_dialogue_model("ERROR: " + str(e))
+                #     result = "I see. What else can you say about that?"
+                #     Logger.log_dialogue_model("FINAL CHOSEN RESPONSE " + result)
 
-            """
-            Execute Knowledge Acquisition
-            """
-            
+                """
+                Execute Knowledge Acquisition
+                """
+                
 
-        else:
-            #TODO: insert KA stuff here
-            if triggered_move == DIALOGUE_TYPE_SUGGESTING_AFFIRM:
-                #add score then general pumping
-                last_dialogue = self.dialogue_planner.get_last_dialogue_move()
+            else:
+                #TODO: insert KA stuff here
+                if triggered_move == DIALOGUE_TYPE_SUGGESTING_AFFIRM:
+                    #add score then general pumping
+                    last_dialogue = self.dialogue_planner.get_last_dialogue_move()
 
-                if last_dialogue is not None:
-                    for X in last_dialogue.word_relation:
-                        self.extractor.add_relation_to_concepts_if_not_existing(X)
-                # triggered_move = DIALOGUE_TYPE_PUMPING_GENERAL
-                triggered_move = DIALOGUE_TYPE_SUGGESTING_AFFIRM
-                pass
-            elif triggered_move == DIALOGUE_TYPE_FOLLOW_UP:
-                # Why dont u like it or is it wrong -- called from database
-                triggered_move = DIALOGUE_TYPE_FOLLOW_UP
-                pass
-            elif triggered_move == DIALOGUE_TYPE_FOLLOW_UP_DONT_LIKE:
-                # triggered_move = DIALOGUE_TYPE_PUMPING_GENERAL
-                triggered_move = DIALOGUE_TYPE_KNOWLEDGE_ACQUISITION_PUMPING
-                # TODO KA get the sentence?
-            elif triggered_move == DIALOGUE_TYPE_FOLLOW_UP_WRONG:
-                #deduct score then general pumping
-                last_dialogue = self.dialogue_planner.get_last_dialogue_move()
-                print(last_dialogue.dialogue_type)
+                    if last_dialogue is not None:
+                        for X in last_dialogue.word_relation:
+                            self.extractor.add_relation_to_concepts_if_not_existing(X)
+                    # triggered_move = DIALOGUE_TYPE_PUMPING_GENERAL
+                    triggered_move = DIALOGUE_TYPE_SUGGESTING_AFFIRM
+                    pass
+                elif triggered_move == DIALOGUE_TYPE_FOLLOW_UP:
+                    # Why dont u like it or is it wrong -- called from database
+                    triggered_move = DIALOGUE_TYPE_FOLLOW_UP
+                    pass
+                elif triggered_move == DIALOGUE_TYPE_FOLLOW_UP_DONT_LIKE:
+                    # triggered_move = DIALOGUE_TYPE_PUMPING_GENERAL
+                    triggered_move = DIALOGUE_TYPE_KNOWLEDGE_ACQUISITION_PUMPING
+                    # TODO KA get the sentence?
+                elif triggered_move == DIALOGUE_TYPE_FOLLOW_UP_WRONG:
+                    #deduct score then general pumping
+                    last_dialogue = self.dialogue_planner.get_last_dialogue_move()
+                    print(last_dialogue.dialogue_type)
 
-                suggestion_word_relation = self.dialogue_planner.get_suggestion_word_rel()
-                print(suggestion_word_relation)
-                if last_dialogue is not None:
-                    for X in suggestion_word_relation:
-                        self.extractor.remove_relation_to_concepts_if_not_valid(X)
-                # triggered_move = DIALOGUE_TYPE_PUMPING_GENERAL
-                triggered_move = DIALOGUE_TYPE_KNOWLEDGE_ACQUISITION_PUMPING
-                # TODO KA get the sentence?
+                    suggestion_word_relation = self.dialogue_planner.get_suggestion_word_rel()
+                    print(suggestion_word_relation)
+                    if last_dialogue is not None:
+                        for X in suggestion_word_relation:
+                            self.extractor.remove_relation_to_concepts_if_not_valid(X)
+                    # triggered_move = DIALOGUE_TYPE_PUMPING_GENERAL
+                    triggered_move = DIALOGUE_TYPE_KNOWLEDGE_ACQUISITION_PUMPING
+                    # TODO KA get the sentence?
 
-            elif triggered_move == DIALOGUE_TYPE_PUMPING_SPECIFIC:
-                self.world.curr_event = self.world.event_chains[len(self.world.event_chains)-1]
+                elif triggered_move == DIALOGUE_TYPE_PUMPING_SPECIFIC:
+                    self.world.curr_event = self.world.event_chains[len(self.world.event_chains)-1]
 
-            #if prompt
-            # result = ORSEN.perform_dialogue_manager(self, triggered_move)
-            # Try Catch
-            try:
+                #if prompt
                 result = ORSEN.perform_dialogue_manager(self, triggered_move)
-            except Exception as e:
-                Logger.log_conversation("ERROR: " + str(e))
-                Logger.log_dialogue_model("ERROR: " + str(e))
-                result = "I see. What else can you say about that?"
-                Logger.log_dialogue_model("FINAL CHOSEN RESPONSE " + result)
+                # Try Catch
+                # try:
+                #     result = ORSEN.perform_dialogue_manager(self, triggered_move)
+                # except Exception as e:
+                #     Logger.log_conversation("ERROR: " + str(e))
+                #     Logger.log_dialogue_model("ERROR: " + str(e))
+                #     result = "I see. What else can you say about that?"
+                #     Logger.log_dialogue_model("FINAL CHOSEN RESPONSE " + result)
 
-        self.dialogue_planner.reset_state()
+            self.dialogue_planner.reset_state()
+            
+        # except Exception as e :
+        #     Logger.log_conversation("Error: " + str(e))
+        #     print("ERROR")
+        #     result = "I see. What else can you say about that?"
+
 
         Logger.log_conversation("=== ORSEN LATENCY TIME (seconds): " + str(time.time() - start_time) + " ===")
         self.user_start_time = time.time()

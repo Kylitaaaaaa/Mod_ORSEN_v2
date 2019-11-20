@@ -71,7 +71,7 @@ DIALOGUE_TYPE_PUMPING_SPECIFIC = "specific"
 THE_END = "end"
 
 #JUVEYANCE
-DIALOGUE_TYPE_SUGGESTING = "suggesting"
+DIALOGUE_TYPE_SUGGESTING = "suggesting1"
 
 DIALOGUE_TYPE_SUGGESTING_AFFIRM = "suggesting_affirm"
 DIALOGUE_TYPE_FOLLOW_UP = "follow_up"
@@ -138,6 +138,8 @@ PUMPING_TRIGGER = ["give me an idea.", "what should i talk about?", "help me.", 
 HINTING_TRIGGER = ["what's next?", "give me a hint.",
                    "what's next", "give me a hint",
                    "orsen + hint"]
+
+SUGGESTING_TRIGGER = ["give a suggestion"]                   
 
 """ KNOWLEDGE ACQUISITION RELATED """
 MIGRATION_SCORE_THRESHOLD = 5

@@ -126,6 +126,9 @@ class DialoguePlanner:
         # check which dialogue moves are usable
         set_to_true = []
 
+        # set_to_true.append(DIALOGUE_TYPE_HINTING)
+        # set_to_true.append(DIALOGUE_TYPE_SUGGESTING)
+
         if self.num_action_events <= 3:
             set_to_true.append(DIALOGUE_TYPE_FEEDBACK)
             set_to_true.append(DIALOGUE_TYPE_PUMPING_GENERAL)

@@ -94,7 +94,7 @@ class DialogueTemplate(ABC):
                     Logger.log_dialogue_model_basic_example(str(temp_list[x]))
                 
                 updated_list =[]
-                if (len(updated_list) > 0):
+                if (len(temp_list) > 0):
                     updated_list.append(np.random.choice(temp_list))
                     Logger.log_dialogue_model_basic_example("Chosen Relation: ")
                     Logger.log_dialogue_model_basic_example(str(updated_list[0]))
@@ -244,12 +244,18 @@ class DialogueTemplate(ABC):
                 Logger.log_dialogue_model_basic_example(str(temp_list[0][x]))
         
         # return temp_list
+        # DEL LATER
+        print("DialogueTemplate Line 248")
+        print(len(temp_list))
+        for x in range(len(temp_list)):
+            print(temp_list[x])
         
         updated_list =[]
-        if (len(updated_list)) > 0:
-            updated_list.append(np.random.choice(temp_list[0]))
-            Logger.log_dialogue_model_basic_example("Chosen Relation: ")
-            Logger.log_dialogue_model_basic_example(str(updated_list[0]))
+        if (len(temp_list)) > 0:
+            if(len(temp_list[0])) > 0:
+                updated_list.append(np.random.choice(temp_list[0]))
+                Logger.log_dialogue_model_basic_example("Chosen Relation: ")
+                Logger.log_dialogue_model_basic_example(str(updated_list[0]))
 
         return updated_list
 

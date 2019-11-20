@@ -13,6 +13,8 @@ class Object:
         self.mention_count = mention_count
 
     def add_in_setting(self, setting):
+        print("Object Line 16")
+        print("in_setting type: ", type(self.in_setting))
         self.in_setting.append(setting)
 
     def __str__(self):
@@ -57,7 +59,7 @@ class Object:
         return None
 
     @staticmethod
-    def create_object(sentence, token, id="", attribute=[], in_setting="", mention_count=0, gender=""):
+    def create_object(sentence, token, id="", attribute=[], in_setting=[], mention_count=0, gender=""):
         entity = Object.get_object_entity_via_token(token, sentence)
 
         entity_text = token.text
