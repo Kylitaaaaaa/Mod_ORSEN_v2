@@ -139,7 +139,7 @@ HINTING_TRIGGER = ["what's next?", "give me a hint.",
                    "what's next", "give me a hint",
                    "orsen + hint"]
 
-SUGGESTING_TRIGGER = ["give a suggestion"]                   
+SUGGESTING_TRIGGER = ["give me a suggestion", "give me a suggestion."]                   
 
 """ KNOWLEDGE ACQUISITION RELATED """
 MIGRATION_SCORE_THRESHOLD = 5

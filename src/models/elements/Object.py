@@ -13,8 +13,6 @@ class Object:
         self.mention_count = mention_count
 
     def add_in_setting(self, setting):
-        print("Object Line 16")
-        print("in_setting type: ", type(self.in_setting))
         self.in_setting.append(setting)
 
     def __str__(self):

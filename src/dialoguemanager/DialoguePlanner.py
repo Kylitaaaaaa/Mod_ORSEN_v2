@@ -9,7 +9,7 @@ from src import Logger, DIALOGUE_TYPE_FEEDBACK, DIALOGUE_TYPE_PUMPING_GENERAL, D
     DIALOGUE_TYPE_KNOWLEDGE_ACQUISITION_PUMPING
 from src.models.dialogue import DialogueHistoryTemplate
 from src.models.dialogue.constants import *
-from src.dbo.dialogue.DBODialogueTemplate import DBODialogueTemplate, PUMPING_TRIGGER, PROMPT_TRIGGER, \
+from src.dbo.dialogue.DBODialogueTemplate import DBODialogueTemplate, PUMPING_TRIGGER, PROMPT_TRIGGER, HINTING_TRIGGER, SUGGESTING_TRIGGER, \
     DIALOGUE_TYPE_PUMPING_SPECIFIC, DIALOGUE_TYPE_PROMPT
 
 FALLBACK_DIALOGUE_MOVE = 1  # GENERAL DIALOGUE TEMPLATE
@@ -273,6 +273,14 @@ class DialoguePlanner:
             return DIALOGUE_TYPE_PROMPT
         elif response in PROMPT_TRIGGER:
             return DIALOGUE_TYPE_PROMPT
+        elif response in HINTING_TRIGGER:
+            if len(event_chain) > 0:
+                return DIALOGUE_TYPE_HINTING
+            return DIALOGUE_TYPE_PUMPING_GENERAL
+        elif response in SUGGESTING_TRIGGER:
+            if len(event_chain) > 0:
+                return DIALOGUE_TYPE_SUGGESTING
+            return DIALOGUE_TYPE_PUMPING_GENERAL
         return None
 
     def set_template_details_history(self, chosen_template):        
