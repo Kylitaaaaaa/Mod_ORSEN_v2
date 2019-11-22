@@ -6,7 +6,7 @@ class LocalConcept(Concept):
     score = 0
     valid = 1
 
-    def __init__(self, id, first, rel, second, user_id, score, valid):
+    def __init__(self, id, user_id, first, rel, second, score, valid):
         super().__init__(id, first, rel, second)
 
         self.user_id = user_id

@@ -16,7 +16,7 @@ class Character(Object):
         
     @staticmethod
     def create_character(sentence, token, id="", attribute=[], in_setting=[], mention_count=0, gender=""):
-        entity = Object.get_object_entity_via_token(token, sentence)
+        entity = Object.get_object_entity_via_token(token, sentence.ents)
         print("The entity I found is: ", entity)
         entity_text = token.text
         entity_types = []
