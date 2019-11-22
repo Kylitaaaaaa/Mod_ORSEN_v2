@@ -18,15 +18,15 @@ class Object:
     def __str__(self):
         my_string = "Entity " + self.id + " (" + self.name + ")\n" 
         
-        print(" Attribute:")
+        my_string = my_string + " Attribute:\n"
         for a in self.attribute:
             my_string = my_string + "\t" + str(a) + "\n"
         
-        print(" Type: ")
+        my_string = my_string + " Type: \n"
         for t in self.type:
             my_string = my_string + "\t" + str(t) + "\n"
         
-        print(" Places: ")
+        my_string = my_string + " Places: \n"
         for s in self.in_setting:
             my_string = my_string + "\t" + s.value + "\n"
 #        if not self.in_setting:
@@ -39,10 +39,9 @@ class Object:
         return my_string.strip()
 
     @staticmethod
-    def get_object_entity_via_token(token, sentence):
-        entities = sentence.ents
-
+    def get_object_entity_via_token(token, entities):
         for ent in entities:
+            print(type(ent[0]))
             print(str(token), "vs", ent)
             print("Ent range:", ent.start, "to", ent.end)
             if type(ent) == type(token):
@@ -58,7 +57,7 @@ class Object:
 
     @staticmethod
     def create_object(sentence, token, id="", attribute=[], in_setting=[], mention_count=0, gender=""):
-        entity = Object.get_object_entity_via_token(token, sentence)
+        entity = Object.get_object_entity_via_token(token, sentence.ents)
 
         entity_text = token.text
         entity_types = []

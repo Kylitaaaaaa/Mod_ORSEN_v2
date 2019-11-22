@@ -16,6 +16,7 @@ from src.models.concept import LocalConcept, GlobalConcept
 from src.models.nlp import ExtractionTemplate, Relation
 from src.models.user import User
 from src.textunderstanding import InputDecoder
+from src.models.elements import Object
 
 class State:
     def __init__(self, sentence):
@@ -38,7 +39,7 @@ class EizenExtractor(object):
     MODE_CONCATENATING = "concatenate"
 
     #Ni change ko to sm yung en_core_web kasi ang bagal ng lg
-    def __init__(self, model_to_use="en_core_web_sm"):
+    def __init__(self, model_to_use="en_core_web_lg"):
         print("Last compatibility version check: %s.\n" % (LAST_CHECK_DATE))
 
         print("Checking spaCy version: %s" % (spacy.__version__))
@@ -604,7 +605,7 @@ class EizenExtractor(object):
         if extracted is not None:
             relations.append(extracted)
         for relation in relations:
-            self.add_relation_to_concepts_if_not_existing(relation)
+            self.add_relation_to_concepts_if_not_existing(self.convert_relation_to_lemma(relation, ents))
 
         # if event_type == EVENT_DESCRIPTION:
         #     print(template.relation)
@@ -620,6 +621,57 @@ class EizenExtractor(object):
         #             relations.append(extracted)
 
         return relations
+
+    def find_new_word(self, sentence):
+        print("=================================")
+        global_concept_manager = DBOConceptGlobalImpl()
+        local_concept_manager = DBOConceptLocalImpl()
+
+        for token in sentence:
+            entity = Object.get_object_entity_via_token(token, sentence.ents)
+
+            if  token.pos_ == "NOUN" or token.pos_ == "VERB" or token.pos_ == "ADJ":
+                if not (global_concept_manager.get_concept_by_word(token.text) or \
+                    global_concept_manager.get_concept_by_word(token.lemma_) or \
+                    local_concept_manager.get_concept_by_word(token.text) or \
+                    local_concept_manager.get_concept_by_word(token.lemma_)) :
+                    
+                    if entity:
+                        if entity.label_ != "PERSON" and entity.label_ != "DATE" and entity.label_ != "TIME" and entity.label_ != "GPE":
+                            print("entered1")
+                            return "I need help, please use " + token.text + " in a sentence."
+                    else:
+                        print("entered2")
+                        return "I need help, please use " + token.text + " in a sentence."
+                
+        return None
+
+    def convert_relation_to_lemma(self, relation, ents):
+        temp = Relation()
+        temp.keyword = relation.keyword
+        temp.keyword_type = relation.keyword_type
+        temp.first_token = relation.first_token.lemma_
+        temp.relation = relation.relation
+        temp.second_token = relation.second_token.lemma_
+        temp.is_flipped = relation.is_flipped
+
+        entity = Object.get_object_entity_via_token(relation.first_token, ents)
+
+        if temp.first_token == "-PRON-":
+            temp.first_token = "character"
+        elif entity:
+            if entity.label_ == "PERSON":
+                temp.first_token = "character"
+                self.add_relation_to_concepts_if_not_existing(Relation(relation.first_token, "character", "", "InstanceOf", "", "", "", ""))
+            elif entity.label_ == "DATE":
+                self.add_relation_to_concepts_if_not_existing(Relation(relation.first_token, "date", "", "InstanceOf", "", "", "", ""))
+            elif entity.label_ == "TIME":
+                self.add_relation_to_concepts_if_not_existing(Relation(relation.first_token, "time", "", "InstanceOf", "", "", "", ""))
+            elif entity.label_ == "GPE":
+                self.add_relation_to_concepts_if_not_existing(Relation(relation.first_token, "location", "", "InstanceOf", "", "", "", ""))
+            
+
+        return temp
 
     def add_relation_to_concepts_if_not_existing(self, relation):
         global_concept_manager = DBOConceptGlobalImpl()
@@ -647,11 +699,11 @@ class EizenExtractor(object):
                     if concept.score >= MIGRATION_SCORE_THRESHOLD - 1:
                         # pass
                         concept_to_migrate = GlobalConcept.convert_local_to_global(concept)
-                        local_concept_manager.delete_concept(concept.id)
+                        local_concept_manager.update_valid(concept.first, concept.relation, concept.second, 0)
                         global_concept_manager.add_concept(concept_to_migrate)
                         Logger.log_information_extraction_basic("Transferring the concept " + concept.one_line_print() + " from local to global.")
                     else:
-                        local_concept_manager.update_score(concept.id, concept.score+1)
+                        local_concept_manager.update_score(concept.first, concept.relation, concept.second, concept.score+2)
                         Logger.log_information_extraction_basic("Increasing the score of " + concept.one_line_print() + " from " + str(concept.score) + " to " + str(concept.score+1))
 
     def remove_relation_to_concepts_if_not_valid(self, relation):
@@ -672,11 +724,11 @@ class EizenExtractor(object):
 
                 if concept.score <= (MIGRATION_SCORE_THRESHOLD*-1) - 1:
                     # pass
-                    local_concept_manager.delete_concept(concept.id)
+                    local_concept_manager.update_valid(concept.first, concept.relation, concept.second, 0)
                     Logger.log_information_extraction_basic(
                         "Deleting the concept " + concept.one_line_print() + " from local.")
                 else:
-                    local_concept_manager.update_score(concept.id, concept.score - 1)
+                    local_concept_manager.update_score(concept.first, concept.relation, concept.second, concept.score - 1)
                     Logger.log_information_extraction_basic(
                         "Decreasing the score of " + concept.one_line_print() + " from " + str(concept.score) + " to " + str(
                             concept.score - 1))

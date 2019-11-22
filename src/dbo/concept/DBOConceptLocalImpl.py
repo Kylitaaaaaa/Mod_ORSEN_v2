@@ -48,11 +48,14 @@ class DBOConceptLocalImpl(DBOConcept):
 
         return sql_response
 
-    def update_score(self, id, score):
+    def update_score(self, first, relation, second, score):
         q = Query\
             .update(self.table_reference)\
             .set(self.table_reference.score, score)\
-            .where(self.table_reference.id == id)
+            .where(
+            (self.table_reference.first == first) & (self.table_reference.relation == relation) & (
+                    self.table_reference.second == second)
+        )
 
         query = q.get_sql()
         query = query.replace("\"", "")
@@ -62,11 +65,14 @@ class DBOConceptLocalImpl(DBOConcept):
 
         return sql_response
 
-    def update_valid(self, id, valid):
+    def update_valid(self, first, relation, second, valid):
         q = Query\
             .update(self.table_reference)\
             .set(self.table_reference.valid, valid)\
-            .where(self.table_reference.id == id)
+            .where(
+            (self.table_reference.first == first) & (self.table_reference.relation == relation) & (
+                    self.table_reference.second == second)
+        )
 
         query = q.get_sql()
         query = query.replace("\"", "")
@@ -76,11 +82,14 @@ class DBOConceptLocalImpl(DBOConcept):
 
         return sql_response
 
-    def delete_concept(self, id):
+    def delete_concept(self, first, relation, second):
         q = Query\
             .from_(self.table_reference)\
             .delete()\
-            .where(self.table_reference.id == id)
+            .where(
+            (self.table_reference.first == first) & (self.table_reference.relation == relation) & (
+                    self.table_reference.second == second)
+        )
 
         query = q.get_sql()
         query = query.replace("\"", "")

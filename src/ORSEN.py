@@ -70,12 +70,13 @@ class ORSEN:
                 Executes text understanding part. This includes the extraction of important information in the text input 
                 (using previous sentences as context). This also including breaking the sentences into different event entities.  
                 """""
-                sentence_references = ORSEN.perform_text_understanding(self, response)
+                result = ORSEN.perform_text_understanding(self, response)
 
                 """" 
                 Executing Dialogue Manager 
                 """""
-                result = ORSEN.perform_dialogue_manager(self)
+                if result is None:
+                    result = ORSEN.perform_dialogue_manager(self)
                 # Try Catch
                 # try:
                 #     result = ORSEN.perform_dialogue_manager(self)
@@ -128,7 +129,8 @@ class ORSEN:
                     self.world.curr_event = self.world.event_chains[len(self.world.event_chains)-1]
 
                 #if prompt
-                result = ORSEN.perform_dialogue_manager(self, triggered_move)
+                if result is None:
+                    result = ORSEN.perform_dialogue_manager(self, triggered_move)
                 # Try Catch
                 # try:
                 #     result = ORSEN.perform_dialogue_manager(self, triggered_move)
@@ -155,6 +157,7 @@ class ORSEN:
     def perform_text_understanding(self, response):
 
         story = response
+        result = None
 
         event_entities, sentence_references = self.extractor.parse_user_input(story, self.world)
 
@@ -233,6 +236,11 @@ class ORSEN:
                     if subject == None:
                         subject = Object.create_object(sentence=sentence, token=relation_entity.first_token)
                         self.world.add_object(subject)
+                        for t in subject.type:
+                            if t.description == "PERSON":
+                                self.world.remove_object(subject)
+                                direct_object = Character.create_character(sentence=sentence, token=relation_entity.first_token)
+                                self.world.add_character(subject)
 
                 subject.mention_count += 1
 
@@ -280,6 +288,11 @@ class ORSEN:
                         if direct_object == None:
                             direct_object = Object.create_object(sentence=sentence, token=event_entity[DIRECT_OBJECT])
                             self.world.add_object(direct_object)
+                            for t in direct_object.type:
+                                if t.description == "PERSON":
+                                    self.world.remove_object(direct_object)
+                                    direct_object = Character.create_character(sentence=sentence, token=event_entity[DIRECT_OBJECT])
+                                    self.world.add_character(direct_object)
                     direct_object.mention_count += 1
 
                     for s in settings:
@@ -306,13 +319,17 @@ class ORSEN:
             current_setting_list.extend(settings)
             # world.add_event(event, sentence)
 
+            result = self.extractor.find_new_word(sentence)
+
         for i in range(len(current_event_list)):
             self.world.add_event(current_event_list[i], current_sentence_list[i])
 
         for i in range(len(current_setting_list)):
             self.world.add_setting(setting)
 
-        return sentence_references
+        print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
+        print(result)
+        return result
 
     def perform_dialogue_manager(self, move_to_execute=""):
         # curr_event = None
@@ -342,6 +359,12 @@ class ORSEN:
         #setting template details
         print("CHOSEN TEMPLATE: ", type(chosen_template))
         print("FINAL CHOSEN TEMPLATE: ", chosen_template)
+        print("CHARACTERS:")
+        for character in self.world.characters:
+            print(character.__str__())
+        print("OBJECTS: ")
+        for object in self.world.objects:
+            print(object.__str__())
         self.dialogue_planner.set_template_details_history(chosen_template)
 
         Logger.log_dialogue_model_basic("FINAL CHOSEN TEMPLATE: " + str(chosen_template))
