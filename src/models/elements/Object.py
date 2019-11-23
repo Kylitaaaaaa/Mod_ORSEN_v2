@@ -41,7 +41,6 @@ class Object:
     @staticmethod
     def get_object_entity_via_token(token, entities):
         for ent in entities:
-            print(type(ent[0]))
             print(str(token), "vs", ent)
             print("Ent range:", ent.start, "to", ent.end)
             if type(ent) == type(token):

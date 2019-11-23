@@ -623,7 +623,6 @@ class EizenExtractor(object):
         return relations
 
     def find_new_word(self, sentence):
-        print("=================================")
         global_concept_manager = DBOConceptGlobalImpl()
         local_concept_manager = DBOConceptLocalImpl()
 
@@ -638,10 +637,8 @@ class EizenExtractor(object):
                     
                     if entity:
                         if entity.label_ != "PERSON" and entity.label_ != "DATE" and entity.label_ != "TIME" and entity.label_ != "GPE":
-                            print("entered1")
                             return "I need help, please use " + token.text + " in a sentence."
                     else:
-                        print("entered2")
                         return "I need help, please use " + token.text + " in a sentence."
                 
         return None

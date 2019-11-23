@@ -237,7 +237,7 @@ class ORSEN:
                         subject = Object.create_object(sentence=sentence, token=relation_entity.first_token)
                         self.world.add_object(subject)
                         for t in subject.type:
-                            if t.description == "PERSON":
+                            if t.description.text == "PERSON":
                                 self.world.remove_object(subject)
                                 direct_object = Character.create_character(sentence=sentence, token=relation_entity.first_token)
                                 self.world.add_character(subject)
@@ -289,7 +289,7 @@ class ORSEN:
                             direct_object = Object.create_object(sentence=sentence, token=event_entity[DIRECT_OBJECT])
                             self.world.add_object(direct_object)
                             for t in direct_object.type:
-                                if t.description == "PERSON":
+                                if t.description.text == "PERSON":
                                     self.world.remove_object(direct_object)
                                     direct_object = Character.create_character(sentence=sentence, token=event_entity[DIRECT_OBJECT])
                                     self.world.add_character(direct_object)
@@ -327,8 +327,6 @@ class ORSEN:
         for i in range(len(current_setting_list)):
             self.world.add_setting(setting)
 
-        print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
-        print(result)
         return result
 
     def perform_dialogue_manager(self, move_to_execute=""):
@@ -359,12 +357,6 @@ class ORSEN:
         #setting template details
         print("CHOSEN TEMPLATE: ", type(chosen_template))
         print("FINAL CHOSEN TEMPLATE: ", chosen_template)
-        print("CHARACTERS:")
-        for character in self.world.characters:
-            print(character.__str__())
-        print("OBJECTS: ")
-        for object in self.world.objects:
-            print(object.__str__())
         self.dialogue_planner.set_template_details_history(chosen_template)
 
         Logger.log_dialogue_model_basic("FINAL CHOSEN TEMPLATE: " + str(chosen_template))
