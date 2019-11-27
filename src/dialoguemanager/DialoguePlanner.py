@@ -133,6 +133,9 @@ class DialoguePlanner:
             set_to_true.append(DIALOGUE_TYPE_FEEDBACK)
             set_to_true.append(DIALOGUE_TYPE_PUMPING_GENERAL)
 
+        elif (self.get_num_usage(DIALOGUE_TYPE_FEEDBACK) + self.get_num_usage(DIALOGUE_TYPE_PUMPING_GENERAL) + self.get_num_usage(DIALOGUE_TYPE_PUMPING_SPECIFIC) + self.get_num_usage(DIALOGUE_TYPE_SUGGESTING)) % 4 == 0:
+            set_to_true = ['feedback', 'suggesting']
+
         elif self.get_num_usage(DIALOGUE_TYPE_FEEDBACK) + self.get_num_usage(DIALOGUE_TYPE_PUMPING_GENERAL) == 3:
             set_to_true.append(DIALOGUE_TYPE_PUMPING_SPECIFIC)
             set_to_true.append(DIALOGUE_TYPE_PUMPING_GENERAL)

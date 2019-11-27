@@ -605,7 +605,7 @@ class EizenExtractor(object):
         if extracted is not None:
             relations.append(extracted)
         for relation in relations:
-            self.add_relation_to_concepts_if_not_existing(self.convert_relation_to_lemma(relation, ents))
+            self.add_relation_to_concepts_if_not_existing(self.convert_relation_to_lemma(relation, ents), 2)
 
         # if event_type == EVENT_DESCRIPTION:
         #     print(template.relation)
@@ -659,18 +659,18 @@ class EizenExtractor(object):
         elif entity:
             if entity.label_ == "PERSON":
                 temp.first_token = "character"
-                self.add_relation_to_concepts_if_not_existing(Relation(relation.first_token, "character", "", "InstanceOf", "", "", "", ""))
+                self.add_relation_to_concepts_if_not_existing(Relation(relation.first_token, "character", "", "InstanceOf", "", "", "", ""), 2)
             elif entity.label_ == "DATE":
-                self.add_relation_to_concepts_if_not_existing(Relation(relation.first_token, "date", "", "InstanceOf", "", "", "", ""))
+                self.add_relation_to_concepts_if_not_existing(Relation(relation.first_token, "date", "", "InstanceOf", "", "", "", ""), 2)
             elif entity.label_ == "TIME":
-                self.add_relation_to_concepts_if_not_existing(Relation(relation.first_token, "time", "", "InstanceOf", "", "", "", ""))
+                self.add_relation_to_concepts_if_not_existing(Relation(relation.first_token, "time", "", "InstanceOf", "", "", "", ""), 2)
             elif entity.label_ == "GPE":
-                self.add_relation_to_concepts_if_not_existing(Relation(relation.first_token, "location", "", "InstanceOf", "", "", "", ""))
+                self.add_relation_to_concepts_if_not_existing(Relation(relation.first_token, "location", "", "InstanceOf", "", "", "", ""), 2)
             
 
         return temp
 
-    def add_relation_to_concepts_if_not_existing(self, relation):
+    def add_relation_to_concepts_if_not_existing(self, relation, increment):
         global_concept_manager = DBOConceptGlobalImpl()
         local_concept_manager = DBOConceptLocalImpl()
 
@@ -701,7 +701,7 @@ class EizenExtractor(object):
                         Logger.log_information_extraction_basic("Transferring the concept " + concept.one_line_print() + " from local to global.")
                     else:
                         local_concept_manager.update_score(concept.first, concept.relation, concept.second, concept.score+2)
-                        Logger.log_information_extraction_basic("Increasing the score of " + concept.one_line_print() + " from " + str(concept.score) + " to " + str(concept.score+1))
+                        Logger.log_information_extraction_basic("Increasing the score of " + concept.one_line_print() + " from " + str(concept.score) + " to " + str(concept.score + increment))
 
     def remove_relation_to_concepts_if_not_valid(self, relation):
         print("HIHI")
