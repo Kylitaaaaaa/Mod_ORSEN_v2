@@ -56,6 +56,7 @@ class ORSEN:
         start_time = time.time()
 
         tester = 0
+        result = None
         if tester == 0:
         # try:
             """"
@@ -99,7 +100,8 @@ class ORSEN:
 
                     if last_dialogue is not None:
                         for X in last_dialogue.word_relation:
-                            self.extractor.add_relation_to_concepts_if_not_existing(X)
+                            Logger.log_information_extraction("Update score from suggesting + ")
+                            self.extractor.add_relation_to_concepts_if_not_existing(X, 1)
                     # triggered_move = DIALOGUE_TYPE_PUMPING_GENERAL
                     triggered_move = DIALOGUE_TYPE_SUGGESTING_AFFIRM
                     pass
@@ -113,6 +115,7 @@ class ORSEN:
                     # TODO KA get the sentence?
                 elif triggered_move == DIALOGUE_TYPE_FOLLOW_UP_WRONG:
                     #deduct score then general pumping
+                    Logger.log_information_extraction("Update score from suggesting - ")
                     last_dialogue = self.dialogue_planner.get_last_dialogue_move()
                     print(last_dialogue.dialogue_type)
 
@@ -167,8 +170,10 @@ class ORSEN:
 
         prev_sentence = "<START>"
         curr_sentence = ""
+        last = None
 
         for event_entity, sentence in zip(event_entities, sentence_references):
+            last = sentence
             if prev_sentence == "<START>":
                 prev_sentence = ""
                 curr_sentence = sentence.text
@@ -269,7 +274,8 @@ class ORSEN:
                         self.world.add_character(actor)
                     else:
                         print("Actor entity object found. Remove from objects and add to characters", str(actor))
-                        actor = Character.create_character(sentence=sentence, token=self.world.remove_object(actor))
+                        self.world.remove_object(actor)
+                        actor = Character.create_character(sentence=sentence, token=event_entity[ACTOR])
                         self.world.add_character(actor)
 
                 actor.mention_count += 1
@@ -319,7 +325,8 @@ class ORSEN:
             current_setting_list.extend(settings)
             # world.add_event(event, sentence)
 
-            result = self.extractor.find_new_word(sentence)
+        if last is not None:
+            result = self.extractor.find_new_word(last)
 
         for i in range(len(current_event_list)):
             self.world.add_event(current_event_list[i], current_sentence_list[i])

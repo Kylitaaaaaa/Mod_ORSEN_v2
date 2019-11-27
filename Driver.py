@@ -138,7 +138,7 @@ orsen = ORSEN()
 is_engaged = True
 while is_engaged:
     orsen.initialize_story_prerequisites()
-    print("Let's make another story! You go first")
+    print("Let's make a story! You go first")
     start_storytelling()
     print("Do you want to make another story?")
     user_input = get_input()
