@@ -158,6 +158,7 @@ class OCCManager():
         # chosen_emotion = self.choose_emotion(curr_action_event, self.get_event_valence())
 
 
+        self.print_occ_values()
 
         return chosen_emotion
 
@@ -366,6 +367,18 @@ class OCCManager():
                                     self.sp + " , " + self.sr + " , " + self.op + " , " + self.pros + " , " + self.stat + " , " + str(self.unexp) + " , " +   self.sa + " , " +   str(self.vr) + " , " +
                                     self.ed + " , " + self.eoa + " , " + self.edev + " , " + self.ef)
 
+        print("HERE ARE OCC VALUES")
+        # print(self.af + " , " + self.de + " , " +
+        #                             self.of + " , " + self.oa + " , " +
+        #                             self.sp + " , " + self.sr + " , " + self.op + " , " + self.pros + " , " + self.stat + " , " + str(self.unexp) + " , " +   self.sa + " , " +   str(self.vr) + " , " +
+        #                             self.ed + " , " + self.eoa + " , " + self.edev + " , " + self.ef)
+
+        print(self.af + " \n " + self.de + " \n " +
+              self.of + " \n " + self.oa + " \n " +
+              self.sp + " \n " + self.sr + " \n " + self.op + " \n " + self.pros + " \n " + self.stat + " \n " + str(
+            self.unexp) + " \n " + self.sa + " \n " + str(self.vr) + " \n " +
+              self.ed + " \n " + self.eoa + " \n " + self.edev + " \n " + self.ef)
+
 
         # Logger.log_occ_values_basic("OCC VALUES:")
         # Logger.log_occ_values_basic("Agent:")
@@ -423,7 +436,7 @@ class OCCManager():
         sentiment = self.get_vader_sentiment(self.curr_event.subject.name)
         if sentiment == VADER_NEGATIVE:
             return AF_NOT_LIKED, OF_NOT_LIKED
-        return AF_LIKED, AF_NOT_LIKED
+        return AF_LIKED, OF_LIKED
 
     """
     Direction of Emotion (de)

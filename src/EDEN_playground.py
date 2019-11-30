@@ -1,4 +1,4 @@
-from EDEN.OCC import OCCManager
+from EDEN.OCC.OCCManager import OCCManager
 from EDEN.constants import *
 from EDEN.db import DBOEmotion
 from EDEN.models import EmotionActionEvent
@@ -10,11 +10,8 @@ import datetime
 from src.models import World
 from src.models.elements import Object, Attribute, Setting, Character
 import time
+import csv
 
-
-
-occ_manager = OCCManager()
-orsen = ORSEN()
 
 def test_eden():
     response = ["I loved you too much to let you die, dear sister, but your heart was failing you, so I gave you mine.",
@@ -415,6 +412,7 @@ def extract_convo(file_path):
     user_resp = []
     orsen_resp = []
     user_orsen_resp = []
+    orsen_dmoves = []
 
     user_lat = []
     orsen_lat = []
@@ -425,15 +423,55 @@ def extract_convo(file_path):
         if "???: " in X:
             user_resp.append(X.split("???: ", 1)[1].replace('\n', ''))
             user_orsen_resp.append(X.split("???: ", 1)[1].replace('\n', ''))
+            orsen_dmoves.append('')
+        elif "User : " in X:
+            user_resp.append(X.split("User : ", 1)[1].replace('\n', ''))
+            user_orsen_resp.append(X.split("User : ", 1)[1].replace('\n', ''))
+            orsen_dmoves.append('')
         elif "ORSEN: " in X:
             orsen_resp.append(X.split("ORSEN: ", 1)[1].replace('\n', ''))
             user_orsen_resp.append(X.split("ORSEN: ", 1)[1].replace('\n', ''))
+        elif "EDEN: " in X:
+            orsen_resp.append(X.split("EDEN: ", 1)[1].replace('\n', ''))
+            user_orsen_resp.append(X.split("EDEN: ", 1)[1].replace('\n', ''))
+        elif "EREN: " in X:
+            orsen_resp.append(X.split("EREN: ", 1)[1].replace('\n', ''))
+            user_orsen_resp.append(X.split("EREN: ", 1)[1].replace('\n', ''))
         elif "USER LATENCY TIME (seconds): " in X:
             user_lat.append(float(X.split("USER LATENCY TIME (seconds): ", 1)[1].replace('\n', '')))
             user_orsen_lat.append(float(X.split("USER LATENCY TIME (seconds): ", 1)[1].replace('\n', '')))
         elif "ORSEN LATENCY TIME (seconds): " in X:
             orsen_lat.append(float(X.split("ORSEN LATENCY TIME (seconds): ", 1)[1].replace('\n', '')))
             user_orsen_lat.append(float(X.split("ORSEN LATENCY TIME (seconds): ", 1)[1].replace('\n', '')))
+        elif "CHOSEN DIALOGUE MOVE: " in X:
+            move_to_add = X.split("CHOSEN DIALOGUE MOVE: ", 1)[1].replace('\n', '')
+            if move_to_add == 'e-label':
+                orsen_dmoves.append('Labelling')
+            elif move_to_add == 'e-pumping':
+                orsen_dmoves.append('Emotion')
+            elif move_to_add == 'c-pumping':
+                orsen_dmoves.append('Cause')
+            elif move_to_add == 'd-praise':
+                orsen_dmoves.append('Praise')
+            elif move_to_add == 'e-emphasis':
+                orsen_dmoves.append('Emphasis')
+            elif move_to_add == 'd-correcting':
+                orsen_dmoves.append('Corrective')
+            elif move_to_add == 'd-pumping':
+                orsen_dmoves.append('Discipline')
+            elif move_to_add == 'evaluation':
+                orsen_dmoves.append('Evaluating')
+            elif move_to_add == 'recollection':
+                orsen_dmoves.append('Recollecting')
+            elif move_to_add == 'e-followup':
+                orsen_dmoves.append('Followup')
+            elif move_to_add == 'general':
+                orsen_dmoves.append('General')
+            elif move_to_add == 'specific':
+                orsen_dmoves.append('Specific')
+
+
+
 
     # print("===PRINTING USER RESPONSES===")
     # print_list(user_resp)
@@ -445,10 +483,12 @@ def extract_convo(file_path):
     # print_list(orsen_lat)
     print("===PRINTING USER ORSEN RESPONSES===")
     print_list(user_orsen_resp)
-    # print("===PRINTING USER ORSEN LATENCY===")
-    # print_list(user_orsen_lat)
+    print("===PRINTING USER ORSEN LATENCY===")
+    print_list(user_orsen_lat)
+    print("===PRINTING ORSEN MOVES===")
+    print_list(orsen_dmoves)
 
-    return user_resp, orsen_resp, user_orsen_resp, user_lat, orsen_lat
+    return user_resp, orsen_resp, user_orsen_resp, user_lat, orsen_lat, orsen_dmoves
     # return user_orsen_resp
 
 def print_list(list):
@@ -481,70 +521,187 @@ def test_dataset():
     dbo_emotion = DBOEmotion('nrc_emotion')
     dbo_emotion.get_all_terms()
 
+def get_data_csv():
+    file_path = "/Users/kylesantos/Desktop/Thesis/ScratchCompiled-User-Input.csv"
 
-# main_file_path = '/Users/kylesantos/Desktop/oct 20 testing/'
-# file_paths = ['1 zairah/',
-#               '2 Renhart/',
-#               '3 Maricar/',
-#               '4 Jhanness/',
-#               '5 Jim/',
-#               '6 Shad/',
-#               '7 Clarenz/',
-#               '8 Harvy/',
-#               '9 Lian/',
-#               '10 Jhanissa 1/',
-#               '10 Jhanissa 2/'
-#               ]
+    sheets = []
 
-# file_paths = ['1 James/',
-#               '2 Abeng/',
-#               '3 Jim 1/',
-#               '3 Jim 2/',
-#               '4 Vincent/',
-#               '5 Harvy/'
+
+    with open(file_path, mode='r') as csv_file:
+        csv_reader = csv.DictReader(csv_file)
+        line_count = 0
+        curr_participant_num = 1
+        curr_participant = []
+        for row in csv_reader:
+            if line_count == 0:
+                print(f'Column names are {", ".join(row)}')
+                line_count += 1
+            line_count += 1
+
+            if row["Turn"] != "" and row["Turn"] != "Turn":
+                if row["Participant #"] == str(curr_participant_num):
+                    curr_participant.append(row)
+                else:
+                    print("CHECKING: ", curr_participant)
+                    sheets.append(curr_participant)
+                    curr_participant = []
+                    curr_participant_num += 1
+
+        sheets.append(curr_participant)
+
+        print(f'Processed {line_count} lines.')
+
+    print("PRINTING SHEETS LEN: ", len(sheets))
+
+    return sheets
+
+
+def extract_time(participant_list):
+    dialogue_moves = ["Emphasis", "Praise", "Corrective", "General", "Emotion", "Cause", "Discipline", "Evaluating", "Labelling", "Recollecting", "Specific", "Followup"]
+    num_iterations = 3
+    iteration_1 = [1, 2, 3, 4, 5]
+    iteration_2 = [6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+    iteration_3 = [16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27]
+
+
+    # user_latency_time = [[0] * len(dialogue_moves)] * num_iterations
+    # eren_latency_time = [[0] * len(dialogue_moves)] * num_iterations
+    # user_dialogue_count = [[0] * len(dialogue_moves)] * num_iterations
+    # eren_dialogue_count = [[0] * len(dialogue_moves)] * num_iterations
+
+    user_latency_time = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
+    eren_latency_time = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
+    user_dialogue_count = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
+    eren_dialogue_count = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
+
+    all_user_latency_time = []
+    all_eren_latency_time = []
+    all_user_dialogue_count = []
+    all_eren_dialogue_count = []
+
+    for participant in participant_list:
+        curr_user_latency_time = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        curr_eren_latency_time = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        curr_user_dialogue_count = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        curr_eren_dialogue_count = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+
+        for response in participant:
+            curr_iteration = -1
+
+            if int(response["Participant #"]) in iteration_1:
+                curr_iteration = 0
+            elif int(response["Participant #"]) in iteration_2:
+                curr_iteration = 1
+            elif int(response["Participant #"]) in iteration_3:
+                curr_iteration = 2
+
+            print("curr Iter: ", curr_iteration, "   :   user: ", response["Participant #"])
+            if response["User Dialogue Move"] != "":
+                try:
+                    (user_latency_time[curr_iteration])[dialogue_moves.index(response["User Dialogue Move"])] += float(response["Latency"])
+                    (user_dialogue_count[curr_iteration])[dialogue_moves.index(response["User Dialogue Move"])] += 1
+
+                    curr_user_latency_time[dialogue_moves.index(response["User Dialogue Move"])] += float(
+                        response["Latency"])
+                    curr_user_dialogue_count[dialogue_moves.index(response["User Dialogue Move"])] += 1
+                except:
+                    print("heh")
+            elif response["Dialogue Move Used 1"] != "":
+                try:
+                    (eren_latency_time[curr_iteration])[dialogue_moves.index(response["Dialogue Move Used 1"])] += float(response["Latency"])
+                    (eren_dialogue_count[curr_iteration])[dialogue_moves.index(response["Dialogue Move Used 1"])] += 1
+
+                    curr_eren_latency_time[dialogue_moves.index(response["User Dialogue Move"])] += float(
+                        response["Latency"])
+                    curr_eren_dialogue_count[dialogue_moves.index(response["User Dialogue Move"])] += 1
+                except:
+                    print("heh")
+            elif response["Dialogue Move Used 2"] != "":
+                try:
+                    (eren_latency_time[curr_iteration])[dialogue_moves.index(response["Dialogue Move Used 2"])] += float(response["Latency"])
+                    (eren_dialogue_count[curr_iteration])[dialogue_moves.index(response["Dialogue Move Used 1"])] += 1
+
+                    curr_eren_latency_time[dialogue_moves.index(response["User Dialogue Move"])] += float(
+                        response["Latency"])
+                    curr_eren_dialogue_count[dialogue_moves.index(response["User Dialogue Move"])] += 1
+                except:
+                    print("heh")
+        all_user_latency_time.append(curr_user_latency_time)
+        all_eren_latency_time.append(curr_eren_latency_time)
+        all_user_dialogue_count.append(curr_user_dialogue_count)
+        all_eren_dialogue_count.append(curr_eren_dialogue_count)
+
+    # print("===DIALOGUE MOVES===")
+    # print_list(dialogue_moves)
+    #
+    #
+    # print("===USER LATENCEY===")
+    # # print_list(user_latency_time)
+    #
+    # for i in range (len(user_latency_time)):
+    #     print("*****Iteration ", i)
+    #     print_list(user_latency_time[i])
+    #
+    # print("===EREN LATENCEY===")
+    # # print_list(eren_latency_time)
+    #
+    # for i in range (len(eren_latency_time)):
+    #     print("*****Iteration ", i)
+    #     print_list(eren_latency_time[i])
+    #
+    # print("===USER COUNT===")
+    # # print_list(user_dialogue_count)
+    #
+    # for i in range (len(user_dialogue_count)):
+    #     print("*****Iteration ", i)
+    #     print_list(user_dialogue_count[i])
+    #
+    # print("===EREN COUNT===")
+    # # print_list(eren_dialogue_count)
+    #
+    # for i in range (len(eren_dialogue_count)):
+    #     print("*****Iteration ", i)
+    #     print_list(eren_dialogue_count[i])
+
+    import numpy
+    all_user_latency_time_numpy = numpy.asarray(all_user_latency_time)
+    numpy.savetxt("all_user_latency_time.csv", all_user_latency_time_numpy, delimiter=",")
+
+    all_eren_latency_time_numpy = numpy.asarray(all_eren_latency_time)
+    numpy.savetxt("all_eren_latency_time.csv", all_eren_latency_time_numpy, delimiter=",")
+
+    all_user_dialogue_count_numpy = numpy.asarray(all_user_dialogue_count)
+    numpy.savetxt("all_user_dialogue_count.csv", all_user_dialogue_count_numpy, delimiter=",")
+
+    all_eren_dialogue_count_numpy = numpy.asarray(all_eren_dialogue_count)
+    numpy.savetxt("all_eren_dialogue_count.csv", all_eren_dialogue_count_numpy, delimiter=",")
+
+
+
+
+
+
+# main_file_path = '/Users/kylesantos/Desktop/Thesis/raw data/oct 31 testing/'
+#
+# file_paths = ['3L celine/',
+#               '3M kiara/',
+#               '3N embry/',
+#               '3N embry 2/',
+#               '3O trisha/',
+#               '3P christian/'
+#
 #               ]
 #
 # for X in file_paths:
 #     print(" === " + X + " === ")
-#     # user_resp, orsen_resp, user_orsen_resp, user_lat, orsen_lat = extract_convo(main_file_path + X)
-#     get_time(main_file_path + X)
+#     user_resp, orsen_resp, user_orsen_resp, user_lat, orsen_lat, orsen_dmoves= extract_convo(main_file_path + X)
+#     # get_time(main_file_path + X)
 
 
+sheet_data = get_data_csv()
+extract_time(sheet_data)
 
 
-
-# print("\n\n=====Zairah=====")
-# extract_emo_class("/Users/kylesantos/Desktop/oct 26 testing/1 zairah/")
-#
-# print("\n\n=====Renhart=====")
-# # extract_emo_class("/Users/kylesantos/Desktop/oct 26 testing/2 Renhart/")
-# #
-# print("\n\n=====Maricar=====")
-# extract_emo_class("/Users/kylesantos/Desktop/oct 26 testing/3 Maricar/")
-# #
-# print("\n\n=====Jhanness=====")
-# extract_emo_class("/Users/kylesantos/Desktop/oct 26 testing/4 Jhanness/")
-#
-# print("\n\n=====Jim=====")
-# extract_emo_class("/Users/kylesantos/Desktop/oct 26 testing/5 Jim/")
-#
-# print("\n\n=====Shad=====")
-# extract_emo_class("/Users/kylesantos/Desktop/oct 26 testing/6 Shad/")
-#
-#
-# print("\n\n=====Clarenz=====")
-# extract_emo_class("/Users/kylesantos/Desktop/oct 26 testing/7 Clarenz/")
-#
-# print("\n\n=====Harvy=====")
-# extract_emo_class("/Users/kylesantos/Desktop/oct 26 testing/8 Harvy/")
-#
-# print("\n\n=====Lian=====")
-# extract_emo_class("/Users/kylesantos/Desktop/oct 26 testing/9 Lian/")
-#
-# print("\n\n=====Jhanissa 1=====")
-# extract_emo_class("/Users/kylesantos/Desktop/oct 26 testing/10 Jhanissa 1/")
-#
-# print("\n\n=====Jhanissa 2=====")
-# extract_emo_class("/Users/kylesantos/Desktop/oct 26 testing/10 Jhanissa 2/")
-
-test_eden()
+# occ_manager = OCCManager()
+# orsen = ORSEN()
+# test_eden()

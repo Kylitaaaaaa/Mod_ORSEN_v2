@@ -29,7 +29,9 @@ class Emotion(Event):
         self.eoa = eoa
         self.edev = edev
         self.ef = ef
+
         self.type = EVENT_EMOTION
+        self.print_occ_values()
 
     def get_emotion_type(self):
         if self.emotion in NEGATIVE_EMOTIONS:
