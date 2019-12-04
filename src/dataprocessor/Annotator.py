@@ -11,7 +11,7 @@ import neuralcoref
 from spacy.tokens import Token
 
 class Annotator(object):
-    def __init__(self, model_to_use = "en_core_web_lg"):
+    def __init__(self, model_to_use = "en_core_web_sm"):
         print("Last compatibility version check: %s.\n" % (LAST_CHECK_DATE))
                 
         print("Checking spaCy version: %s" % (spacy.__version__))

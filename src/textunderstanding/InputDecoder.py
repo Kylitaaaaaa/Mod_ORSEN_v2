@@ -6,7 +6,7 @@ from src import Logger
 
 import spacy
 # [Celina] I changed it to sm for testing only
-nlp = spacy.load('en_core_web_lg')
+nlp = spacy.load('en_core_web_sm')
 
 class InputDecoder:
     __instance = None

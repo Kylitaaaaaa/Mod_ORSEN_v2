@@ -34,7 +34,6 @@ class KnowledgeAcquisitionPumpingDialogueTemplate(DialogueTemplate):
         Logger.log_dialogue_model_basic("Subject: " + subject)
 
         response = [x.replace("1", subject) for x in response]
-        print("HMM KA", response)
 
         return response
 

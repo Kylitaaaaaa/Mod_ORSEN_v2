@@ -133,8 +133,8 @@ class DialoguePlanner:
             set_to_true.append(DIALOGUE_TYPE_FEEDBACK)
             set_to_true.append(DIALOGUE_TYPE_PUMPING_GENERAL)
 
-        elif (self.get_num_usage(DIALOGUE_TYPE_FEEDBACK) + self.get_num_usage(DIALOGUE_TYPE_PUMPING_GENERAL) + self.get_num_usage(DIALOGUE_TYPE_PUMPING_SPECIFIC) + self.get_num_usage(DIALOGUE_TYPE_SUGGESTING)) % 4 == 0:
-            set_to_true = ['feedback', 'suggesting']
+        # elif (self.get_num_usage(DIALOGUE_TYPE_FEEDBACK) + self.get_num_usage(DIALOGUE_TYPE_PUMPING_GENERAL) + self.get_num_usage(DIALOGUE_TYPE_PUMPING_SPECIFIC) + self.get_num_usage(DIALOGUE_TYPE_SUGGESTING)) % 4 == 0:
+        #     set_to_true = ['feedback', 'suggesting']
 
         elif self.get_num_usage(DIALOGUE_TYPE_FEEDBACK) + self.get_num_usage(DIALOGUE_TYPE_PUMPING_GENERAL) == 3:
             set_to_true.append(DIALOGUE_TYPE_PUMPING_SPECIFIC)
@@ -182,7 +182,6 @@ class DialoguePlanner:
 
             if X.is_usable(self.curr_event, self.get_num_usage(X.get_type())):
                 usable_template_list.append(X)
-
         return usable_template_list
 
     def get_num_usage(self, dialogue_type):

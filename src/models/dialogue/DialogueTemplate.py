@@ -6,6 +6,7 @@ from src import *
 from src.Logger import Logger
 from src.models.elements import Character, Object
 from src.models.nlp import Relation
+from src.models.concept import GlobalConcept, LocalConcept
 import numpy as np
 
 
@@ -103,21 +104,21 @@ class DialogueTemplate(ABC):
             else:
                 #check <index> <relation> <index>
                 temp_list = self.get_rel_list(blank_list, self.relation[i])
-                print("CHECK ", len(temp_list) )
 
             if len(temp_list) > 0:
                 blank_list = self.update_list(blank_list, temp_list)
-                # print("SS", blank_list)
+                print("DialogueTemplate Line 114 ", blank_list)
+
             else:
                 print("NO RELATIONS FOUND")
                 Logger.log_dialogue_model_basic_example("NO RELATIONS FOUND")
                 return False
+
         if len(blank_list) > 0:
             # TODO: Randomizer should not be here, relations_blanks for suggesting and hinting
             self.relations_blanks = blank_list
             return True
         else:
-            print("WHY")
             print("NO RELATIONS FOUND")
             Logger.log_dialogue_model_basic_example("NO RELATIONS FOUND")
         return False
@@ -138,7 +139,6 @@ class DialogueTemplate(ABC):
 
         for X in init_list:
             for Y in to_add_list:
-                print("HH")
                 print(type(Y))
                 if type(Y) == Object or type(Y) == Character:
                     temp_list = []
@@ -157,12 +157,14 @@ class DialogueTemplate(ABC):
                     temp_list.extend(X)
                     temp_list.append(Y)
                     final_list.append(temp_list)
+        
+        return final_list
 
         # print("NEW")
         # for x in final_list:
         #     print(x)
         # print("FF", final_list)
-        return final_list
+        # return final_list
 
     def get_element_list(self, element_type, curr_event):
         # editted this code kasi all characters, objects ang nasasama? We only need one.
@@ -222,7 +224,6 @@ class DialogueTemplate(ABC):
     def get_rel_list(self, init_list, relation):
         # TODO: Randomizer should not be here
         temp_list =[]
-        print(init_list)
         for X in init_list:
             if len(X) > int(relation[0]) - 1:
                 print("X len is: ", len(X))
@@ -236,20 +237,19 @@ class DialogueTemplate(ABC):
                     temp_list.append(self.dbo_concept.get_concept_by_first_relation(curr_refer.name, relation[1]))
                 else:
                     print("testing: ", curr_refer.first)
-                    temp_list.append(self.dbo_concept.get_concept_by_first_relation(curr_refer.first, relation[1]))    
+                    temp_list.append(self.dbo_concept.get_concept_by_first_relation(curr_refer.first, relation[1])) 
+            else:
+                for items in range(len(X)):
+                    if isinstance(X[items], LocalConcept):
+                        curr_refer = X[items]
+                        print("testing: ", curr_refer.second)
+                        temp_list.append(self.dbo_concept.get_concept_by_second_relation(curr_refer.second, relation[1])) 
         
         Logger.log_dialogue_model_basic_example("List of all Valid Relations: ")
         if (len(temp_list)) > 0:
             for x in range(len(temp_list[0])):
                 Logger.log_dialogue_model_basic_example(str(temp_list[0][x]))
-        
-        # return temp_list
-        # DEL LATER
-        print("DialogueTemplate Line 248")
-        print(len(temp_list))
-        for x in range(len(temp_list)):
-            print(temp_list[x])
-        
+               
         updated_list =[]
         if (len(temp_list)) > 0:
             if(len(temp_list[0])) > 0:

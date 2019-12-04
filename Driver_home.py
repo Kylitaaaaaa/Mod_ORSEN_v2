@@ -41,14 +41,14 @@ def login():
         status = "ask_code"
         return "I don't think that's right. Can you try again? What's your username?"
     else:
-        # UserHandler.get_instance().set_global_curr_user(temp_user)
+        UserHandler.get_instance().set_global_curr_user(temp_user)
         status = "storytelling"
         return "Hi! Welcome back " + name + " . Let's make a story. You start!"
 
 def signup():
     global status, dbo_user
 
-    temp_user = dbo_user.add_user(User(-1, name, code))
+    UserHandler.get_instance().set_global_curr_user(dbo_user.add_user(User(-1, name, code)))
     status = "storytelling"
     return "Alright" + name + ", let's make a story. You start!"
 
@@ -73,15 +73,23 @@ orsen = ORSEN()
 @app.route('/orsen', methods=["POST"])
 def driver():
 
-    global status, name, code, have_account
+    global status, name, code, have_account, user_input
 
     requestJson = request.get_json()
     focus = requestJson["inputs"][0]
-    user_input = requestJson["inputs"][0]["rawInputs"][0]["query"]
     data = {}
+    user_input = ""
+
+    if focus["intent"] != "actions.intent.NO_INPUT":
+        user_input = requestJson["inputs"][0]["rawInputs"][0]["query"]
+
+    if focus["intent"] == "actions.intent.NO_INPUT":
+        orsen_response = "I can't seem to hear you. What did you say?"
+        Logger.log_conversation("NO INPUT : " + str(orsen_response))
+        data = json_reply.response(orsen_response)
 
     # Greet the User
-    if focus["intent"] == "actions.intent.MAIN":
+    elif focus["intent"] == "actions.intent.MAIN":
 
         orsen_response = "Hi! I'm ORSEN. "
 

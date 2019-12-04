@@ -17,6 +17,8 @@ class SuggestingDialogueTemplate(DialogueTemplate):
             to_insert = ""
             Logger.log_dialogue_model_basic("Current Blank: " + self.blanks[i])
 
+            print(self.relation[i])
+
             if self.dependent_nodes[i] is not None:
                 curr_index = response.index(self.dependent_nodes[i])
                 if self.blanks[i] == 'Object' or self.blanks[i] == 'Character':
@@ -25,9 +27,17 @@ class SuggestingDialogueTemplate(DialogueTemplate):
                 elif self.blanks[i] == 'IsA':
                     to_insert = self.relations_blanks[0][i].first
                     Logger.log_dialogue_model_basic(str(self.relations_blanks[0][i].first))
-                else:
+
+                # <2 UsedFor 3>
+                elif int(self.relation[i][0]) < int(self.relation[i][2]):
                     to_insert = self.relations_blanks[0][i].second
                     Logger.log_dialogue_model_basic(str(self.relations_blanks[0][i].second))
+
+                # <3 CreatedBy 2>
+                else:
+                    to_insert = self.relations_blanks[0][i].first
+                    Logger.log_dialogue_model_basic(str(self.relations_blanks[0][i].first))
+                
 
                 response[curr_index] = to_insert
 

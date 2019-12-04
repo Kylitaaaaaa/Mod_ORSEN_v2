@@ -30,7 +30,7 @@ class ContentDetermination:
         #choose template
         chosen_template = self.choose_template()
         print("CHOSEN TEMPLATE IS: ", chosen_template)
-        print("CHOSEN TEMPLATE IS: ", len(chosen_template.template))
+
         #fill template to use
         # if template has no fillable blanks, enter this particular if statement
         if len(chosen_template.template) == 1:
@@ -47,7 +47,6 @@ class ContentDetermination:
             print(chosen_template.dependent_nodes)
             print("=============")
             response = chosen_template.fill_blanks(self.curr_event)
-            # Hinting type turns None
 
         # if response type is not a string (as in, pag template/list siya), join stuff idk
         if type(response) is not type("dump"):
@@ -64,7 +63,12 @@ class ContentDetermination:
     def choose_template(self):
         print("templates:")
         print(self.usable_template_list)
-        return np.random.choice(self.usable_template_list)
+        
+        if (len(self.usable_template_list) > 0):
+            return np.random.choice(self.usable_template_list)
+        else:
+            # return empty list lang? di ko sure if tama :(
+            return self.usable_template_list
 
 
 

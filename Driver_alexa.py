@@ -40,14 +40,14 @@ def login():
         status = "ask_code"
         return "I don't think that's right. Can you try again? What's your username?"
     else:
-        # UserHandler.get_instance().set_global_curr_user(temp_user)
+        UserHandler.get_instance().set_global_curr_user(temp_user)
         status = "storytelling"
         return "Hi! Welcome back " + name + " . Let's make a story. You start!"
 
 def signup():
     global status, dbo_user
 
-    temp_user = dbo_user.add_user(User(-1, name, code))
+    UserHandler.get_instance().set_global_curr_user(dbo_user.add_user(User(-1, name, code)))
     status = "storytelling"
     return "Alright" + name + ", let's make a story. You start!"
 
@@ -90,6 +90,31 @@ def welcome():
 
     return question(orsen_response)
 
+@ask.intent("AMAZON.FallbackIntent")
+def unknown():
+    
+    orsen_response = "I don't understand. Please repeat what you said"
+
+    Logger.log_conversation("Alexa didn't get the trigger. Went to AMAZON.FallbackIntent")
+    Logger.log_dialogue_model("Alexa didn't get the trigger. Went to AMAZON.FallbackIntent")
+
+    Logger.log_conversation("ORSEN: " + str(orsen_response))
+    Logger.log_dialogue_model("ORSEN: " + str(orsen_response))
+
+    return question (orsen_response)
+
+@ask.intent("TryAgain")
+def error():
+    orsen_response = "I don't understand. Please repeat what you said"
+
+    Logger.log_conversation("Alexa didn't get the trigger. Went to TryAgain intent")
+    Logger.log_dialogue_model("Alexa didn't get the trigger. Went to TryAgain intent")
+
+    Logger.log_conversation("ORSEN: " + str(orsen_response))
+    Logger.log_dialogue_model("ORSEN: " + str(orsen_response))
+
+    return question (orsen_response) 
+
 @ask.intent("searchQuery", convert={'query': str})
 def driver(query):
     print(query)
@@ -98,10 +123,20 @@ def driver(query):
 
     user_input = query
     global status, name, code, have_account
-    
+
     if user_input == None:
         orsen_response = "Please try again"
         return question (orsen_response) 
+    
+    # if user_input == None:
+    #     orsen_response = "Please try again"
+    #     Logger.log_conversation("Alexa didn't get the trigger")
+    #     Logger.log_dialogue_model("Alexa didn't get the trigger")
+
+    #     Logger.log_conversation("ORSEN: " + str(orsen_response))
+    #     Logger.log_dialogue_model("ORSEN: " + str(orsen_response))
+
+    #     return question (orsen_response) 
     
     # LOGIN SIGNUP
     if status == "account_status":

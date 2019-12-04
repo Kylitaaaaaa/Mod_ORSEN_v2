@@ -39,7 +39,7 @@ class EizenExtractor(object):
     MODE_CONCATENATING = "concatenate"
 
     #Ni change ko to sm yung en_core_web kasi ang bagal ng lg
-    def __init__(self, model_to_use="en_core_web_lg"):
+    def __init__(self, model_to_use="en_core_web_sm"):
         print("Last compatibility version check: %s.\n" % (LAST_CHECK_DATE))
 
         print("Checking spaCy version: %s" % (spacy.__version__))
@@ -700,11 +700,10 @@ class EizenExtractor(object):
                         global_concept_manager.add_concept(concept_to_migrate)
                         Logger.log_information_extraction_basic("Transferring the concept " + concept.one_line_print() + " from local to global.")
                     else:
-                        local_concept_manager.update_score(concept.first, concept.relation, concept.second, concept.score+2)
+                        local_concept_manager.update_score(concept.first, concept.relation, concept.second, concept.score + increment)
                         Logger.log_information_extraction_basic("Increasing the score of " + concept.one_line_print() + " from " + str(concept.score) + " to " + str(concept.score + increment))
 
     def remove_relation_to_concepts_if_not_valid(self, relation):
-        print("HIHI")
         print(relation)
         local_concept_manager = DBOConceptLocalImpl()
 
