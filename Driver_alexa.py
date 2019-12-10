@@ -1,3 +1,7 @@
+"""
+This is the driver file for Alexa
+"""
+
 from src.dbo.user import DBOUser
 from src.models.user import User
 from src import Logger, IS_AFFIRM, IS_DENY, IS_END, UserHandler

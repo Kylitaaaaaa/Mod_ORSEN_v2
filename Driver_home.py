@@ -103,10 +103,6 @@ def driver():
         
         data = json_reply.response(orsen_response)
     
-    #TODO Silent Responses
-    #elif focus["intent"] == "actions.intent.NO_INPUT":
-
-    # focus["intent"] == "actions.intent.TEXT":
     else:
         # LOGIN SIGNUP
         if status == "account_status":
