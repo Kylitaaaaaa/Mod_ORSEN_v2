@@ -1,3 +1,10 @@
+"""
+This is the driver file for Google Home/ Google Assistant
+The other files needed can be dound under the src folder then googlehome folder
+Don't forget to delete creds.data 
+"""
+
+
 from src.dbo.user import DBOUser
 from src.models.user import User
 from src import Logger, IS_AFFIRM, IS_DENY, IS_END, UserHandler
