@@ -2,6 +2,7 @@ from src.knowledgeacquisition.followup.SuggestingDialogueTemplate import Suggest
 from src.models.dialogue import *
 from src.constants import *
 from src.models.dialogue.EFollowupDialogueTemplate import EFollowupDialogueTemplate
+from src.models.dialogue.WelcomeDialogueTemplate import WelcomeDialogueTemplate
 
 
 class DialogueTemplateBuilder:
@@ -66,8 +67,8 @@ class DialogueTemplateBuilder:
          return EFollowupDialogueTemplate(id, templates, relations, blanks, nodes, dependent_nodes)
 
       ##WELCOME MESSAGE
-      elif dialogue_type == DIALOGUE_TYPE_EDEN_WELCOME:
-         return EDENWelcomeDialogueTemplate(id, templates, relations, blanks, nodes, dependent_nodes)
+      elif dialogue_type == DIALOGUE_TYPE_WELCOME:
+         return WelcomeDialogueTemplate(id, templates, relations, blanks, nodes, dependent_nodes)
 
 
 

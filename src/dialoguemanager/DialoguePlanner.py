@@ -203,6 +203,9 @@ class DialoguePlanner:
     def check_trigger_phrases(self, event_chain =[]):
         if self.response in IS_END:
             return DIALOGUE_TYPE_E_END
+
+
+
         return ""
 
     def check_affirm_deny(self, destructive = True, emotion_event = None):
@@ -231,8 +234,4 @@ class DialoguePlanner:
         return ""
 
     def get_welcome_message_type(self):
-        if CURR_ORSEN_VERSION == ORSEN or CURR_ORSEN_VERSION == ORSEN2:
-            return DIALOGUE_TYPE_ORSEN_WELCOME
-        elif CURR_ORSEN_VERSION == EDEN:
-            return DIALOGUE_TYPE_EDEN_WELCOME
-        return DIALOGUE_TYPE_ORSEN_WELCOME
+        return DIALOGUE_TYPE_WELCOME

@@ -36,7 +36,7 @@ EDEN_DIALOGUE_LIST = [CPumpingDialogueTemplate(),
                       EEndDialogueTemplate(),
                       EEmphasisDialogueTemplate()]
 
-"""DEFAULT IS ORSEN"""
+"""VERSION CONTROL FOR RANDOMIZABLE DIALOGUE MOVES"""
 if CURR_ORSEN_VERSION == ORSEN:
     DIALOGUE_LIST = ORSEN_RAND_DIALOGUE_LIST
 elif CURR_ORSEN_VERSION == ORSEN2:

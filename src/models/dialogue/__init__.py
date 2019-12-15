@@ -25,5 +25,5 @@ from .EvaluationDialogueTemplate import EvaluationDialogueTemplate
 from .RecollectionDialogueTemplate import RecollectionDialogueTemplate
 from .EEndDialogueTemplate import EEndDialogueTemplate
 from .EEmphasisDialogueTemplate import EEmphasisDialogueTemplate
-from .EDENWelcomeDialogueTemplate import EDENWelcomeDialogueTemplate
+from .WelcomeDialogueTemplate import WelcomeDialogueTemplate
 
