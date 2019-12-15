@@ -231,4 +231,8 @@ class DialoguePlanner:
         return ""
 
     def get_welcome_message_type(self):
-        return ""
+        if CURR_ORSEN_VERSION == ORSEN or CURR_ORSEN_VERSION == ORSEN2:
+            return DIALOGUE_TYPE_ORSEN_WELCOME
+        elif CURR_ORSEN_VERSION == EDEN:
+            return DIALOGUE_TYPE_EDEN_WELCOME
+        return DIALOGUE_TYPE_ORSEN_WELCOME

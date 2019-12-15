@@ -11,7 +11,8 @@ from ... import CURR_ORSEN_VERSION, ORSEN, ORSEN2, EDEN
 ORSEN_RAND_DIALOGUE_LIST = [FeedbackDialogueTemplate(),
                  PromptDialogueTemplate(),
                  PumpingGeneralDialogueTemplate(),
-                 PumpingSpecificDialogueTemplate()]
+                 PumpingSpecificDialogueTemplate(),
+                 SuggestingDialogueTemplate()] ###Suggesting is same as hinting in ORSEN2 context
 
 """ORSEN 2"""
 ORSEN2_RAND_DIALOGUE_LIST = [FeedbackDialogueTemplate(),
