@@ -205,7 +205,8 @@ while is_engaged:
     temp_welcome = orsen.get_response(move_to_execute = orsen.dialogue_planner.get_welcome_message_type())
     print(temp_welcome)
 
-
+    DEFAULT_SEED = time.time()
+    Logger.log_dialogue_model(("SEED VALUE:", DEFAULT_SEED))
 
     # print("Let's make another story! You go first")
     start_storytelling()
