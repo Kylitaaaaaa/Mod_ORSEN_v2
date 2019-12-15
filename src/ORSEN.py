@@ -1,4 +1,5 @@
 import time
+import traceback
 
 from EDEN.constants import EVENT_EMOTION
 from EDEN.models import Emotion
@@ -78,6 +79,8 @@ class ORSEN:
         try:
             orsen_reply = self.perform_dialogue_manager(response, preselected_move=move_to_execute)
         except Exception as e:
+            traceback.print_exc()
+
             print(e)
             Logger.log_conversation("ERROR: " + str(e))
             orsen_reply = "I see. What else can you say about that?"
@@ -102,7 +105,10 @@ class ORSEN:
         prev_sentence = "<START>"
         curr_sentence = ""
 
+        last = None
         for event_entity, sentence in zip(event_entities, sentence_references):
+            last = sentence
+
             if prev_sentence == "<START>":
                 prev_sentence = ""
                 curr_sentence = sentence.text
@@ -243,8 +249,8 @@ class ORSEN:
             current_setting_list.extend(settings)
             # world.add_event(event, sentence)
 
-        if curr_sentence is not None:
-            result = self.extractor.find_new_word(curr_sentence)
+        if last is not None:
+            result = self.extractor.find_new_word(last)
 
         for i in range(len(current_event_list)):
             self.world.add_event(current_event_list[i], current_sentence_list[i])

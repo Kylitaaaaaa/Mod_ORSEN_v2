@@ -2,6 +2,8 @@ from src import IS_A
 from src.models.pickles.PickleObject import PickleObject
 from . import Attribute
 
+from spacy.tokens import Token
+
 
 class Object:
 
@@ -47,19 +49,20 @@ class Object:
         return my_string.strip()
 
     @staticmethod
-    def get_object_entity_via_token(token, sentence):
-        entities = sentence.ents
+    def get_object_entity_via_token(token, entities):
+        # entities = sentence.ents
 
         for ent in entities:
             print(str(token), "vs", ent)
-            print("Ent range:", ent.start, "to", ent.end)
+
             if type(ent) == type(token):
-                print("Entity range:", token.start, "to", token.end)
-                if ent.start <= token.start and ent.end >= token.end:
+                # print("Entity range:", token.start, "to", token.end)
+                if ent.i == token.i:
                     return ent
             elif type(ent[0]) == type(token):
+                print("Ent range:", ent.start, "to", ent.end)
                 print("Token index:", token.i)
-                if ent.start <= token.i < ent.end:
+                if ent.start <= token.start and ent.end >= token.end:
                     return ent
             print()
         return None
@@ -73,7 +76,14 @@ class Object:
 
         if entity is not None:
             entity_text = entity.text
-            entity_type = Attribute(relation=IS_A, description=entity.label_, is_negated=False)
+            entity_label = ""
+            print(type(entity),'vs',type(Token))
+            if type(entity) == Token:
+                entity_label = entity_text
+            else:
+                entity_label = entity.label_
+
+            entity_type = Attribute(relation=IS_A, description=entity_label, is_negated=False)
             entity_types.append(entity_type)
 
         if type(attribute) == Attribute:

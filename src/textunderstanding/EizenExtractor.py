@@ -16,6 +16,8 @@ from src.models.concept import LocalConcept, GlobalConcept
 from src.models.nlp import ExtractionTemplate, Relation
 from src.models.user import User
 from src.textunderstanding import InputDecoder
+from src.models.elements import Object
+
 
 class State:
     def __init__(self, sentence):
@@ -37,6 +39,7 @@ class EizenExtractor(object):
     MODE_LISTING = "list"
     MODE_CONCATENATING = "concatenate"
 
+    # Ni change ko to sm yung en_core_web kasi ang bagal ng lg
     def __init__(self, model_to_use="en_core_web_lg"):
         print("Last compatibility version check: %s.\n" % (LAST_CHECK_DATE))
 
@@ -57,6 +60,7 @@ class EizenExtractor(object):
         return doc
 
     """Check verb type given spacy token. Unused"""
+
     def check_token(self, token):
         if token.pos_ == 'VERB':
             indirect_object = False
@@ -93,6 +97,7 @@ class EizenExtractor(object):
         - link 1: https://www.visualthesaurus.com/cm/dictionary/the-forgotten-helping-verbs/
         - link 2: http://www.softschools.com/language_arts/grammar/helping_verbs/list/
     """
+
     def is_action_verb(self, token):
         if token.pos_ == "VERB":
             if "aux" in token.dep_ or token.text in HELPING_VERBS:
@@ -126,6 +131,7 @@ class EizenExtractor(object):
     """Check if the action event given is a part of the subordinate clause by checking for a subordinate conjunction"""
     """If <something> then <another thing> --> something IS REMOVED since it only provides context"""
     """Read more at https://www.grammarly.com/blog/subordinating-conjunctions/"""
+
     def is_subordinate_clause(self, action_token):
         for child in action_token.children:
             if child.pos_ == 'ADP' and child.tag_ == 'IN' and child.dep_ == "mark":
@@ -139,6 +145,7 @@ class EizenExtractor(object):
     """Check if the dependent clause is simply a relative clause, or a clause with the main task of providing more context"""
     """The young shepherd who wished to marry has acquainted the three sisters --> who wished to marry is removed since it only provides context"""
     """Read more at https://www.toppr.com/guides/english/pronoun/relative-pronoun/"""
+
     def is_relative_clause(self, action_token):
         if 'VB' in action_token.tag_:
             if action_token.dep_ == "relcl":
@@ -159,6 +166,7 @@ class EizenExtractor(object):
                 return False
 
     """Checks if a given action is negated via the dependency 'neg' (or negation modifer)"""
+
     def is_negated(self, action):
         for child in action.children:
             if child.dep_ == 'neg':
@@ -166,6 +174,7 @@ class EizenExtractor(object):
         return False
 
     """Given a noun, replace it with the full noun chunk (e.g. instead of getting only Potter, also get the preceeding name 'Harry'"""
+
     def convert_noun_to_noun_chunks(self, noun_chunks, subjects):
         # print("NOUN CHUNK: %s" % (noun_chunks))
         # print("SUBJECTS  : %s" % (subjects))
@@ -191,7 +200,7 @@ class EizenExtractor(object):
         # print("SUBJECTS  : %s" % (subjects))
 
         try:
-            subject_index = subject .i
+            subject_index = subject.i
         except:
             subject_index = subject.start
 
@@ -227,7 +236,9 @@ class EizenExtractor(object):
         # return subjects
 
     """Retrieves a token that qualifies in the required POS tag and dependency tag. Connectors are traversed since they are simply connectors."""
-    def retrieve_tokens(self, pos_tags, dependencies, token, excluded_tags=[], additional_connecting_tags=[], mode=MODE_LISTING):
+
+    def retrieve_tokens(self, pos_tags, dependencies, token, excluded_tags=[], additional_connecting_tags=[],
+                        mode=MODE_LISTING):
         connectors = ["cc", "det", "punct", "agent", "prep"]
         connectors.extend(additional_connecting_tags)
         # print("FINAL RESULING CONNECTIONS:", connectors)
@@ -249,7 +260,8 @@ class EizenExtractor(object):
                         tokens.append(token.head)
 
                     child._.is_traversed = True
-                    tokens = tokens + self.retrieve_tokens(pos_tags, dependencies, token.head, excluded_tags, additional_connecting_tags, mode)
+                    tokens = tokens + self.retrieve_tokens(pos_tags, dependencies, token.head, excluded_tags,
+                                                           additional_connecting_tags, mode)
                 else:
                     if mode == self.MODE_CONCATENATING:
                         tokens = tokens + ' ' + child.text
@@ -257,7 +269,8 @@ class EizenExtractor(object):
                         tokens.append(child)
 
                     child._.is_traversed = True
-                    tokens = tokens + self.retrieve_tokens(pos_tags, dependencies, child, excluded_tags, additional_connecting_tags, mode)
+                    tokens = tokens + self.retrieve_tokens(pos_tags, dependencies, child, excluded_tags,
+                                                           additional_connecting_tags, mode)
 
             elif child.dep_ in connectors:
                 if mode == self.MODE_CONCATENATING:
@@ -265,7 +278,8 @@ class EizenExtractor(object):
 
                 #            print("\ttraversing '%s'(child of %s)" % (child.text, token.text))
                 child._.is_traversed = True
-                tokens = tokens + self.retrieve_tokens(pos_tags, dependencies, child, excluded_tags, additional_connecting_tags, mode)
+                tokens = tokens + self.retrieve_tokens(pos_tags, dependencies, child, excluded_tags,
+                                                       additional_connecting_tags, mode)
 
         #    print("RETURNING:", tokens)
         return tokens
@@ -287,6 +301,7 @@ class EizenExtractor(object):
         return nsubj
 
     """Retrieves the direct OBJECT associated with a given action"""
+
     def get_objects(self, action, sentence_state):
         dobj = []
         if sentence_state.voice == VOICE_ACTIVE:
@@ -304,6 +319,7 @@ class EizenExtractor(object):
         return dobj
 
     """Retrieves the adverbs associated with a given action (specifically, adverb of manner)"""
+
     def get_adverbs(self, action, sentence_state):
         adv = self.retrieve_tokens(pos_tags=['ADV'],
                                    dependencies=['advmod'],
@@ -321,8 +337,8 @@ class EizenExtractor(object):
         split = prep.split(" ")
         while "|" in split[0]:
             split.pop(0)
-        while "|" in split[len(split)-1]:
-            split.pop(len(split)-1)
+        while "|" in split[len(split) - 1]:
+            split.pop(len(split) - 1)
 
         new_prep = ' '.join(split)
         new_prep = new_prep.replace('|', '')
@@ -331,17 +347,17 @@ class EizenExtractor(object):
 
     def get_object_of_preposition(self, action, sentence_state, preposition):
         obj_prep = self.retrieve_tokens(pos_tags=['ADP', 'NOUN'],
-                                    dependencies=['pobj', 'prep'],
-                                    token=action,
-                                    mode=self.MODE_CONCATENATING)
+                                        dependencies=['pobj', 'prep'],
+                                        token=action,
+                                        mode=self.MODE_CONCATENATING)
 
         obj_prep = obj_prep.replace(preposition, '')
 
         split = obj_prep.split(" ")
         while "|" in split[0]:
             split.pop(0)
-        while "|" in split[len(split)-1]:
-            split.pop(len(split)-1)
+        while "|" in split[len(split) - 1]:
+            split.pop(len(split) - 1)
 
         new_obj_prep = ' '.join(split)
         new_obj_prep = new_obj_prep.replace('|', '')
@@ -391,7 +407,8 @@ class EizenExtractor(object):
         unspliced_events = []
         for i in range(start, end, factor):
             event_action = actions[i]
-            Logger.log_information_extraction_basic("Starting extraction centered on action '" + str(event_action).upper() + "'")
+            Logger.log_information_extraction_basic(
+                "Starting extraction centered on action '" + str(event_action).upper() + "'")
 
             event_actors = self.get_actors(event_action, sentence_state)
             Logger.log_information_extraction_basic("ACTORS:" + str(event_actors))
@@ -418,19 +435,20 @@ class EizenExtractor(object):
             for token in sentence:
                 token._.is_traversed = False
 
-
             if not event_actors:
-                Logger.log_information_extraction_basic("No actors found. Using previous actor set: " + str(actors_state))
+                Logger.log_information_extraction_basic(
+                    "No actors found. Using previous actor set: " + str(actors_state))
                 event_actors = actors_state
             else:
                 event_actors = self.convert_noun_to_noun_chunks(subjects, event_actors)
-                Logger.log_information_extraction_basic("New set after converting actor tokens to actor noun chunks: " + str(event_actors))
+                Logger.log_information_extraction_basic(
+                    "New set after converting actor tokens to actor noun chunks: " + str(event_actors))
 
                 actors_state = event_actors
                 Logger.log_information_extraction_basic("Storing current set for future use: " + str(actors_state))
 
-
-            event = [event_actors, event_action, event_objects, event_adverbs, event_prepositions, event_obj_prepositions]
+            event = [event_actors, event_action, event_objects, event_adverbs, event_prepositions,
+                     event_obj_prepositions]
             Logger.log_information_extraction_basic("Currently formed event:")
             Logger.log_information_extraction_basic_example(str(event))
 
@@ -440,7 +458,8 @@ class EizenExtractor(object):
         Logger.log_information_extraction_basic_example(str(unspliced_events))
         if sentence_state.voice == VOICE_PASSIVE:
             unspliced_events.reverse()
-            Logger.log_information_extraction_basic_example("Reversing events caused by passive voice:\n" + str(unspliced_events))
+            Logger.log_information_extraction_basic_example(
+                "Reversing events caused by passive voice:\n" + str(unspliced_events))
 
         pre_partial = []
         for unspliced_event in unspliced_events:
@@ -525,39 +544,60 @@ class EizenExtractor(object):
 
     def extract_keywordless_relation(self, template, token):
         # print("Checking %s against %s (dep_ of %s)" % (template.first, token.text, token.dep_))
-        if template.first == token.dep_:
+        if token.text not in HELPING_VERBS:
+            if template.first == token.dep_:
 
-            second_pass = False
-            third_pass = False
-            if template.third.strip() == "":
-                third_pass = True
+                second_pass = False
+                # third_pass = False
+                # if template.third.strip() == "":
+                #     third_pass = True
 
-            relation = Relation()
-            relation.keyword = template.keyword
-            relation.keyword_type = template.keyword_type
-            relation.relation = template.relation
-            relation.is_flipped = template.is_flipped
+                relation = Relation()
+                relation.keyword = template.keyword
+                relation.keyword_type = template.keyword_type
+                relation.relation = template.relation
+                relation.is_flipped = template.is_flipped
 
-            relation.first_token = token
+                relation.first_token = token
 
-            for child in token.children:
+                for child in token.children:
 
-                if template.second == child.dep_ or second_pass == True:
-                    # print("In second with token %s(%s):" % (child, child.dep_))
+                    if template.second == child.dep_:  # or second_pass == True:
+                        # print("In second with token %s(%s):" % (child, child.dep_))
 
-                    if template.third.strip is not "":
-                        if template.third == child.dep_:
+                        # if template.third.strip is not "":
+                        #     if template.third == child.dep_:
 
-                            if third_pass == False:
-                                third_pass = True
-                                relation.third_token = child
+                        #         if third_pass == False:
+                        #             third_pass = True
+                        #             relation.third_token = child
 
-                    if second_pass == False:
-                        second_pass = True
-                        relation.second_token = child
+                        if second_pass == False:
+                            second_pass = True
+                            relation.second_token = child
+                            return relation
 
-            if second_pass and third_pass:
-                return relation
+                # if second_pass and third_pass:
+            elif template.second == token.dep_:
+
+                first_pass = False
+
+                relation = Relation()
+                relation.keyword = template.keyword
+                relation.keyword_type = template.keyword_type
+                relation.relation = template.relation
+                relation.is_flipped = template.is_flipped
+
+                relation.second_token = token
+
+                for child in token.children:
+
+                    if template.first == child.dep_:
+
+                        if first_pass == False:
+                            first_pass = True
+                            relation.first_token = child
+                            return relation
 
         return None
 
@@ -575,13 +615,13 @@ class EizenExtractor(object):
             # print(">>> Keyword-connected approach")
             return self.extract_keyword_connected_relation(unflipped, token)
 
-
     def get_relations_from_sentence(self, event_type, template, token, subjects, ents):
         relations = []
         extracted = self.extract_relation_via_template(template, token)
         if extracted is not None:
-            Logger.log_information_extraction_basic_example(str(extracted))
             relations.append(extracted)
+        for relation in relations:
+            self.add_relation_to_concepts_if_not_existing(self.convert_relation_to_lemma(relation, ents))
 
         # if event_type == EVENT_DESCRIPTION:
         #     print(template.relation)
@@ -597,6 +637,57 @@ class EizenExtractor(object):
         #             relations.append(extracted)
 
         return relations
+
+    def find_new_word(self, sentence):
+        global_concept_manager = DBOConceptGlobalImpl()
+        local_concept_manager = DBOConceptLocalImpl()
+
+        for token in sentence:
+            entity = Object.get_object_entity_via_token(token, sentence.ents)
+
+            if token.pos_ == "NOUN" or token.pos_ == "VERB" or token.pos_ == "ADJ":
+                if not (global_concept_manager.get_concept_by_word(token.text) or \
+                        global_concept_manager.get_concept_by_word(token.lemma_) or \
+                        local_concept_manager.get_concept_by_word(token.text) or \
+                        local_concept_manager.get_concept_by_word(token.lemma_)):
+
+                    if entity:
+                        if entity.label_ != "PERSON" and entity.label_ != "DATE" and entity.label_ != "TIME" and entity.label_ != "GPE":
+                            return "I need help, please use " + token.text + " in a sentence."
+                    else:
+                        return "I need help, please use " + token.text + " in a sentence."
+
+        return None
+
+    def convert_relation_to_lemma(self, relation, ents):
+        temp = Relation()
+        temp.keyword = relation.keyword
+        temp.keyword_type = relation.keyword_type
+        temp.first_token = relation.first_token.lemma_
+        temp.relation = relation.relation
+        temp.second_token = relation.second_token.lemma_
+        temp.is_flipped = relation.is_flipped
+
+        entity = Object.get_object_entity_via_token(relation.first_token, ents)
+
+        if temp.first_token == "-PRON-":
+            temp.first_token = "character"
+        elif entity:
+            if entity.label_ == "PERSON":
+                temp.first_token = "character"
+                self.add_relation_to_concepts_if_not_existing(
+                    Relation(relation.first_token, "character", "", "InstanceOf", "", "", "", ""))
+            elif entity.label_ == "DATE":
+                self.add_relation_to_concepts_if_not_existing(
+                    Relation(relation.first_token, "date", "", "InstanceOf", "", "", "", ""))
+            elif entity.label_ == "TIME":
+                self.add_relation_to_concepts_if_not_existing(
+                    Relation(relation.first_token, "time", "", "InstanceOf", "", "", "", ""))
+            elif entity.label_ == "GPE":
+                self.add_relation_to_concepts_if_not_existing(
+                    Relation(relation.first_token, "location", "", "InstanceOf", "", "", "", ""))
+
+        return temp
 
     def add_relation_to_concepts_if_not_existing(self, relation):
         global_concept_manager = DBOConceptGlobalImpl()
@@ -624,36 +715,45 @@ class EizenExtractor(object):
                     if concept.score >= MIGRATION_SCORE_THRESHOLD - 1:
                         # pass
                         concept_to_migrate = GlobalConcept.convert_local_to_global(concept)
-                        local_concept_manager.delete_concept(concept.id)
+                        local_concept_manager.update_valid(concept.first, concept.relation, concept.second, 0)
                         global_concept_manager.add_concept(concept_to_migrate)
-                        Logger.log_information_extraction_basic("Transferring the concept " + concept.one_line_print() + " from local to global.")
+                        Logger.log_information_extraction_basic(
+                            "Transferring the concept " + concept.one_line_print() + " from local to global.")
                     else:
-                        local_concept_manager.update_score(concept.id, concept.score+1)
-                        Logger.log_information_extraction_basic("Increasing the score of " + concept.one_line_print() + " from " + str(concept.score) + " to " + str(concept.score+1))
+                        local_concept_manager.update_score(concept.first, concept.relation, concept.second,
+                                                           concept.score + 2)
+                        Logger.log_information_extraction_basic(
+                            "Increasing the score of " + concept.one_line_print() + " from " + str(
+                                concept.score) + " to " + str(concept.score + 1))
 
     def remove_relation_to_concepts_if_not_valid(self, relation):
+        print("HIHI")
+        print(relation)
         local_concept_manager = DBOConceptLocalImpl()
 
         concept = local_concept_manager.get_specific_concept(first=str(relation.first_token),
                                                              relation=str(relation.relation),
                                                              second=str(relation.second_token))
+        user = UserHandler.get_instance().curr_user
         if concept is None:
             pass
         else:
-            Logger.log_information_extraction_basic("Decrementing concept: "
-                                                    + concept.one_line_print())
+            if str(concept.user_id) != str(user.id):
+                Logger.log_information_extraction_basic("Decrementing concept: "
+                                                        + concept.one_line_print())
 
-            if concept.score <= (MIGRATION_SCORE_THRESHOLD*-1) - 1:
-                # pass
-                local_concept_manager.delete_concept(concept.id)
-                Logger.log_information_extraction_basic(
-                    "Deleting the concept " + concept.one_line_print() + " from local.")
-            else:
-                local_concept_manager.update_score(concept.id, concept.score - 1)
-                Logger.log_information_extraction_basic(
-                    "Decreasing the score of " + concept.one_line_print() + " from " + str(concept.score) + " to " + str(
-                        concept.score - 1))
-
+                if concept.score <= (MIGRATION_SCORE_THRESHOLD * -1) - 1:
+                    # pass
+                    local_concept_manager.update_valid(concept.first, concept.relation, concept.second, 0)
+                    Logger.log_information_extraction_basic(
+                        "Deleting the concept " + concept.one_line_print() + " from local.")
+                else:
+                    local_concept_manager.update_score(concept.first, concept.relation, concept.second,
+                                                       concept.score - 1)
+                    Logger.log_information_extraction_basic(
+                        "Decreasing the score of " + concept.one_line_print() + " from " + str(
+                            concept.score) + " to " + str(
+                            concept.score - 1))
 
     def extract_event_attribute(self, sentence, event_type_flag=True):
         # If event type flag is True, then the passed sentence has a smaller chance of containing a description type thing.
@@ -677,14 +777,15 @@ class EizenExtractor(object):
             for i in range(len(extraction_templates)):
                 template = extraction_templates[i]
                 extraction_strings = extraction_strings + "(" + template.first + ", " + template.keyword + "[" + template.relation + "]" + ", " + template.second + ")"
-                if i != len(extraction_templates) -1:
+                if i != len(extraction_templates) - 1:
                     extraction_strings = extraction_strings + ", "
             Logger.log_information_extraction_basic(extraction_strings)
 
             Logger.log_information_extraction_basic("Extracted relations:")
             for i in range(len(extraction_templates)):
-                extracted_relations = self.get_relations_from_sentence(EVENT_DESCRIPTION, extraction_templates[i], token, subjects, ents)
-                if extracted_relations is not None:
+                extracted_relations = self.get_relations_from_sentence(EVENT_DESCRIPTION, extraction_templates[i],
+                                                                       token, subjects, ents)
+                if extracted_relations:
                     relations.extend(extracted_relations)
 
         return relations
@@ -704,7 +805,6 @@ class EizenExtractor(object):
         #
         # return events
 
-
     def extract_event_creation(self, s):
         events = []
 
@@ -719,7 +819,6 @@ class EizenExtractor(object):
             Logger.log_information_extraction_basic_example(e)
 
         return events
-
 
     def parse_user_input(self, content, world):
         Logger.log_information_extraction(content)
@@ -745,7 +844,8 @@ class EizenExtractor(object):
         Logger.log_information_extraction_basic_example(resolved)
 
         self.doc = self.nlp(resolved)
-        Logger.log_information_extraction_basic("Annotating resolved sentence. Start processing by splitting into different sentences.")
+        Logger.log_information_extraction_basic(
+            "Annotating resolved sentence. Start processing by splitting into different sentences.")
 
         event_entities = []
         sentence_entities = []
@@ -802,7 +902,6 @@ class EizenExtractor(object):
     def append_and_empty_list(self, partial_prepend, partial):
         partial_prepend.extend(partial)
         return partial_prepend, []
-
 
     def to_nltk_tree(self, node):
         if node.n_lefts + node.n_rights > 0:
