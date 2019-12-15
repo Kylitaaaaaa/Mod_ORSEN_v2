@@ -10,19 +10,19 @@ class Logger:
     @staticmethod
     def setup_loggers():
         date = datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S")
-        # Logger.__setup_logger__(CONVERSATION_LOG, '../logs/conversation/' + date + '.txt')
-        # Logger.__setup_logger_basic__(INFORMATION_EXTRACTION_LOG, '../logs/information extraction/' + date + '.txt')
-        # Logger.__setup_logger_basic__(DIALOGUE_MODEL_LOG, '../logs/dialogue model/' + date + '.txt')
-        # Logger.__setup_logger_basic__(EVENT_CHAIN_LOG, '../logs/event chain/' + date + '.txt')
-        #
-        # Logger.__setup_logger_basic__(EMOTION_CLASSIFICATION, '../logs/emotion classification/' + date + '.txt')
+        Logger.__setup_logger__(CONVERSATION_LOG, '../logs/conversation/' + date + '.txt')
+        Logger.__setup_logger_basic__(INFORMATION_EXTRACTION_LOG, '../logs/information extraction/' + date + '.txt')
+        Logger.__setup_logger_basic__(DIALOGUE_MODEL_LOG, '../logs/dialogue model/' + date + '.txt')
+        Logger.__setup_logger_basic__(EVENT_CHAIN_LOG, '../logs/event chain/' + date + '.txt')
 
-        Logger.__setup_logger__(CONVERSATION_LOG, '../Mod_ORSEN_v2/logs/conversation/' + date + '.txt')
-        Logger.__setup_logger_basic__(INFORMATION_EXTRACTION_LOG,
-                                      '../Mod_ORSEN_v2/logs/information extraction/' + date + '.txt')
-        Logger.__setup_logger_basic__(DIALOGUE_MODEL_LOG, '../Mod_ORSEN_v2/logs/dialogue model/' + date + '.txt')
-        Logger.__setup_logger_basic__(EVENT_CHAIN_LOG, '../Mod_ORSEN_v2/logs/event chain/' + date + '.txt')
-        Logger.__setup_logger_basic__(EMOTION_CLASSIFICATION, '../Mod_ORSEN_v2/logs/emotion classification/' + date + '.txt')
+        Logger.__setup_logger_basic__(EMOTION_CLASSIFICATION, '../logs/emotion classification/' + date + '.txt')
+
+        # Logger.__setup_logger__(CONVERSATION_LOG, '../Mod_ORSEN_v2/logs/conversation/' + date + '.txt')
+        # Logger.__setup_logger_basic__(INFORMATION_EXTRACTION_LOG,
+        #                               '../Mod_ORSEN_v2/logs/information extraction/' + date + '.txt')
+        # Logger.__setup_logger_basic__(DIALOGUE_MODEL_LOG, '../Mod_ORSEN_v2/logs/dialogue model/' + date + '.txt')
+        # Logger.__setup_logger_basic__(EVENT_CHAIN_LOG, '../Mod_ORSEN_v2/logs/event chain/' + date + '.txt')
+        # Logger.__setup_logger_basic__(EMOTION_CLASSIFICATION, '../Mod_ORSEN_v2/logs/emotion classification/' + date + '.txt')
 
     @staticmethod
     def __setup_logger__(name, log_file, level=logging.INFO):
