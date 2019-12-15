@@ -74,6 +74,22 @@ class ORSENDialoguePlanner(DialoguePlanner):
             set_to_true.append(preselected_move)
         self.set_dialogue_list_true(set_to_true)
 
+    def finalize_dialogue_move(self, curr_dialogue_move):
+        if curr_dialogue_move == DIALOGUE_TYPE_RECOLLECTION:
+            return DIALOGUE_TYPE_E_END
+        return ""
 
+    def check_auto_response(self, destructive = True, emotion_event = None):
+        next_move = self.check_trigger_phrases()
+        return next_move
+
+    def check_trigger_phrases(self, event_chain =[]):
+        if self.response in PROMPT_TRIGGER:
+            return DIALOGUE_TYPE_PROMPT
+        elif self.response in PUMPING_TRIGGER:
+            return DIALOGUE_TYPE_PUMPING_SPECIFIC
+        elif self.response in HINTING_TRIGGER:
+            return DIALOGUE_TYPE_HINTING
+        return ""
 
 
