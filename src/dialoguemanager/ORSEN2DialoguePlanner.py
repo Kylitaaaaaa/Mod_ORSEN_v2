@@ -1,6 +1,7 @@
 from EDEN.constants import *
 from src import *
-from src.dialoguemanager import DialoguePlanner
+from src.dialoguemanager import DialoguePlanner, ORSENDialoguePlanner
+
 
 class ORSEN2DialoguePlanner(DialoguePlanner):
 
@@ -8,19 +9,49 @@ class ORSEN2DialoguePlanner(DialoguePlanner):
         super().__init__()
         self.response = ""
 
+    def init_set_dialogue_moves_usable(self, preselected_move=""):
+        # check which dialogue moves are usable
+        set_to_true = []
+        if preselected_move =="":
+            print(self.curr_world_num_events)
+
+            if self.curr_world_num_events <=3:
+                if len(self.get_usable_templates(DIALOGUE_TYPE_FEEDBACK)) > 0:
+                    set_to_true.append(DIALOGUE_TYPE_FEEDBACK)
+                if len(self.get_usable_templates(DIALOGUE_TYPE_PUMPING_GENERAL)) > 0:
+                    set_to_true.append(DIALOGUE_TYPE_PUMPING_GENERAL)
+                if len(self.get_usable_templates(DIALOGUE_TYPE_PUMPING_SPECIFIC)) > 0:
+                    set_to_true.append(DIALOGUE_TYPE_PUMPING_SPECIFIC)
+            elif self.curr_world_num_events ==3:
+                if len(self.get_usable_templates(DIALOGUE_TYPE_PUMPING_SPECIFIC)) > 0:
+                    set_to_true.append(DIALOGUE_TYPE_PUMPING_SPECIFIC)
+            else:
+                if len(self.get_usable_templates(DIALOGUE_TYPE_FEEDBACK)) > 0:
+                    set_to_true.append(DIALOGUE_TYPE_FEEDBACK)
+                if len(self.get_usable_templates(DIALOGUE_TYPE_PUMPING_GENERAL)) > 0:
+                    set_to_true.append(DIALOGUE_TYPE_PUMPING_GENERAL)
+                if len(self.get_usable_templates(DIALOGUE_TYPE_PUMPING_SPECIFIC)) > 0:
+                    set_to_true.append(DIALOGUE_TYPE_PUMPING_SPECIFIC)
+                if len(self.get_usable_templates(DIALOGUE_TYPE_HINTING)) > 0:
+                    set_to_true.append(DIALOGUE_TYPE_HINTING)
+                if len(self.get_usable_templates(DIALOGUE_TYPE_SUGGESTING)) > 0:
+                    set_to_true.append(DIALOGUE_TYPE_SUGGESTING)
+        else:
+            set_to_true.append(preselected_move)
+        self.set_dialogue_list_true(set_to_true)
+
     ###checks only dialogue that does not need to go through text understanding
     # def check_trigger_phrases(self, response, event_chain):
-    def check_trigger_phrases(self, event_chain):
-        if self.response in IS_END:
-            return DIALOGUE_TYPE_E_END
+    def check_trigger_phrases(self, event_chain =[]):
         if self.response in PUMPING_TRIGGER:
             if len(event_chain) > 0:
                 return DIALOGUE_TYPE_PUMPING_SPECIFIC
             return DIALOGUE_TYPE_PROMPT
         elif self.response in PROMPT_TRIGGER:
             return DIALOGUE_TYPE_PROMPT
+        return ""
 
-    def check_based_prev_move(self):
+    def check_based_prev_move(self, destructive = True):
         last_move = self.get_last_dialogue_move()
 
         if last_move is not None:
@@ -48,3 +79,5 @@ class ORSEN2DialoguePlanner(DialoguePlanner):
     # suggestion model
     def is_ongoing_done(self):
         pass
+
+

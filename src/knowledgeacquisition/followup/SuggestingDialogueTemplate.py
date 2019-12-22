@@ -24,10 +24,6 @@ class SuggestingDialogueTemplate(DialogueTemplate):
         response.insert(0, "What if ")
         return response
 
-    def is_usable(self, to_check=[]):
-        # TODO fix fill_blank implementation
-        pass
-
     def get_template_to_use(self):
         # check if it has usable templates
         return []

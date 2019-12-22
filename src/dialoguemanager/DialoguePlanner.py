@@ -40,9 +40,14 @@ class DialoguePlanner:
         np.random.seed(DEFAULT_SEED)
         self.response = ""
 
-    def set_state(self, curr_event, num_action_events):
-        self.curr_event = curr_event
-        self.num_action_events = num_action_events
+        self.curr_world_num_events = 0
+
+    # def set_state(self, curr_event, num_action_events):
+    #     self.curr_event = curr_event
+    #     self.num_action_events = num_action_events
+
+    def set_state(self, curr_world_num_events):
+        self.curr_world_num_events = curr_world_num_events
 
     def reset_state(self):
         self.chosen_dialogue_move = None
@@ -54,6 +59,20 @@ class DialoguePlanner:
 
         self.is_usable = []
         self.is_usable = [False] * len(DIALOGUE_LIST)
+
+        self.curr_world_num_events = 0
+
+    def reset_new_world(self):
+        self.chosen_dialogue_move = None
+        self.chosen_dialogue_template = []
+        self.chosen_move_index = -1
+        self.curr_event = None
+        self.dialogue_history = []
+        self.dialogue_template = DBODialogueTemplate('templates')
+        self.frequency_count = np.zeros(len(DIALOGUE_LIST))
+        self.is_usable = [False] * len(DIALOGUE_LIST)
+        self.move_index = -1
+        self.num_action_events = 0
 
     def setup_templates_is_usable(self, move_to_execute=""):
         self.usable_templates = []
@@ -192,20 +211,12 @@ class DialoguePlanner:
 
 
     """BASIC Responses"""
-    def check_auto_response(self, destructive = True, emotion_event = None):
+
+    def check_auto_response(self, destructive=True, emotion_event=None):
         next_move = self.check_trigger_phrases()
-        if next_move != "":
-            return next_move
-        else:
-            next_move = self.check_affirm_deny(destructive, emotion_event)
         return next_move
 
     def check_trigger_phrases(self, event_chain =[]):
-        if self.response in IS_END:
-            return DIALOGUE_TYPE_E_END
-
-
-
         return ""
 
     def check_affirm_deny(self, destructive = True, emotion_event = None):
@@ -235,3 +246,41 @@ class DialoguePlanner:
 
     def get_welcome_message_type(self):
         return DIALOGUE_TYPE_WELCOME
+
+    def perform_dialogue_planner(self, dialogue_move=""):
+        #still no triggered phrase
+        if dialogue_move == "":
+            self.setup_templates_is_usable()
+
+            Logger.log_dialogue_model_basic("Breakdown of values used:")
+            Logger.log_dialogue_model_basic_example(DIALOGUE_LIST)
+            Logger.log_dialogue_model_basic_example(self.is_usable)
+            Logger.log_dialogue_model_basic_example(self.frequency_count)
+
+            print("Breakdown of values used:")
+            self.print_dialogue_list()
+
+            #choose dialogue based on dialogue history
+            self.chosen_move_index = self.choose_dialogue()
+            Logger.log_dialogue_model_basic("Chosen dialogue index: " + str(self.chosen_move_index))
+            self.chosen_dialogue_move = DIALOGUE_LIST[self.chosen_move_index].get_type()
+
+            # choose dialogue template to be used
+            self.chosen_dialogue_template = self.usable_templates[self.chosen_move_index]
+
+        else:
+            # self.setup_templates_is_usable(dialogue_move)
+            self.chosen_dialogue_move = dialogue_move
+            self.chosen_dialogue_template = self.get_usable_templates(dialogue_move)
+
+        #add chosen dialogue move to history
+        self.dialogue_history.append(DialogueHistoryTemplate(dialogue_type=self.chosen_dialogue_move))
+        print("FINAL DIALOGUE LIST: ", self.chosen_dialogue_move)
+        self.print_dialogue_list()
+
+        Logger.log_conversation("CHOSEN DIALOGUE MOVE: " + self.chosen_dialogue_move)
+
+        return self.chosen_dialogue_move
+
+    def init_set_dialogue_moves_usable(self, preselected_move=""):
+        pass
