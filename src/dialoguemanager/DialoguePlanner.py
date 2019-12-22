@@ -107,7 +107,7 @@ class DialoguePlanner:
 
         # check which template is usable
         for X in template_list:
-            if X.is_usable(self.curr_event, self.get_num_usage(X.get_type())):
+            if X.is_usable(self.curr_event, self.get_num_usage(X.get_type()), move_to_execute):
                 usable_template_list.append(X)
 
         return usable_template_list

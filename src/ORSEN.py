@@ -315,8 +315,6 @@ class ORSEN:
         self.content_determination.set_state(move_to_execute, self.dialogue_planner.curr_event, available_templates)
         response, chosen_template = self.content_determination.perform_content_determination()
 
-
-
         """FINALIZE MOVES"""
 
         #check if other dialogue moves should be appended
@@ -355,12 +353,6 @@ class ORSEN:
         return response
 
     def is_end_story(self, response):
-        # if self.is_end or \
-        #         response.lower() in IS_END or \
-        #         (self.dialogue_planner.get_last_dialogue_move() is not None and self.dialogue_planner.get_last_dialogue_move().dialogue_type == DIALOGUE_TYPE_E_END):
-        #     return True
-
-
         if CURR_ORSEN_VERSION == EDEN:
             if self.is_end or \
                     (
@@ -369,12 +361,5 @@ class ORSEN:
         else:
             if response in IS_END:
                 return True
-
-        # if response in IS_END:
-        #     return True
-        #
-        # if self.is_end or \
-        #         (self.dialogue_planner.get_last_dialogue_move() is not None and self.dialogue_planner.get_last_dialogue_move().dialogue_type == DIALOGUE_TYPE_E_END):
-        #     return True
 
         return False
