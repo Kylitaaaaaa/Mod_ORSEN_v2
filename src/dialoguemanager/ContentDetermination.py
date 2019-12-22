@@ -46,7 +46,8 @@ class ContentDetermination:
 
     def repeat_story(self, event_chains):
         response = ""
-        for event in event_chains:
+        for i in range(len(event_chains)):
+            event = event_chains[i]
             to_insert = event.subject.name + " "
             if event.get_type() == EVENT_ACTION:
                 to_insert = to_insert + str(event.verb)
@@ -56,6 +57,8 @@ class ContentDetermination:
                 # Iterate through attributes
                 for X in event.attributes:
                     to_insert = to_insert + X.keyword + " " + str(X.description.lemma_)
+            elif event.get_type() == EVENT_EMOTION:
+                to_insert = to_insert + str(event.verb)
             to_insert = to_insert + ". "
             response = response + to_insert
         return response

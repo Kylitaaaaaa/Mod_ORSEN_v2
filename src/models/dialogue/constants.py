@@ -5,43 +5,25 @@ from src.knowledgeacquisition.followup import SuggestingDialogueTemplate
 
 
 #list of all dialogue moves
+from ... import CURR_ORSEN_VERSION, ORSEN, ORSEN2, EDEN
+
 """ORSEN"""
-# DIALOGUE_LIST = [FeedbackDialogueTemplate(),
-#                  PromptDialogueTemplate(),
-#                  PumpingGeneralDialogueTemplate(),
-#                  PumpingSpecificDialogueTemplate()]
+ORSEN_RAND_DIALOGUE_LIST = [FeedbackDialogueTemplate(),
+                 PromptDialogueTemplate(),
+                 PumpingGeneralDialogueTemplate(),
+                 PumpingSpecificDialogueTemplate(),
+                 SuggestingDialogueTemplate()] ###Suggesting is same as hinting in ORSEN2 context
 
 """ORSEN 2"""
-# DIALOGUE_LIST = [FeedbackDialogueTemplate(),
-#                  PumpingGeneralDialogueTemplate(),
-#                  PumpingSpecificDialogueTemplate(),
-#                  HintingDialogueTemplate(),
-#                  SuggestingDialogueTemplate()]
+ORSEN2_RAND_DIALOGUE_LIST = [FeedbackDialogueTemplate(),
+                 PumpingGeneralDialogueTemplate(),
+                 PumpingSpecificDialogueTemplate(),
+                 HintingDialogueTemplate(),
+                 SuggestingDialogueTemplate()]
 
 """EDEN"""
-# DIALOGUE_LIST = [PumpingGeneralDialogueTemplate(),
-#                  CPumpingDialogueTemplate(),
-#                  DCorrectingDialogueTemplate(),
-#                  DPraiseDialogueTemplate(),
-#                  EEmphasisDialogueTemplate(),
-#                  DPumpingDialogueTemplate(),
-#                  ELabelDialogueTemplate(),
-#                  EvaluationDialogueTemplate(),
-#                  RecollectionDialogueTemplate(),
-#                  EEndDialogueTemplate()
-#                  ]
-
-DIALOGUE_LIST = [PumpingGeneralDialogueTemplate(),
+EDEN_RAND_DIALOGUE_LIST = [PumpingGeneralDialogueTemplate(),
                  PumpingSpecificDialogueTemplate()
-                 # CPumpingDialogueTemplate(),
-                 # DCorrectingDialogueTemplate(),
-                 # DPraiseDialogueTemplate(),
-                 # EEmphasisDialogueTemplate(),
-                 # DPumpingDialogueTemplate(),
-                 # ELabelDialogueTemplate(),
-                 # EvaluationDialogueTemplate(),
-                 # RecollectionDialogueTemplate(),
-                 # EEndDialogueTemplate()
                  ]
 
 EDEN_DIALOGUE_LIST = [CPumpingDialogueTemplate(),
@@ -53,3 +35,16 @@ EDEN_DIALOGUE_LIST = [CPumpingDialogueTemplate(),
                       RecollectionDialogueTemplate(),
                       EEndDialogueTemplate(),
                       EEmphasisDialogueTemplate()]
+
+"""VERSION CONTROL FOR RANDOMIZABLE DIALOGUE MOVES"""
+if CURR_ORSEN_VERSION == ORSEN:
+    DIALOGUE_LIST = ORSEN_RAND_DIALOGUE_LIST
+elif CURR_ORSEN_VERSION == ORSEN2:
+    DIALOGUE_LIST = ORSEN2_RAND_DIALOGUE_LIST
+elif CURR_ORSEN_VERSION == EDEN:
+    DIALOGUE_LIST = EDEN_RAND_DIALOGUE_LIST
+else:
+    DIALOGUE_LIST = ORSEN_RAND_DIALOGUE_LIST
+
+
+

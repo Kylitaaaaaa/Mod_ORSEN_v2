@@ -50,14 +50,24 @@ class DialogueTemplate(ABC):
     def get_type(self):
         return self.dialogue_type
 
-    def is_usable(self, curr_event, num_usage):
+    def is_usable(self, curr_event, num_usage, move_to_execute):
         decision = False
         if self.relation[0][0] == 'None':
             decision = True
         else:
             # Requires a relation
+            # if CURR_ORSEN_VERSION == constants.ORSEN:
+            #     if curr_event is None and move_to_execute == DIALOGUE_TYPE_PROMPT:
+            #         decision = True
+
             if curr_event is None:
-                decision = False
+                if CURR_ORSEN_VERSION == constants.ORSEN:
+                    if move_to_execute == DIALOGUE_TYPE_PROMPT:
+                        decision = True
+                    else:
+                        decision = False
+                else:
+                    decision = False
             else:
                 if len(self.blanks) == 0:
                     return True

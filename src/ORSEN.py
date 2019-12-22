@@ -315,19 +315,22 @@ class ORSEN:
         self.content_determination.set_state(move_to_execute, self.dialogue_planner.curr_event, available_templates)
         response, chosen_template = self.content_determination.perform_content_determination()
 
-
-
         """FINALIZE MOVES"""
 
         #check if other dialogue moves should be appended
         #is it necessary to repeat the story
         if self.dialogue_planner.is_repeat_story(move_to_execute):
-            emotion_story = self.content_determination.repeat_emotion_story(self.world.curr_emotion_event, self.world.event_chains)
-            if emotion_story == "":
-                response = ""
+            if CURR_ORSEN_VERSION == EDEN:
+                emotion_story = self.content_determination.repeat_emotion_story(self.world.curr_emotion_event, self.world.event_chains)
+                if emotion_story == "":
+                    response = ""
+                else:
+                    response = response + \
+                               "\n" + emotion_story
             else:
+                full_story = self.content_determination.repeat_story(self.world.event_chains)
                 response = response + \
-                           "\n" + emotion_story
+                           "\n" + full_story
 
         if self.dialogue_planner.get_second_to_last_dialogue_move() is not None and \
                 self.dialogue_planner.get_second_to_last_dialogue_move().dialogue_type == DIALOGUE_TYPE_E_FOLLOWUP:
@@ -350,13 +353,13 @@ class ORSEN:
         return response
 
     def is_end_story(self, response):
-        # if self.is_end or \
-        #         response.lower() in IS_END or \
-        #         (self.dialogue_planner.get_last_dialogue_move() is not None and self.dialogue_planner.get_last_dialogue_move().dialogue_type == DIALOGUE_TYPE_E_END):
-        #     return True
-
-        if self.is_end or \
-                (self.dialogue_planner.get_last_dialogue_move() is not None and self.dialogue_planner.get_last_dialogue_move().dialogue_type == DIALOGUE_TYPE_E_END):
-            return True
+        if CURR_ORSEN_VERSION == EDEN:
+            if self.is_end or \
+                    (
+                            self.dialogue_planner.get_last_dialogue_move() is not None and self.dialogue_planner.get_last_dialogue_move().dialogue_type == DIALOGUE_TYPE_E_END):
+                return True
+        else:
+            if response in IS_END:
+                return True
 
         return False

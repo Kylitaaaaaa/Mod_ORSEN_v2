@@ -1,6 +1,7 @@
 from src.dbo.user import DBOUser
 from src.models.user import User
-from src import Logger, IS_AFFIRM, IS_DENY, IS_END, UserHandler, DIALOGUE_TYPE_E_END, DIALOGUE_TYPE_RECOLLECTION, Pickle
+from src import Logger, IS_AFFIRM, IS_DENY, IS_END, UserHandler, DIALOGUE_TYPE_E_END, DIALOGUE_TYPE_RECOLLECTION, \
+    Pickle, CURR_ORSEN_VERSION, EDEN
 from src.ORSEN import ORSEN
 from src.textunderstanding.InputDecoder import InputDecoder
 import datetime
@@ -89,47 +90,32 @@ def start_storytelling():
     is_end_story = False
     while not is_end_story:
         start_time = time.time()
-        user_input = get_input() #TODO: Uncomment after testing
-
-        print("TRYING TO GET TIME %s: " % (time.time() - start_time))
-        print("TRYING TO GET TIME again : ", str(time.time() - start_time))
-
+        user_input = get_input()
         Logger.log_conversation("LATENCY TIME (seconds): " + str(time.time() - start_time))
-        # user_input = "John kicked the love"
         user_input = clean_user_input(user_input)
 
         Logger.log_conversation("User : " + str(user_input))
-
-        is_end_story = orsen.is_end_story(user_input)
         print("IS END STORY: ", is_end_story)
 
-        if not is_end_story:
-            orsen_response = orsen.get_response(user_input)
-            print("=========================================================")
-            print("EDEN:", orsen_response)
-            print("=========================================================")
-            Logger.log_conversation("EDEN: " + str(orsen_response))
-            is_end_story = orsen.is_end_story(user_input)
+
+        if CURR_ORSEN_VERSION == EDEN:
+            if not is_end_story:
+                orsen_response = orsen.get_response(user_input)
+                is_end_story = orsen.is_end_story(user_input)
+            else:
+                orsen_response = orsen.get_response("", move_to_execute = DIALOGUE_TYPE_RECOLLECTION)
         else:
-            """EDEN"""
-            # orsen_response = orsen.get_response("", move_to_execute = DIALOGUE_TYPE_E_END)
-            orsen_response = orsen.get_response("", move_to_execute = DIALOGUE_TYPE_RECOLLECTION)
-            # orsen_response = orsen_response + orsen.get_response("", move_to_execute = DIALOGUE_TYPE_RECOLLECTION)
-            print("=========================================================")
-            print("EDEN:", orsen_response)
-            print("=========================================================")
-            Logger.log_conversation("EDEN: " + str(orsen_response))
+            is_end_story = orsen.is_end_story(user_input)
+            if not is_end_story:
+                orsen_response = orsen.get_response(user_input)
+            else:
+                orsen_response = orsen.get_response("", move_to_execute = DIALOGUE_TYPE_RECOLLECTION)
 
+        print("=========================================================")
+        print(CURR_ORSEN_VERSION, ":", orsen_response)
+        print("=========================================================")
+        Logger.log_conversation(CURR_ORSEN_VERSION + ":" +  orsen_response)
 
-
-
-            # is_end_story = True
-
-            # """ORSEN"""
-            # print("Thank you for the story! Do you want to hear it again?")
-            # user_input = get_input()
-            # if user_input.lower() in IS_AFFIRM:
-            #     print(orsen.repeat_story())
 
 orsen = ORSEN()
 
@@ -205,7 +191,8 @@ while is_engaged:
     temp_welcome = orsen.get_response(move_to_execute = orsen.dialogue_planner.get_welcome_message_type())
     print(temp_welcome)
 
-
+    DEFAULT_SEED = time.time()
+    Logger.log_dialogue_model(("SEED VALUE:", DEFAULT_SEED))
 
     # print("Let's make another story! You go first")
     start_storytelling()

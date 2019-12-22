@@ -55,8 +55,6 @@ class DialoguePlanner:
         self.is_usable = []
         self.is_usable = [False] * len(DIALOGUE_LIST)
 
-
-
     def setup_templates_is_usable(self, move_to_execute=""):
         self.usable_templates = []
         #sets usable dialogue moves based on previous dialogue move -- modify check_based_prev_move
@@ -109,7 +107,7 @@ class DialoguePlanner:
 
         # check which template is usable
         for X in template_list:
-            if X.is_usable(self.curr_event, self.get_num_usage(X.get_type())):
+            if X.is_usable(self.curr_event, self.get_num_usage(X.get_type()), move_to_execute):
                 usable_template_list.append(X)
 
         return usable_template_list
@@ -186,9 +184,54 @@ class DialoguePlanner:
             return self.dialogue_history[len(self.dialogue_history) - 2]
         return None
 
-
     def is_move_eden(self, type):
         for X in EDEN_DIALOGUE_LIST:
             if X.dialogue_type == type:
                 return True
         return False
+
+
+    """BASIC Responses"""
+    def check_auto_response(self, destructive = True, emotion_event = None):
+        next_move = self.check_trigger_phrases()
+        if next_move != "":
+            return next_move
+        else:
+            next_move = self.check_affirm_deny(destructive, emotion_event)
+        return next_move
+
+    def check_trigger_phrases(self, event_chain =[]):
+        if self.response in IS_END:
+            return DIALOGUE_TYPE_E_END
+
+
+
+        return ""
+
+    def check_affirm_deny(self, destructive = True, emotion_event = None):
+        # check if last dialogue move has yes or no:
+        last_move = self.get_last_dialogue_move()
+        next_move = ""
+        return next_move
+
+    def check_based_prev_move(self, destructive = True):
+        return ""
+
+    def get_latest_event(self, last_fetched):
+        if len(last_fetched) > 0:
+            return last_fetched[len(last_fetched) - 1]
+        return None
+
+    def check_based_curr_event(self, detected_event, curr_event):
+        return ""
+
+    def is_repeat_story(self, move_to_execute):
+        if move_to_execute == DIALOGUE_TYPE_RECOLLECTION:
+            return True
+        return False
+
+    def finalize_dialogue_move(self, curr_dialogue_move):
+        return ""
+
+    def get_welcome_message_type(self):
+        return DIALOGUE_TYPE_WELCOME
