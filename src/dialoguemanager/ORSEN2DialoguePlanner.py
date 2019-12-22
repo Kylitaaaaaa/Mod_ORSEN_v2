@@ -15,6 +15,10 @@ class ORSEN2DialoguePlanner(DialoguePlanner):
         if preselected_move =="":
             print(self.curr_world_num_events)
 
+            #uncomment to test suggesting
+            # if len(self.get_usable_templates(DIALOGUE_TYPE_SUGGESTING)) > 0:
+            #     set_to_true.append(DIALOGUE_TYPE_SUGGESTING)
+
             if self.curr_world_num_events <=3:
                 if len(self.get_usable_templates(DIALOGUE_TYPE_FEEDBACK)) > 0:
                     set_to_true.append(DIALOGUE_TYPE_FEEDBACK)
@@ -22,7 +26,7 @@ class ORSEN2DialoguePlanner(DialoguePlanner):
                     set_to_true.append(DIALOGUE_TYPE_PUMPING_GENERAL)
                 if len(self.get_usable_templates(DIALOGUE_TYPE_PUMPING_SPECIFIC)) > 0:
                     set_to_true.append(DIALOGUE_TYPE_PUMPING_SPECIFIC)
-            elif self.curr_world_num_events ==3:
+            elif self.get_num_dialogue_history(DIALOGUE_TYPE_FEEDBACK) == 3:
                 if len(self.get_usable_templates(DIALOGUE_TYPE_PUMPING_SPECIFIC)) > 0:
                     set_to_true.append(DIALOGUE_TYPE_PUMPING_SPECIFIC)
             else:
@@ -41,14 +45,13 @@ class ORSEN2DialoguePlanner(DialoguePlanner):
         self.set_dialogue_list_true(set_to_true)
 
     ###checks only dialogue that does not need to go through text understanding
-    # def check_trigger_phrases(self, response, event_chain):
     def check_trigger_phrases(self, event_chain =[]):
-        if self.response in PUMPING_TRIGGER:
-            if len(event_chain) > 0:
-                return DIALOGUE_TYPE_PUMPING_SPECIFIC
+        if self.response in PROMPT_TRIGGER:
             return DIALOGUE_TYPE_PROMPT
-        elif self.response in PROMPT_TRIGGER:
-            return DIALOGUE_TYPE_PROMPT
+        elif self.response in HINTING_TRIGGER:
+            return DIALOGUE_TYPE_HINTING
+        elif self.response in PUMPING_TRIGGER:
+            return DIALOGUE_TYPE_PUMPING_SPECIFIC
         return ""
 
     def check_based_prev_move(self, destructive = True):
@@ -56,20 +59,21 @@ class ORSEN2DialoguePlanner(DialoguePlanner):
 
         if last_move is not None:
             print("LAST MOVE IS: ", last_move.dialogue_type)
-            ###START EDEN
-            #check if last move is eden
 
             # check if prev move is suggestion
             if last_move.dialogue_type == DIALOGUE_TYPE_SUGGESTING:
                 if self.response in IS_AFFIRM:
-                    return DIALOGUE_TYPE_SUGGESTING_AFFIRM
+                    # TODO: Add to story world
+                    pass
                 elif self.response in IS_DENY:
                     return DIALOGUE_TYPE_FOLLOW_UP
             # check if prev move is follow up
             elif last_move.dialogue_type == DIALOGUE_TYPE_FOLLOW_UP:
                 if self.response in IS_DONT_LIKE:
+                    # TODO: Point System
                     return DIALOGUE_TYPE_FOLLOW_UP_DONT_LIKE
                 if self.response in IS_WRONG:
+                    # TODO: Point System
                     return DIALOGUE_TYPE_FOLLOW_UP_WRONG
 
         else:

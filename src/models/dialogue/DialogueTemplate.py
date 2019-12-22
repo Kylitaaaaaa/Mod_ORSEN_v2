@@ -61,7 +61,7 @@ class DialogueTemplate(ABC):
             #         decision = True
 
             if curr_event is None:
-                if CURR_ORSEN_VERSION == constants.ORSEN:
+                if CURR_ORSEN_VERSION == constants.ORSEN or CURR_ORSEN_VERSION == ORSEN2:
                     if move_to_execute == DIALOGUE_TYPE_PROMPT:
                         decision = True
                     else:

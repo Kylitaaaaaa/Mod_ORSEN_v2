@@ -284,3 +284,11 @@ class DialoguePlanner:
 
     def init_set_dialogue_moves_usable(self, preselected_move=""):
         pass
+
+    def get_num_dialogue_history(self, to_check_dialogue_move):
+        count = 0
+        for curr_dialogue_move in self.dialogue_history:
+            if curr_dialogue_move.dialogue_type == to_check_dialogue_move:
+                count += 1
+
+        return count
