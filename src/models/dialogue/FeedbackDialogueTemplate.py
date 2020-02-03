@@ -24,9 +24,8 @@ class FeedbackDialogueTemplate(DialogueTemplate):
             Logger.log_dialogue_model_basic("Current Blank: " + self.blanks[i])
 
             if self.blanks[i] == 'Repeat':
-                to_insert = event.subject.name + " "
-                Logger.log_dialogue_model_basic(str(event.subject.name + " "))
-                Logger.log_dialogue_model_basic("Current Event Type: " + str(event.get_type()))
+                to_insert = self.check_subject(event.subject.name) + " "
+                # to_insert = event.subject.name + " "
                 if event.get_type() == EVENT_ACTION:
                     to_insert = to_insert + str(event.verb)
                     Logger.log_dialogue_model_basic(str(to_insert + str(event.verb)))

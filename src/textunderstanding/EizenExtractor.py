@@ -603,6 +603,7 @@ class EizenExtractor(object):
         relations = []
         extracted = self.extract_relation_via_template(template, token)
         if extracted is not None:
+            Logger.log_information_extraction_basic_example(str(extracted))
             relations.append(extracted)
         for relation in relations:
             self.add_relation_to_concepts_if_not_existing(self.convert_relation_to_lemma(relation, ents), 2)

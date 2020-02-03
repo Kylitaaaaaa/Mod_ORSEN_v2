@@ -1,3 +1,6 @@
+from src.models.pickles.PickleObject import PickleObject
+import spacy
+
 class Attribute:
 
     relation = ""
@@ -50,3 +53,12 @@ class Attribute:
             if self.description == other.desciption:
                 if self.is_negated == other.is_negated:
                     return True
+
+    def get_pickled_atribute(self):
+        pickled_attribute = PickleObject()
+        pickled_attribute.relation = str(self.relation)
+        pickled_attribute.description = str(self.description)
+        pickled_attribute.is_negated = self.is_negated
+        pickled_attribute.keyword = str(self.keyword)
+
+        return pickled_attribute

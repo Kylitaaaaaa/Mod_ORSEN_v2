@@ -1,6 +1,5 @@
 from . import DialogueTemplate
-from src.constants import DIALOGUE_TYPE_PUMPING_SPECIFIC
-from src.Logger import Logger
+from src.constants import DIALOGUE_TYPE_PUMPING_SPECIFIC, EVENT_ACTION, EVENT_CREATION, EVENT_DESCRIPTION
 
 
 class PumpingSpecificDialogueTemplate(DialogueTemplate):
@@ -17,14 +16,28 @@ class PumpingSpecificDialogueTemplate(DialogueTemplate):
             Logger.log_dialogue_model_basic("Current Blank: " + self.blanks[i])
             
             if self.blanks[i] == 'Character':
-                to_insert = event.get_characters_involved()[0].name
-                Logger.log_dialogue_model_basic(str(event.get_characters_involved()[0].name))
-            elif self.blanks[i] == 'Object':
+                to_insert = self.check_subject(event.get_characters_involved()[0].name)
+                # if event.get_characters_involved()[0].name.lower() == 'i':
+                #     to_insert = 'you'
+                # else:
+                #     to_insert = event.get_characters_involved()[0].name
+            elif self.blanks[i] == 'Object' or self.blanks[i] == 'Item':
                 to_insert = event.get_objects_involved()[0].name
                 Logger.log_dialogue_model_basic(str(event.get_objects_involved()[0].name))
             elif self.blanks[i] == 'Event':
-                to_insert = event.subject.name + " " + str(event.verb.lemma_)
-                Logger.log_dialogue_model_basic(str(event.subject.name + " " + str(event.verb.lemma_)))
+                to_insert = self.check_subject(event.subject.name) + " " + str(event.verb.lemma_)
+                # to_insert = event.subject.name + " " + str(event.verb.lemma_)
+            elif self.blanks[i] == 'Repeat':
+                to_insert = self.check_subject(event.subject.name) + " "
+                # to_insert = event.subject.name + " "
+                if event.get_type() == EVENT_ACTION:
+                    to_insert = to_insert + str(event.verb)
+                elif event.get_type() == EVENT_CREATION:
+                    to_insert = event.subject.name
+                elif event.get_type() == EVENT_DESCRIPTION:
+                    #Iterate through attributes
+                    for X in event.attributes:
+                        to_insert = to_insert + X.keyword + " " + str(X.description.lemma_)
            
             response[curr_index] = to_insert
 

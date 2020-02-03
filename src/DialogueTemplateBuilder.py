@@ -1,6 +1,8 @@
 from src.knowledgeacquisition.followup import *
 from src.models.dialogue import *
 from src.constants import *
+from src.models.dialogue.EFollowupDialogueTemplate import EFollowupDialogueTemplate
+
 
 class DialogueTemplateBuilder:
 
@@ -46,5 +48,36 @@ class DialogueTemplateBuilder:
 
       elif dialogue_type == DIALOGUE_TYPE_INPUT_MISHEARD:
          return InputMisheardDialogueTemplate(id, templates, relations, blanks, nodes, dependent_nodes)
+
+
+      elif dialogue_type == DIALOGUE_TYPE_C_PUMPING:
+         return CPumpingDialogueTemplate(id, templates, relations, blanks, nodes, dependent_nodes)
+      elif dialogue_type == DIALOGUE_TYPE_D_CORRECTING:
+         return DCorrectingDialogueTemplate(id, templates, relations, blanks, nodes, dependent_nodes)
+      elif dialogue_type == DIALOGUE_TYPE_D_PRAISE:
+         return DPraiseDialogueTemplate(id, templates, relations, blanks, nodes, dependent_nodes)
+      elif dialogue_type == DIALOGUE_TYPE_D_PUMPING:
+         return DPumpingDialogueTemplate(id, templates, relations, blanks, nodes, dependent_nodes)
+      elif dialogue_type == DIALOGUE_TYPE_E_LABEL:
+         return ELabelDialogueTemplate(id, templates, relations, blanks, nodes, dependent_nodes)
+      elif dialogue_type == DIALOGUE_TYPE_E_PUMPING:
+         return EPumpingDialogueTemplate(id, templates, relations, blanks, nodes, dependent_nodes)
+      elif dialogue_type == DIALOGUE_TYPE_EVALUATION:
+         return EvaluationDialogueTemplate(id, templates, relations, blanks, nodes, dependent_nodes)
+      elif dialogue_type == DIALOGUE_TYPE_RECOLLECTION:
+         return RecollectionDialogueTemplate(id, templates, relations, blanks, nodes, dependent_nodes)
+      elif dialogue_type == DIALOGUE_TYPE_E_END:
+         return EEndDialogueTemplate(id, templates, relations, blanks, nodes, dependent_nodes)
+      elif dialogue_type == DIALOGUE_TYPE_E_EMPHASIS:
+         return EEmphasisDialogueTemplate(id, templates, relations, blanks, nodes, dependent_nodes)
+      elif dialogue_type == DIALOGUE_TYPE_E_FOLLOWUP:
+         return EFollowupDialogueTemplate(id, templates, relations, blanks, nodes, dependent_nodes)
+
+      ##WELCOME MESSAGE
+      elif dialogue_type == DIALOGUE_TYPE_EDEN_WELCOME:
+         return EDENWelcomeDialogueTemplate(id, templates, relations, blanks, nodes, dependent_nodes)
+
+
+
       else:
          return UnknownDialogueTemplate(id, templates, relations, blanks, nodes, dependent_nodes)

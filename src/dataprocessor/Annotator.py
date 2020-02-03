@@ -35,6 +35,7 @@ class Annotator(object):
 
         try:
             Token.set_extension("is_traversed", default=False)
+
         except ValueError:
             print("Field is_traversed is already existing on Token type")
 

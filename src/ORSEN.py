@@ -1,4 +1,9 @@
+import time
+
+from EDEN.constants import EVENT_EMOTION
+from EDEN.models import Emotion
 from src.dataprocessor import Annotator
+from src.dialoguemanager import DialoguePlannerBuilder
 from src.models import World
 from src.models.elements import Attribute, Setting
 from src.models.elements import Object, Character
@@ -8,7 +13,9 @@ from . import Logger
 from src.textunderstanding.InputDecoder import InputDecoder
 from src.dialoguemanager import *
 from src.models.events import *
-import time
+from EDEN.OCC import OCCManager
+
+
 
 class ORSEN:
 
@@ -18,17 +25,29 @@ class ORSEN:
         self.annotator = Annotator()
         self.extractor = EizenExtractor()
 
-        self.dialogue_planner = DialoguePlanner()
+        # self.dialogue_planner = DialoguePlanner()
+        self.dialogue_planner = DialoguePlannerBuilder.build(CURR_ORSEN_VERSION)
         self.content_determination = ContentDetermination()
         self.initialize_story_prerequisites()
         self.user_start_time = time.time()
         self.user_end_time = time.time()
 
+        ###EDEN
+        self.occ_manager = OCCManager()
+        self.is_end = False
+        # self.world = None
+        self.user_start_time = time.time()
+        self.user_end_time = time.time()
+
     def initialize_story_prerequisites(self):
+        # self.world = None
         self.world = World()
         self.turn_count = 1
         self.prereqs = []
         self.prereqs_pointer = [0, 0]
+        # self.dialogue_planner.reset_state()
+        self.dialogue_planner.dialogue_history = []
+
 
     def add_prereq(self, prereq):
         self.prereqs.append(prereq)
@@ -46,121 +65,32 @@ class ORSEN:
             return False
         return True
 
-    def get_response(self, response):
-        Logger.log_dialogue_model("\n======= NEW UTTERANCE =======")
-        Logger.log_dialogue_model("USER INPUT: " + response)
-        Logger.log_dialogue_model("Entering ORSEN.get_response()")
-
+    def get_response(self, response="", move_to_execute = ""):
         self.user_end_time = time.time()
-        Logger.log_conversation("=== USER LATENCY TIME (seconds): " + str(self.user_end_time - self.user_start_time) + " ===")
+
+        Logger.log_conversation("USER LATENCY TIME (seconds): " + str(self.user_end_time - self.user_start_time))
+
         start_time = time.time()
 
-        result = None
+        print("=====USER RESPONSE IS: " + response)
+        if response != "":
+            Logger.log_event_response_eval(response)
 
-        # tester = 0
-        # if tester == 0:
-            
+        # orsen_reply = self.perform_dialogue_manager(response, preselected_move=move_to_execute)
         try:
-            """"
-            Check for trigger phrases 
-            """""
-            triggered_move = self.dialogue_planner.check_trigger_phrases(response, self.world.event_chains) #TODO: REMOVE AFTER TESTING
+            orsen_reply = self.perform_dialogue_manager(response, preselected_move=move_to_execute)
+        except Exception as e:
+            Logger.log_conversation("ERROR: " + str(e))
+            orsen_reply = "I see. What else can you say about that?"
 
-            if triggered_move is None:
-                #if not pump
-                """"
-                Executes text understanding part. This includes the extraction of important information in the text input 
-                (using previous sentences as context). This also including breaking the sentences into different event entities.  
-                """""
-                result = ORSEN.perform_text_understanding(self, response)
+        Logger.log_conversation("ORSEN LATENCY TIME (seconds): " + str(time.time() - start_time))
 
-                """" 
-                Executing Dialogue Manager 
-                """""
-                # if result is None:
-                #     result = ORSEN.perform_dialogue_manager(self)
-                # Try Catch
-                try:
-                    if result is None:
-                       result = ORSEN.perform_dialogue_manager(self) 
-                    # result = ORSEN.perform_dialogue_manager(self)
-                except Exception as e:
-                    Logger.log_conversation("ERROR: " + str(e))
-                    Logger.log_dialogue_model("ERROR: " + str(e))
-                    result = "I see. What else can you say about that?"
-                    Logger.log_dialogue_model("FINAL CHOSEN RESPONSE " + result)
-
-                """
-                Execute Knowledge Acquisition
-                """
-
-            else:
-                #TODO: insert KA stuff here
-                if triggered_move == DIALOGUE_TYPE_SUGGESTING_AFFIRM:
-                    #add score then general pumping
-                    last_dialogue = self.dialogue_planner.get_last_dialogue_move()
-
-                    if last_dialogue is not None:
-                        for X in last_dialogue.word_relation:
-                            Logger.log_information_extraction("Update score from suggesting + ")
-                            self.extractor.add_relation_to_concepts_if_not_existing(X, 1)
-                    # triggered_move = DIALOGUE_TYPE_PUMPING_GENERAL
-                    triggered_move = DIALOGUE_TYPE_SUGGESTING_AFFIRM
-                    pass
-                elif triggered_move == DIALOGUE_TYPE_FOLLOW_UP:
-                    # Why dont u like it or is it wrong -- called from database
-                    triggered_move = DIALOGUE_TYPE_FOLLOW_UP
-                    pass
-                elif triggered_move == DIALOGUE_TYPE_FOLLOW_UP_DONT_LIKE:
-                    # triggered_move = DIALOGUE_TYPE_PUMPING_GENERAL
-                    triggered_move = DIALOGUE_TYPE_KNOWLEDGE_ACQUISITION_PUMPING
-                    # TODO KA get the sentence?
-                elif triggered_move == DIALOGUE_TYPE_FOLLOW_UP_WRONG:
-                    #deduct score then general pumping
-                    Logger.log_information_extraction("Update score from suggesting - ")
-                    last_dialogue = self.dialogue_planner.get_last_dialogue_move()
-                    print(last_dialogue.dialogue_type)
-
-                    suggestion_word_relation = self.dialogue_planner.get_suggestion_word_rel()
-                    print(suggestion_word_relation)
-                    if last_dialogue is not None:
-                        for X in suggestion_word_relation:
-                            self.extractor.remove_relation_to_concepts_if_not_valid(X)
-                    # triggered_move = DIALOGUE_TYPE_PUMPING_GENERAL
-                    triggered_move = DIALOGUE_TYPE_KNOWLEDGE_ACQUISITION_PUMPING
-                    # TODO KA get the sentence?
-
-                elif triggered_move == DIALOGUE_TYPE_PUMPING_SPECIFIC:
-                    self.world.curr_event = self.world.event_chains[len(self.world.event_chains)-1]
-
-                #if prompt
-                # if result is None:
-                #     result = ORSEN.perform_dialogue_manager(self, triggered_move)
-                # Try Catch
-                try:
-                    if result is None:
-                        result = ORSEN.perform_dialogue_manager(self, triggered_move)
-                    #result = ORSEN.perform_dialogue_manager(self, triggered_move)
-                except Exception as e:
-                    Logger.log_conversation("ERROR: " + str(e))
-                    Logger.log_dialogue_model("ERROR: " + str(e))
-                    result = "I see. What else can you say about that?"
-                    Logger.log_dialogue_model("FINAL CHOSEN RESPONSE " + result)
-
-            self.dialogue_planner.reset_state()
-            
-        except Exception as e :
-            Logger.log_conversation("Error: " + str(e))
-            print("ERROR")
-            result = "I see. What else can you say about that?"
-
-        Logger.log_conversation("=== ORSEN LATENCY TIME (seconds): " + str(time.time() - start_time) + " ===")
         self.user_start_time = time.time()
-
-        return result
+        return orsen_reply
 
 
     def perform_text_understanding(self, response):
+
 
         story = response
         result = None
@@ -333,30 +263,83 @@ class ORSEN:
 
         for i in range(len(current_event_list)):
             self.world.add_event(current_event_list[i], current_sentence_list[i])
+        print(current_event_list)
+        self.world.last_fetched = current_event_list
 
         for i in range(len(current_setting_list)):
             self.world.add_setting(setting)
 
-        return result
+    def perform_dialogue_manager(self, response, preselected_move=""):
+        curr_event = None
+        move_to_execute = ""
 
-    def perform_dialogue_manager(self, move_to_execute=""):
-        # curr_event = None
-        curr_event = self.world.curr_event
-        print("THIS IS THE CURRENT EVENT")
-        print(curr_event)
+        #set response in dialogue planner
+        self.dialogue_planner.response = response.lower()
+        move_to_execute = ""
 
-        Logger.log_dialogue_model("Entering perform_dialogue_manager")
-        Logger.log_dialogue_model_basic("THIS IS THE CURRENT EVENT:")
-        Logger.log_dialogue_model(curr_event)
+        # gets move to execute -- uses passed if not empty, asks dialogue planner to decide otherwise
+        #usually used for testing
+        if preselected_move != "":
+            move_to_execute = preselected_move
+            print("----------PRESELECTED: ", move_to_execute)
 
-        self.dialogue_planner.set_state(curr_event, self.world.get_num_action_events())
+        elif self.dialogue_planner.check_auto_response(destructive = False, emotion_event = self.world.curr_emotion_event) != "":
+            # check if trigger phrases, affirm, deny responses
+            move_to_execute = self.dialogue_planner.check_auto_response(emotion_event = self.world.curr_emotion_event)
+            print("----------AUTO: ", move_to_execute)
 
-        # move_to_execute == DIALOGUE_TYPE_HINTING #TODO remove if done
-        if move_to_execute == "":
-            move_to_execute = self.dialogue_planner.perform_dialogue_planner()
+        # regardless if model is done or not, undergo text understanding
+        elif self.dialogue_planner.check_based_prev_move(destructive = False) != "":
+            self.perform_text_understanding(response)
+            move_to_execute = self.dialogue_planner.check_based_prev_move()
+            print("----------BASED ON PREV MOVE: ", move_to_execute)
+            
+            # ADDED
+            last_move = self.dialogue_planner.get_last_dialogue_move()
+            if move_to_execute == DIALOGUE_TYPE_SUGGESTING_AFFIRM:
+                # TODO: Add to story world
+                self.extractor.add_relation_to_concepts_if_not_existing(last_move.word_relation)
+                self.world.add_event(None, last_move.word_relation)
+
+            elif move_to_execute == DIALOGUE_TYPE_FOLLOW_UP_WRONG:
+                # TODO: Point System
+                self.extractor.remove_relation_to_concepts_if_not_valid(last_move.word_relation)
+            # END 
+
         else:
-            self.dialogue_planner.perform_dialogue_planner(move_to_execute)
+            self.perform_text_understanding(response)
 
+            print("LAST FETCHED IS: ", len(self.world.last_fetched))
+            Logger.log_occ_values_basic(response)
+            detected_event = self.dialogue_planner.get_latest_event(self.world.last_fetched)
+            if detected_event is not None and detected_event.type == EVENT_EMOTION:
+                print("ADDED EMOTION EVENT: ", detected_event.sequence_number)
+                self.world.emotion_events.append(detected_event)
+
+            new_move_from_old = self.dialogue_planner.\
+                check_based_curr_event(detected_event, self.world.curr_emotion_event)
+            print("----------EVENT: ", move_to_execute)
+
+            if new_move_from_old == "":
+                #no new move found
+                if detected_event is not None and detected_event.type == EVENT_EMOTION and not self.dialogue_planner.ongoing_c_pumping:
+                    self.world.curr_emotion_event = detected_event
+                    self.dialogue_planner.curr_event = self.world.curr_emotion_event
+
+                    move_to_execute = DIALOGUE_TYPE_E_LABEL
+                else:
+                    move_to_execute = ""
+                    self.dialogue_planner.curr_event = self.world.curr_event
+
+                print("----------NO MOVE SELECTED: ", move_to_execute)
+            else:
+                #for emphasis
+                self.dialogue_planner.curr_event = self.world.curr_emotion_event
+
+                move_to_execute = new_move_from_old
+
+        self.dialogue_planner.perform_dialogue_planner(move_to_execute)
+        #fetches templates of chosen dialogue move
         available_templates = self.dialogue_planner.chosen_dialogue_template
 
         # [CELINA] if there are no avail templates, choose general pump
@@ -365,62 +348,51 @@ class ORSEN:
             available_templates = self.dialogue_planner.chosen_dialogue_template
 
         # send current event to ContentDetermination
-        self.content_determination.set_state(move_to_execute, curr_event, available_templates)
-        # [CELINA] I added self.dialogue_planner.dialogue_history sa parameter for the KA part
-        response, chosen_template = self.content_determination.perform_content_determination(self.dialogue_planner.dialogue_history)
+        self.content_determination.set_state(move_to_execute, self.dialogue_planner.curr_event, available_templates)
+        response, chosen_template = self.content_determination.perform_content_determination()
 
-        #setting template details
-        print("CHOSEN TEMPLATE: ", type(chosen_template))
-        print("FINAL CHOSEN TEMPLATE: ", chosen_template)
+
+
+        """FINALIZE MOVES"""
+
+        #check if other dialogue moves should be appended
+        #is it necessary to repeat the story
+        if self.dialogue_planner.is_repeat_story(move_to_execute):
+            emotion_story = self.content_determination.repeat_emotion_story(self.world.curr_emotion_event, self.world.event_chains)
+            if emotion_story == "":
+                response = ""
+            else:
+                response = response + \
+                           "\n" + emotion_story
+
+        if self.dialogue_planner.get_second_to_last_dialogue_move() is not None and \
+                self.dialogue_planner.get_second_to_last_dialogue_move().dialogue_type == DIALOGUE_TYPE_E_FOLLOWUP:
+            response = "Thank you for clarifying that. " + response
+        #update event chain with new emotion
+        if move_to_execute == DIALOGUE_TYPE_C_PUMPING:
+            self.world.curr_emotion_event.emotion = self.dialogue_planner.curr_event.emotion
+            self.world.emotion_events[len(self.world.emotion_events)-1] = self.world.curr_emotion_event
+
+        #saves dialogue move to history
         self.dialogue_planner.set_template_details_history(chosen_template)
 
-        Logger.log_dialogue_model_basic("FINAL CHOSEN TEMPLATE: " + str(chosen_template))
-        Logger.log_dialogue_model_basic("FINAL CHOSEN RESPONSE: " + str(response))
+        followup_move = self.dialogue_planner.finalize_dialogue_move(move_to_execute)
+        if followup_move != "":
+            response = response + self.perform_dialogue_manager(response="", preselected_move=followup_move)
+
+        self.dialogue_planner.reset_state()
+
 
         return response
 
-    def repeat_story(self):
-        response = ""
-        for event in self.world.event_chains:
-            to_insert = ""
-            
-            if event.get_type() == EVENT_ACTION:
-                
-                to_insert = str(event.subject.name) + " "
-                to_insert += str(event.verb.lemma_)
-                
-                if event.direct_object is not None:
-                    to_insert += " " + str(event.direct_object.name)
-                
-                if event.adverb is not None:
-                    to_insert += " " + str(event.adverb)
-                
-                if str(event.preposition).strip() != "":
-                    to_insert += " " + str(event.preposition)
-                    
-                if str(event.object_of_preposition).strip() != "":
-                    to_insert += " " + str(event.object_of_preposition)
-                
-            elif event.get_type() == EVENT_CREATION:
-                
-                to_insert = "Entity " + str(event.subject.name) + " is introduced"
-                
-            elif event.get_type() == EVENT_DESCRIPTION:
-                
-                to_insert = str(event.subject.name) + " is described as "
-                # Iterate through attributes
-                for i in range(len(event.attributes)):
-                    attribute = event.attributes[i]
-                    to_insert += str(attribute.description.lemma_)
-                    if i == len(event.attributes) - 1 :
-                        pass
-                    else:
-                        to_insert += ", "
-            
-            to_insert = to_insert.strip() + ". "
-            to_insert = to_insert.capitalize()
-            response = response + to_insert
-            
-        return response
+    def is_end_story(self, response):
+        # if self.is_end or \
+        #         response.lower() in IS_END or \
+        #         (self.dialogue_planner.get_last_dialogue_move() is not None and self.dialogue_planner.get_last_dialogue_move().dialogue_type == DIALOGUE_TYPE_E_END):
+        #     return True
 
+        if self.is_end or \
+                (self.dialogue_planner.get_last_dialogue_move() is not None and self.dialogue_planner.get_last_dialogue_move().dialogue_type == DIALOGUE_TYPE_E_END):
+            return True
 
+        return False

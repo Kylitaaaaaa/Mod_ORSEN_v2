@@ -1,8 +1,18 @@
+"""DIALOGUE PLANNER"""
+ORSEN = "ORSEN"
+ORSEN2 = "ORSEN2"
+EDEN = "EREN"
+
+"""UPDATE DEPENDING ON THE MODULE TO BE USED"""
+CURR_ORSEN_VERSION = EDEN
+
 """ FOR LOGS """
 CONVERSATION_LOG = "conversation"
 INFORMATION_EXTRACTION_LOG = "information_extraction"
 DIALOGUE_MODEL_LOG = "dialogue_model"
 EVENT_CHAIN_LOG = "event chain"
+EMOTION_CLASSIFICATION = "emotion classification"
+DUMP_LOG = "dump"
 
 """ PACKAGE VERSIONING CONTROL """
 SPACY_VERSION = '2.1.0'
@@ -22,7 +32,8 @@ FETCH_ALL = 2
 """ GENERIC RESPONSES """
 IS_AFFIRM = ['yes', 'yes.', 'yeah', 'yeah.', 'sure', 'sure.', 'yup', 'yup.']
 IS_DENY = ['no', 'no.', 'nope', 'nope.']
-IS_END = ['bye', 'bye.', 'the end', 'the end.']
+IS_END = ['bye', 'bye.', 'the end', 'the end.', 'STOP']
+IS_DONE_EXPLAINING = ['nothing', 'i dont know', 'nothing.', 'i dont know.']
 
 """ORSEN2 RESPONSES"""
 IS_DONT_LIKE = ['dont like', 'dont like.', 'don\'t like', 'don\'t like.']
@@ -34,6 +45,9 @@ IS_WRONG = ['wrong', 'wrong.']
 EVENT_ACTION = "ACTION_EVENT"
 EVENT_CREATION = "CREATION_EVENT"
 EVENT_DESCRIPTION = "DESCRIPTION_EVENT"
+
+# EMOTION_EVENT_ACTION = "EMOTION_ACTION_EVENT"
+# EMOTION_EVENT_DESCRIPTION = "EMOTION_DESCRIPTION_EVENT"
 
 SETTING_PLACE = 'PLACE'
 SETTING_DATE = 'DATE'
@@ -83,6 +97,25 @@ DIALOGUE_TYPE_KNOWLEDGE_ACQUISITION_PUMPING = "knowledge_acquisition_pumping"
 
 DIALOGUE_TYPE_INPUT_MISHEARD = "INPUT_MISHEARD"
 DIALOGUE_TYPE_UNKNOWN = "UNKNOWN"
+
+#EDEN
+DIALOGUE_TYPE_E_LABEL = "e-label"
+DIALOGUE_TYPE_E_PUMPING = "e-pumping"
+DIALOGUE_TYPE_C_PUMPING = "c-pumping"
+DIALOGUE_TYPE_D_PRAISE = "d-praise"
+DIALOGUE_TYPE_E_EMPHASIS = "e-emphasis"
+DIALOGUE_TYPE_D_CORRECTING = "d-correcting"
+DIALOGUE_TYPE_D_PUMPING = "d-pumping"
+DIALOGUE_TYPE_EVALUATION = "evaluation"
+DIALOGUE_TYPE_RECOLLECTION = "recollection"
+DIALOGUE_TYPE_E_END = "e-end"
+EDEN_LAST_MODEL_MOVE = DIALOGUE_TYPE_RECOLLECTION
+DIALOGUE_TYPE_E_FOLLOWUP = "e-followup"
+DIALOGUE_TYPE_EDEN_WELCOME = "eden_welcome"
+
+
+"""ORSEN"""
+DIALOGUE_TYPE_ORSEN_WELCOME = "orsen_welcome"
 
 """ CONSTANTS BASED ON ENGLISH CONCEPTS """
 
@@ -145,3 +178,4 @@ SUGGESTING_TRIGGER = ["give me a suggestion", "give me a suggestion."]
 MIGRATION_SCORE_THRESHOLD = 5
 
 DEFAULT_SEED = 1
+

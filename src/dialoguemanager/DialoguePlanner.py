@@ -3,14 +3,14 @@ import random
 import numpy as np
 import time
 
+from EDEN.constants import EMOTION_TYPE_POSITIVE
 from src import Logger, DIALOGUE_TYPE_FEEDBACK, DIALOGUE_TYPE_PUMPING_GENERAL, DIALOGUE_TYPE_HINTING, DEFAULT_SEED, \
     DIALOGUE_TYPE_SUGGESTING, DIALOGUE_TYPE_FOLLOW_UP, IS_AFFIRM, IS_DONT_LIKE, IS_WRONG, \
     DIALOGUE_TYPE_FOLLOW_UP_DONT_LIKE, DIALOGUE_TYPE_FOLLOW_UP_WRONG, IS_DENY, DIALOGUE_TYPE_SUGGESTING_AFFIRM, \
     DIALOGUE_TYPE_KNOWLEDGE_ACQUISITION_PUMPING
 from src.models.dialogue import DialogueHistoryTemplate
 from src.models.dialogue.constants import *
-from src.dbo.dialogue.DBODialogueTemplate import DBODialogueTemplate, PUMPING_TRIGGER, PROMPT_TRIGGER, HINTING_TRIGGER, SUGGESTING_TRIGGER, \
-    DIALOGUE_TYPE_PUMPING_SPECIFIC, DIALOGUE_TYPE_PROMPT
+from src.dbo.dialogue.DBODialogueTemplate import *
 
 FALLBACK_DIALOGUE_MOVE = 1  # GENERAL DIALOGUE TEMPLATE
 MAX_WAITING_TIME = 7000  # 7 SECONDS
@@ -39,6 +39,7 @@ class DialoguePlanner:
         self.num_action_events = 0
         # TODO seed(Handle triggered
         np.random.seed(DEFAULT_SEED)
+        self.response = ""
 
     def set_state(self, curr_event, num_action_events):
         self.curr_event = curr_event
@@ -49,7 +50,7 @@ class DialoguePlanner:
         self.chosen_dialogue_template = []
         self.chosen_move_index = -1
         self.move_index = -1
-        self.curr_event = None
+        # self.curr_event = None
         self.num_action_events = 0
 
         self.is_usable = []
@@ -89,10 +90,12 @@ class DialoguePlanner:
         
         Logger.log_dialogue_model_basic("FINAL CHOSEN DIALOGUE MOVE: " + str(self.chosen_dialogue_move))
 
-        return self.chosen_dialogue_move
 
-    def setup_templates_is_usable(self):
-        self.init_set_dialogue_moves_usable()
+    def setup_templates_is_usable(self, move_to_execute=""):
+        self.usable_templates = []
+        #sets usable dialogue moves based on previous dialogue move -- modify check_based_prev_move
+        self.init_set_dialogue_moves_usable(move_to_execute)
+
         # fetch all usable dialogue templates
 
         # For Logging
@@ -121,36 +124,12 @@ class DialoguePlanner:
         
         print("UOL")
 
-
-    def init_set_dialogue_moves_usable(self):
-        # check which dialogue moves are usable
-        set_to_true = []
-
-        # set_to_true.append(DIALOGUE_TYPE_HINTING)
-        # set_to_true.append(DIALOGUE_TYPE_SUGGESTING)
-
-        if self.num_action_events <= 3:
-            set_to_true.append(DIALOGUE_TYPE_FEEDBACK)
-            set_to_true.append(DIALOGUE_TYPE_PUMPING_GENERAL)
-
-        # elif (self.get_num_usage(DIALOGUE_TYPE_FEEDBACK) + self.get_num_usage(DIALOGUE_TYPE_PUMPING_GENERAL) + self.get_num_usage(DIALOGUE_TYPE_PUMPING_SPECIFIC) + self.get_num_usage(DIALOGUE_TYPE_SUGGESTING)) % 4 == 0:
-        #     set_to_true = ['feedback', 'suggesting']
-
-        elif self.get_num_usage(DIALOGUE_TYPE_FEEDBACK) + self.get_num_usage(DIALOGUE_TYPE_PUMPING_GENERAL) == 3:
-            set_to_true.append(DIALOGUE_TYPE_PUMPING_SPECIFIC)
-            set_to_true.append(DIALOGUE_TYPE_PUMPING_GENERAL)
-
-        else:
-            # set_to_true = [True for i in range(len(DIALOGUE_LIST))]
-            set_to_true = ['feedback', 'general', 'specific', 'hinting', 'suggesting']
-            
-        self.set_dialogue_list_true(set_to_true)
-
     def set_dialogue_list_true(self, set_to_true):
         for i in range(len(set_to_true)):
             for j in range(len(DIALOGUE_LIST)):
                 if DIALOGUE_LIST[j].get_type() == set_to_true[i]:
                     self.is_usable[j] = True
+
 
         self.print_dialogue_list()
 
@@ -177,9 +156,6 @@ class DialoguePlanner:
 
         # check which template is usable
         for X in template_list:
-            print("Checking:", X)
-            Logger.log_dialogue_model("Checking template " + str(X))
-
             if X.is_usable(self.curr_event, self.get_num_usage(X.get_type())):
                 usable_template_list.append(X)
         return usable_template_list
@@ -203,15 +179,11 @@ class DialoguePlanner:
             weights_to_use - np.asarray(weights_to_use)
 
             numerator = max_value_list - weights_to_use
-            print(numerator)
 
             probability = numerator / max_value_list
-            print(probability)
 
         candidates = np.argwhere(probability == np.amax(probability))
         candidates = candidates.flatten().tolist()
-        print("Candidates")
-        print(candidates)
 
         # np.random.seed(int(self.seed_time))
         choice = np.random.choice(candidates)
@@ -306,3 +278,15 @@ class DialoguePlanner:
         elif self.dialogue_history[len(self.dialogue_history)-2].dialogue_type == DIALOGUE_TYPE_SUGGESTING:
             print(self.dialogue_history[len(self.dialogue_history)-2].dialogue_type)
             return self.dialogue_history[len(self.dialogue_history)-2].word_relation
+
+    def get_second_to_last_dialogue_move(self):
+        if len(self.dialogue_history) >=2:
+            return self.dialogue_history[len(self.dialogue_history) - 2]
+        return None
+
+
+    def is_move_eden(self, type):
+        for X in EDEN_DIALOGUE_LIST:
+            if X.dialogue_type == type:
+                return True
+        return False

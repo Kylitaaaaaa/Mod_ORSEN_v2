@@ -14,4 +14,16 @@ from .PumpingSpecificDialogueTemplate import PumpingSpecificDialogueTemplate
 
 from .DialogueHistoryTemplate import DialogueHistoryTemplate
 
+"""EDEN"""
+from .CPumpingDialogueTemplate import CPumpingDialogueTemplate
+from .DCorrectingDialogueTemplate import DCorrectingDialogueTemplate
+from .DPraiseDialogueTemplate import DPraiseDialogueTemplate
+from .DPumpingDialogueTemplate import DPumpingDialogueTemplate
+from .ELabelDialogueTemplate import ELabelDialogueTemplate
+from .EPumpingDialogueTemplate import EPumpingDialogueTemplate
+from .EvaluationDialogueTemplate import EvaluationDialogueTemplate
+from .RecollectionDialogueTemplate import RecollectionDialogueTemplate
+from .EEndDialogueTemplate import EEndDialogueTemplate
+from .EEmphasisDialogueTemplate import EEmphasisDialogueTemplate
+from .EDENWelcomeDialogueTemplate import EDENWelcomeDialogueTemplate
 

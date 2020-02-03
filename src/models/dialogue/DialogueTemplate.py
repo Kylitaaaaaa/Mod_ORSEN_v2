@@ -74,55 +74,45 @@ class DialogueTemplate(ABC):
         return decision
 
 
-    def is_usable_relation(self, curr_event):
+    def is_usable_relation(self, curr_event, suggesting_first_try = True):
         # putangina 16 hours ko to ginawa
         blank_list = []
 
         for i in range (len(self.blanks)):
             temp_list = []
-            Logger.log_dialogue_model_basic("Current Blank: " + str(self.blanks[i]))
-
             if self.blanks[i] == 'Character' or self.blanks[i] == 'Object':
                 # check <index> <Character>
                 # check <index> <Object>
                 temp_list = self.get_element_list(self.blanks[i], curr_event)
             elif self.blanks[i] == 'IsA':
                 # check <index> <isA> weekday
-                # TODO randomizer should not be here, will fix this pa
-                temp_list = self.dbo_concept.get_concept_by_second_relation(self.relation[i][2], self.relation[i][1])
-                Logger.log_dialogue_model_basic_example("List of Valid Relations: ")
-                for x in range(len(temp_list)):
-                    Logger.log_dialogue_model_basic_example(str(temp_list[x]))
-                
-                updated_list =[]
-                if (len(temp_list) > 0):
-                    updated_list.append(np.random.choice(temp_list))
-                    Logger.log_dialogue_model_basic_example("Chosen Relation: ")
-                    Logger.log_dialogue_model_basic_example(str(updated_list[0]))
-
-                temp_list = updated_list
+                temp_list = self.dbo_concept.get_concept_by_second_relation(self.relation[i][1], self.relation[i][2])
             else:
                 #check <index> <relation> <index>
                 temp_list = self.get_rel_list(blank_list, self.relation[i])
 
             if len(temp_list) > 0:
                 blank_list = self.update_list(blank_list, temp_list)
-                print("DialogueTemplate Line 114 ", blank_list)
-
             else:
                 print("NO RELATIONS FOUND")
-                Logger.log_dialogue_model_basic_example("NO RELATIONS FOUND")
                 return False
-
         if len(blank_list) > 0:
-            # TODO: Randomizer should not be here, relations_blanks for suggesting and hinting
             self.relations_blanks = blank_list
             return True
         else:
-            print("NO RELATIONS FOUND")
-            Logger.log_dialogue_model_basic_example("NO RELATIONS FOUND")
-        return False
 
+            # ADDED
+            if suggesting_first_try:
+                if self.dialogue_type == DIALOGUE_TYPE_SUGGESTING:
+                    self.dbo_concept = DBOConceptGlobalImpl()
+                    self.is_usable_relation(curr_event, False)
+                    self.dbo_concept = DBOConceptLocalImpl()
+            else:
+                print("NO RELATIONS FOUND")
+            
+            # END
+        return False
+        
     def update_list(self, init_list, to_add_list):
         final_list = []
         #CELINA NOTES: Why may "[]" yun X? [X]
@@ -278,6 +268,14 @@ class DialogueTemplate(ABC):
             if len(curr_event.get_objects_involved()) > 0:
                 return True
             return False
+        elif blank_type == 'Emotion':
+            # if len(curr_event) > 0:
+            #     if curr_event
+            print("EMOTION IS PRESENT: ", curr_event.emotion)
+            if curr_event is not "":
+                return True
+        return False
+
 
     def get_word_relations(self):
         word_rel = []
@@ -307,8 +305,19 @@ class DialogueTemplate(ABC):
 
         return word_rel
 
+    def check_subject(self, subj_to_check):
+        subj_to_check = subj_to_check.lower()
+
+        if subj_to_check == 'i' or subj_to_check == 'we' or subj_to_check == 'us':
+            return 'you'
+        elif subj_to_check == 'my':
+            return 'your'
+        return subj_to_check
+
     @staticmethod
     @abstractmethod
     def get_template_to_use(self):
         # check if it has usable templates
         return []
+
+

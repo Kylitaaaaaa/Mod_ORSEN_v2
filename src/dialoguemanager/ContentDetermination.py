@@ -2,7 +2,8 @@ import numpy as np
 
 from src import DEFAULT_SEED
 from src.constants import DIALOGUE_TYPE_KNOWLEDGE_ACQUISITION_PUMPING #[Celina]
-from src.Logger import Logger
+from EDEN.constants import EVENT_EMOTION
+from src import DEFAULT_SEED, EVENT_ACTION, EVENT_CREATION, EVENT_DESCRIPTION
 
 
 class ContentDetermination:
@@ -23,13 +24,9 @@ class ContentDetermination:
         self.curr_event = []
         self.usable_template_list = []
 
-    def perform_content_determination(self, dialogue_history):
-        Logger.log_dialogue_model("Filling up the template")
-        print("FETCHING: ", self.move_to_execute)
-
+    def perform_content_determination(self):
         #choose template
         chosen_template = self.choose_template()
-        print("CHOSEN TEMPLATE IS: ", chosen_template)
 
         #fill template to use
         # if template has no fillable blanks, enter this particular if statement
@@ -55,20 +52,52 @@ class ContentDetermination:
             # TODO replace multiple occurences of spaces with only one space.
         else:
             str_response = response
-        print("RESPONSE IS: ", str_response)
 
         self.reset_state()
         return str_response, chosen_template
 
     def choose_template(self):
-        print("templates:")
-        print(self.usable_template_list)
-        
-        if (len(self.usable_template_list) > 0):
-            return np.random.choice(self.usable_template_list)
-        else:
-            # return empty list lang? di ko sure if tama :(
-            return self.usable_template_list
+        return np.random.choice(self.usable_template_list)
+
+    def repeat_story(self, event_chains):
+        response = ""
+        for event in event_chains:
+            to_insert = event.subject.name + " "
+            if event.get_type() == EVENT_ACTION:
+                to_insert = to_insert + str(event.verb)
+            elif event.get_type() == EVENT_CREATION:
+                to_insert = event.subject.name
+            elif event.get_type() == EVENT_DESCRIPTION:
+                # Iterate through attributes
+                for X in event.attributes:
+                    to_insert = to_insert + X.keyword + " " + str(X.description.lemma_)
+            to_insert = to_insert + ". "
+            response = response + to_insert
+        return response
+
+    def repeat_emotion_story(self, curr_emotion_event, event_chains):
+        if curr_emotion_event is None:
+            return ""
+
+        # self.world.curr_emotion_event.sequence_number
+        response = ""
+        for i in range (curr_emotion_event.sequence_number-1, len(event_chains)):
+            event = event_chains[i]
+            to_insert = event.subject.name + " "
+            if event.get_type() == EVENT_ACTION:
+                to_insert = to_insert + str(event.verb)
+            elif event.get_type() == EVENT_CREATION:
+                to_insert = event.subject.name
+            elif event.get_type() == EVENT_DESCRIPTION:
+                # Iterate through attributes
+                for X in event.attributes:
+                    to_insert = to_insert + X.keyword + " " + str(X.description.lemma_)
+            elif event.get_type() == EVENT_EMOTION:
+                to_insert = to_insert + str(event.verb)
+            to_insert = to_insert + ". "
+            response = response + to_insert
+        return response
+
 
 
 
