@@ -20,6 +20,8 @@ class DialoguePlanner:
 
     def __init__(self):
         super().__init__()
+    
+    def reset_new_world(self):
         self.frequency_count = np.zeros(len(DIALOGUE_LIST))
         self.is_usable = [False] * len(DIALOGUE_LIST)
         self.move_index = -1
@@ -124,28 +126,24 @@ class DialoguePlanner:
             self.is_usable[i] = self.is_dialogue_usable(DIALOGUE_LIST[i].get_type(), self.usable_templates[i])
 
         def init_set_dialogue_moves_usable(self):
-        # check which dialogue moves are usable
-        set_to_true = []
+            # check which dialogue moves are usable
+            set_to_true = []
 
-        # set_to_true.append(DIALOGUE_TYPE_HINTING)
-        # set_to_true.append(DIALOGUE_TYPE_SUGGESTING)
+            # set_to_true.append(DIALOGUE_TYPE_HINTING)
+            set_to_true.append(DIALOGUE_TYPE_SUGGESTING)
 
-        if self.num_action_events <= 3:
-            set_to_true.append(DIALOGUE_TYPE_FEEDBACK)
-            set_to_true.append(DIALOGUE_TYPE_PUMPING_GENERAL)
+            # if self.num_action_events <= 3:
+            #     set_to_true.append(DIALOGUE_TYPE_FEEDBACK)
+            #     set_to_true.append(DIALOGUE_TYPE_PUMPING_GENERAL)
 
-        # elif (self.get_num_usage(DIALOGUE_TYPE_FEEDBACK) + self.get_num_usage(DIALOGUE_TYPE_PUMPING_GENERAL) + self.get_num_usage(DIALOGUE_TYPE_PUMPING_SPECIFIC) + self.get_num_usage(DIALOGUE_TYPE_SUGGESTING)) % 4 == 0:
-        #     set_to_true = ['feedback', 'suggesting']
+            # elif self.get_num_usage(DIALOGUE_TYPE_FEEDBACK) + self.get_num_usage(DIALOGUE_TYPE_PUMPING_GENERAL) == 3:
+            #     set_to_true.append(DIALOGUE_TYPE_PUMPING_SPECIFIC)
+            #     set_to_true.append(DIALOGUE_TYPE_PUMPING_GENERAL)
 
-        elif self.get_num_usage(DIALOGUE_TYPE_FEEDBACK) + self.get_num_usage(DIALOGUE_TYPE_PUMPING_GENERAL) == 3:
-            set_to_true.append(DIALOGUE_TYPE_PUMPING_SPECIFIC)
-            set_to_true.append(DIALOGUE_TYPE_PUMPING_GENERAL)
-
-        else:
-            # set_to_true = [True for i in range(len(DIALOGUE_LIST))]
-            set_to_true = ['feedback', 'general', 'specific', 'hinting', 'suggesting']
-            
-        self.set_dialogue_list_true(set_to_true)
+            # else:
+            #     set_to_true = ['feedback', 'general', 'specific', 'hinting', 'suggesting']
+                
+            self.set_dialogue_list_true(set_to_true)
 
     def set_dialogue_list_true(self, set_to_true):
         for i in range(len(set_to_true)):
@@ -314,3 +312,6 @@ class DialoguePlanner:
             if X.dialogue_type == type:
                 return True
         return False
+    
+    def get_welcome_message_type(self):
+        return DIALOGUE_TYPE_ORSEN_WELCOME

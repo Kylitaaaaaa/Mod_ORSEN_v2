@@ -77,11 +77,11 @@ class ORSEN:
             Logger.log_event_response_eval(response)
 
         # orsen_reply = self.perform_dialogue_manager(response, preselected_move=move_to_execute)
-        try:
-            orsen_reply = self.perform_dialogue_manager(response, preselected_move=move_to_execute)
-        except Exception as e:
-            Logger.log_conversation("ERROR: " + str(e))
-            orsen_reply = "I see. What else can you say about that?"
+        # try:
+        orsen_reply = self.perform_dialogue_manager(response, preselected_move=move_to_execute)
+        # except Exception as e:
+        # Logger.log_conversation("ERROR: " + str(e))
+        # orsen_reply = "I see. What else can you say about that?"
 
         Logger.log_conversation("ORSEN LATENCY TIME (seconds): " + str(time.time() - start_time))
 
@@ -357,28 +357,29 @@ class ORSEN:
 
         #check if other dialogue moves should be appended
         #is it necessary to repeat the story
-        if self.dialogue_planner.is_repeat_story(move_to_execute):
-            emotion_story = self.content_determination.repeat_emotion_story(self.world.curr_emotion_event, self.world.event_chains)
-            if emotion_story == "":
-                response = ""
-            else:
-                response = response + \
-                           "\n" + emotion_story
+        if CURR_ORSEN_VERSION == EDEN:
+            if self.dialogue_planner.is_repeat_story(move_to_execute):
+                emotion_story = self.content_determination.repeat_emotion_story(self.world.curr_emotion_event, self.world.event_chains)
+                if emotion_story == "":
+                    response = ""
+                else:
+                    response = response + \
+                            "\n" + emotion_story
 
-        if self.dialogue_planner.get_second_to_last_dialogue_move() is not None and \
-                self.dialogue_planner.get_second_to_last_dialogue_move().dialogue_type == DIALOGUE_TYPE_E_FOLLOWUP:
-            response = "Thank you for clarifying that. " + response
-        #update event chain with new emotion
-        if move_to_execute == DIALOGUE_TYPE_C_PUMPING:
-            self.world.curr_emotion_event.emotion = self.dialogue_planner.curr_event.emotion
-            self.world.emotion_events[len(self.world.emotion_events)-1] = self.world.curr_emotion_event
+            if self.dialogue_planner.get_second_to_last_dialogue_move() is not None and \
+                    self.dialogue_planner.get_second_to_last_dialogue_move().dialogue_type == DIALOGUE_TYPE_E_FOLLOWUP:
+                response = "Thank you for clarifying that. " + response
+            #update event chain with new emotion
+            if move_to_execute == DIALOGUE_TYPE_C_PUMPING:
+                self.world.curr_emotion_event.emotion = self.dialogue_planner.curr_event.emotion
+                self.world.emotion_events[len(self.world.emotion_events)-1] = self.world.curr_emotion_event
 
+            followup_move = self.dialogue_planner.finalize_dialogue_move(move_to_execute)
+            if followup_move != "":
+                response = response + self.perform_dialogue_manager(response="", preselected_move=followup_move)
+        
         #saves dialogue move to history
         self.dialogue_planner.set_template_details_history(chosen_template)
-
-        followup_move = self.dialogue_planner.finalize_dialogue_move(move_to_execute)
-        if followup_move != "":
-            response = response + self.perform_dialogue_manager(response="", preselected_move=followup_move)
 
         self.dialogue_planner.reset_state()
 

@@ -1,11 +1,38 @@
 from EDEN.constants import *
 from src import *
 from src.dialoguemanager import DialoguePlanner
+import numpy as np
+import time
+from src.models.dialogue import DialogueHistoryTemplate
+from src.models.dialogue.constants import *
+from src.dbo.dialogue.DBODialogueTemplate import *
 
 class ORSEN2DialoguePlanner(DialoguePlanner):
 
     def __init__(self):
         super().__init__()
+        self.response = ""
+        
+    def reset_new_world(self):
+        self.frequency_count = np.zeros(len(DIALOGUE_LIST))
+        self.is_usable = [False] * len(DIALOGUE_LIST)
+        self.move_index = -1
+
+        self.dialogue_history = []
+        self.usable_templates = []
+
+        self.curr_event = None
+
+        self.dialogue_template = DBODialogueTemplate('templates')
+
+        self.chosen_move_index = -1
+        self.chosen_dialogue_move = None
+        self.chosen_dialogue_template = []
+
+        self.seed_time = time.time()
+        self.num_action_events = 0
+        # TODO seed(Handle triggered
+        np.random.seed(DEFAULT_SEED)
         self.response = ""
 
     ###checks only dialogue that does not need to go through text understanding
@@ -48,3 +75,6 @@ class ORSEN2DialoguePlanner(DialoguePlanner):
     # suggestion model
     def is_ongoing_done(self):
         pass
+
+    def get_welcome_message_type(self):
+        return DIALOGUE_TYPE_ORSEN_WELCOME

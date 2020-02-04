@@ -1,6 +1,7 @@
 from src.dbo.user import DBOUser
 from src.models.user import User
 from src import Logger, IS_AFFIRM, IS_DENY, IS_END, UserHandler, DIALOGUE_TYPE_E_END, DIALOGUE_TYPE_RECOLLECTION, Pickle
+from src.constants import *
 from src.ORSEN import ORSEN
 from src.textunderstanding.InputDecoder import InputDecoder
 import datetime
@@ -85,6 +86,10 @@ def clean_user_input(response):
 
     return response
 
+def orsen_welcome():
+    if CURR_ORSEN_VERSION == "ORSEN2":
+        login_signup()
+
 def start_storytelling():
     is_end_story = False
     while not is_end_story:
@@ -138,7 +143,6 @@ orsen = ORSEN()
 Logger.setup_loggers()
 # Retrieve User Details --- User objects
 print("---------Retrieving User Details---------")
-# login_signup()
 print("done")
 
 # pickle_filepath = '../logs/user world/' + datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S") + "-" + UserHandler.get_instance().curr_user.name
@@ -201,12 +205,10 @@ while is_engaged:
     orsen.world.reset_world()
     orsen.dialogue_planner.reset_new_world()
 
+    #orsen_welcome()
     temp_welcome = orsen.get_response(move_to_execute = orsen.dialogue_planner.get_welcome_message_type())
     print(temp_welcome)
-
-
-
-    # print("Let's make another story! You go first")
+    
     start_storytelling()
 
     #save story world
