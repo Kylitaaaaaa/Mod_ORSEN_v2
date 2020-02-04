@@ -121,8 +121,6 @@ class DialoguePlanner:
         # recheck dialogue moves given templates
         for i in range(len(DIALOGUE_LIST)):
             self.is_usable[i] = self.is_dialogue_usable(DIALOGUE_LIST[i].get_type(), self.usable_templates[i])
-        
-        print("UOL")
 
     def set_dialogue_list_true(self, set_to_true):
         for i in range(len(set_to_true)):
@@ -218,7 +216,7 @@ class DialoguePlanner:
         #get latest dialogue move
         last_move = self.get_last_dialogue_move()
         if last_move is not None:
-            print("EPIC", last_move.dialogue_type)
+            print("Last Move Dialogue Type: ", last_move.dialogue_type)
 
         if last_move is not None:
             # check if prev move is suggestion
