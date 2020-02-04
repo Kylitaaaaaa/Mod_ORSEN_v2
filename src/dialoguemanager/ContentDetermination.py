@@ -57,7 +57,14 @@ class ContentDetermination:
         return str_response, chosen_template
 
     def choose_template(self):
-        return np.random.choice(self.usable_template_list)
+        print("templates:")
+        print(self.usable_template_list)
+        
+        if (len(self.usable_template_list) > 0):
+            return np.random.choice(self.usable_template_list)
+        else:
+            # return empty list lang? di ko sure if tama :(
+            return self.usable_template_list
 
     def repeat_story(self, event_chains):
         response = ""
