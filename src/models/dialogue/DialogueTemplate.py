@@ -80,39 +80,55 @@ class DialogueTemplate(ABC):
 
         for i in range (len(self.blanks)):
             temp_list = []
+            Logger.log_dialogue_model_basic("Current Blank: " + str(self.blanks[i]))
+
             if self.blanks[i] == 'Character' or self.blanks[i] == 'Object':
                 # check <index> <Character>
                 # check <index> <Object>
                 temp_list = self.get_element_list(self.blanks[i], curr_event)
             elif self.blanks[i] == 'IsA':
                 # check <index> <isA> weekday
-                temp_list = self.dbo_concept.get_concept_by_second_relation(self.relation[i][1], self.relation[i][2])
+                # TODO randomizer should not be here, will fix this pa
+                temp_list = self.dbo_concept.get_concept_by_second_relation(self.relation[i][2], self.relation[i][1])
+                Logger.log_dialogue_model_basic_example("List of Valid Relations: ")
+                for x in range(len(temp_list)):
+                    Logger.log_dialogue_model_basic_example(str(temp_list[x]))
+                
+                updated_list =[]
+                if (len(temp_list) > 0):
+                    updated_list.append(np.random.choice(temp_list))
+                    Logger.log_dialogue_model_basic_example("Chosen Relation: ")
+                    Logger.log_dialogue_model_basic_example(str(updated_list[0]))
+
+                temp_list = updated_list
             else:
                 #check <index> <relation> <index>
                 temp_list = self.get_rel_list(blank_list, self.relation[i])
 
             if len(temp_list) > 0:
                 blank_list = self.update_list(blank_list, temp_list)
+                print("DialogueTemplate Line 114 ", blank_list)
+
             else:
-                print("NO RELATIONS FOUND")
+                if suggesting_first_try:
+                    if self.dialogue_type == DIALOGUE_TYPE_SUGGESTING:
+                        self.dbo_concept = DBOConceptGlobalImpl()
+                        self.is_usable_relation(curr_event, False)
+                        self.dbo_concept = DBOConceptLocalImpl()
+                else:
+                    print("NO RELATIONS FOUND")
+                    Logger.log_dialogue_model_basic_example("NO RELATIONS FOUND")
                 return False
+
         if len(blank_list) > 0:
+            # TODO: Randomizer should not be here, relations_blanks for suggesting and hinting
             self.relations_blanks = blank_list
             return True
         else:
-
-            # ADDED
-            if suggesting_first_try:
-                if self.dialogue_type == DIALOGUE_TYPE_SUGGESTING:
-                    self.dbo_concept = DBOConceptGlobalImpl()
-                    self.is_usable_relation(curr_event, False)
-                    self.dbo_concept = DBOConceptLocalImpl()
-            else:
-                print("NO RELATIONS FOUND")
-            
-            # END
+            print("NO RELATIONS FOUND")
+            Logger.log_dialogue_model_basic_example("NO RELATIONS FOUND")
         return False
-        
+
     def update_list(self, init_list, to_add_list):
         final_list = []
         #CELINA NOTES: Why may "[]" yun X? [X]
@@ -275,7 +291,6 @@ class DialogueTemplate(ABC):
             if curr_event is not "":
                 return True
         return False
-
 
     def get_word_relations(self):
         word_rel = []

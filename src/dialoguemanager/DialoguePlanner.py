@@ -90,6 +90,7 @@ class DialoguePlanner:
         
         Logger.log_dialogue_model_basic("FINAL CHOSEN DIALOGUE MOVE: " + str(self.chosen_dialogue_move))
 
+        return self.chosen_dialogue_move
 
     def setup_templates_is_usable(self, move_to_execute=""):
         self.usable_templates = []
@@ -122,12 +123,35 @@ class DialoguePlanner:
         for i in range(len(DIALOGUE_LIST)):
             self.is_usable[i] = self.is_dialogue_usable(DIALOGUE_LIST[i].get_type(), self.usable_templates[i])
 
+        def init_set_dialogue_moves_usable(self):
+        # check which dialogue moves are usable
+        set_to_true = []
+
+        # set_to_true.append(DIALOGUE_TYPE_HINTING)
+        # set_to_true.append(DIALOGUE_TYPE_SUGGESTING)
+
+        if self.num_action_events <= 3:
+            set_to_true.append(DIALOGUE_TYPE_FEEDBACK)
+            set_to_true.append(DIALOGUE_TYPE_PUMPING_GENERAL)
+
+        # elif (self.get_num_usage(DIALOGUE_TYPE_FEEDBACK) + self.get_num_usage(DIALOGUE_TYPE_PUMPING_GENERAL) + self.get_num_usage(DIALOGUE_TYPE_PUMPING_SPECIFIC) + self.get_num_usage(DIALOGUE_TYPE_SUGGESTING)) % 4 == 0:
+        #     set_to_true = ['feedback', 'suggesting']
+
+        elif self.get_num_usage(DIALOGUE_TYPE_FEEDBACK) + self.get_num_usage(DIALOGUE_TYPE_PUMPING_GENERAL) == 3:
+            set_to_true.append(DIALOGUE_TYPE_PUMPING_SPECIFIC)
+            set_to_true.append(DIALOGUE_TYPE_PUMPING_GENERAL)
+
+        else:
+            # set_to_true = [True for i in range(len(DIALOGUE_LIST))]
+            set_to_true = ['feedback', 'general', 'specific', 'hinting', 'suggesting']
+            
+        self.set_dialogue_list_true(set_to_true)
+
     def set_dialogue_list_true(self, set_to_true):
         for i in range(len(set_to_true)):
             for j in range(len(DIALOGUE_LIST)):
                 if DIALOGUE_LIST[j].get_type() == set_to_true[i]:
                     self.is_usable[j] = True
-
 
         self.print_dialogue_list()
 
@@ -154,6 +178,8 @@ class DialoguePlanner:
 
         # check which template is usable
         for X in template_list:
+            print("Checking:", X)
+            Logger.log_dialogue_model("Checking template " + str(X))
             if X.is_usable(self.curr_event, self.get_num_usage(X.get_type())):
                 usable_template_list.append(X)
         return usable_template_list
