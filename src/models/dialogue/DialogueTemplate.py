@@ -75,7 +75,6 @@ class DialogueTemplate(ABC):
 
 
     def is_usable_relation(self, curr_event, suggesting_first_try = True):
-        # putangina 16 hours ko to ginawa
         blank_list = []
 
         for i in range (len(self.blanks)):
@@ -104,20 +103,13 @@ class DialogueTemplate(ABC):
             else:
                 #check <index> <relation> <index>
                 temp_list = self.get_rel_list(blank_list, self.relation[i])
-
+            
             if len(temp_list) > 0:
                 blank_list = self.update_list(blank_list, temp_list)
-                print("DialogueTemplate Line 114 ", blank_list)
 
             else:
-                if suggesting_first_try:
-                    if self.dialogue_type == DIALOGUE_TYPE_SUGGESTING:
-                        self.dbo_concept = DBOConceptGlobalImpl()
-                        self.is_usable_relation(curr_event, False)
-                        self.dbo_concept = DBOConceptLocalImpl()
-                else:
-                    print("NO RELATIONS FOUND")
-                    Logger.log_dialogue_model_basic_example("NO RELATIONS FOUND")
+                print("NO RELATIONS FOUND")
+                Logger.log_dialogue_model_basic_example("NO RELATIONS FOUND")
                 return False
 
         if len(blank_list) > 0:
