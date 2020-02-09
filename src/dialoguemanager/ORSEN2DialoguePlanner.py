@@ -34,18 +34,73 @@ class ORSEN2DialoguePlanner(DialoguePlanner):
         # TODO seed(Handle triggered
         np.random.seed(DEFAULT_SEED)
         self.response = ""
+    
+    def init_set_dialogue_moves_usable(self):
+        # check which dialogue moves are usable
+        set_to_true = []
+
+        # set_to_true.append(DIALOGUE_TYPE_HINTING)
+        # set_to_true.append(DIALOGUE_TYPE_SUGGESTING)
+
+        if self.num_action_events <= 3:
+            set_to_true.append(DIALOGUE_TYPE_FEEDBACK)
+            set_to_true.append(DIALOGUE_TYPE_PUMPING_GENERAL)
+
+        elif self.get_num_usage(DIALOGUE_TYPE_FEEDBACK) + self.get_num_usage(DIALOGUE_TYPE_PUMPING_GENERAL) == 3:
+            set_to_true.append(DIALOGUE_TYPE_PUMPING_SPECIFIC)
+            set_to_true.append(DIALOGUE_TYPE_PUMPING_GENERAL)
+
+        else:
+            set_to_true = ['feedback', 'general', 'specific', 'hinting', 'suggesting']
+
+        self.set_dialogue_list_true(set_to_true)
 
     ###checks only dialogue that does not need to go through text understanding
-    # def check_trigger_phrases(self, response, event_chain):
-    def check_trigger_phrases(self, event_chain):
+    def check_trigger_phrases(self, response, event_chain):
+        response = response.lower()
+
+        #get latest dialogue move
+        last_move = self.get_last_dialogue_move()
+        if last_move is not None:
+            print("Last Move Dialogue Type: ", last_move.dialogue_type)
+
+        if last_move is not None:
+            # check if prev move is suggestion
+            if last_move.dialogue_type == DIALOGUE_TYPE_SUGGESTING:
+                if response in IS_AFFIRM:
+                    return DIALOGUE_TYPE_SUGGESTING_AFFIRM
+                elif response in IS_DENY:
+                    return DIALOGUE_TYPE_FOLLOW_UP
+            #check if prev move is follow up
+            elif last_move.dialogue_type == DIALOGUE_TYPE_FOLLOW_UP:
+                print("LAST MOVE IS FOLLOW UP")
+                if response in IS_DONT_LIKE:
+                    print("DON'T LIKE")
+                    return DIALOGUE_TYPE_KNOWLEDGE_ACQUISITION_PUMPING
+                    # return DIALOGUE_TYPE_FOLLOW_UP_DONT_LIKE
+                elif response in IS_WRONG:
+                    print("DEDUCT")
+                    return DIALOGUE_TYPE_FOLLOW_UP_WRONG
+            elif last_move.dialogue_type == DIALOGUE_TYPE_KNOWLEDGE_ACQUISITION_PUMPING:
+                return DIALOGUE_TYPE_SUGGESTING_AFFIRM       
+
         if self.response in IS_END:
             return DIALOGUE_TYPE_E_END
-        if self.response in PUMPING_TRIGGER:
+        elif response in PUMPING_TRIGGER:
             if len(event_chain) > 0:
                 return DIALOGUE_TYPE_PUMPING_SPECIFIC
             return DIALOGUE_TYPE_PROMPT
-        elif self.response in PROMPT_TRIGGER:
+        elif response in PROMPT_TRIGGER:
             return DIALOGUE_TYPE_PROMPT
+        elif response in HINTING_TRIGGER:
+            if len(event_chain) > 0:
+                return DIALOGUE_TYPE_HINTING
+            return DIALOGUE_TYPE_PUMPING_GENERAL
+        elif response in SUGGESTING_TRIGGER:
+            if len(event_chain) > 0:
+                return DIALOGUE_TYPE_SUGGESTING
+            return DIALOGUE_TYPE_PUMPING_GENERAL
+        return None
 
     def check_based_prev_move(self):
         last_move = self.get_last_dialogue_move()

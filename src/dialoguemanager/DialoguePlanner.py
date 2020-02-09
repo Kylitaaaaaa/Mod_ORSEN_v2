@@ -94,11 +94,8 @@ class DialoguePlanner:
 
         return self.chosen_dialogue_move
 
-    def setup_templates_is_usable(self, move_to_execute=""):
-        self.usable_templates = []
-        #sets usable dialogue moves based on previous dialogue move -- modify check_based_prev_move
-        self.init_set_dialogue_moves_usable(move_to_execute)
-
+    def setup_templates_is_usable(self):
+        self.init_set_dialogue_moves_usable()
         # fetch all usable dialogue templates
 
         # For Logging
@@ -125,25 +122,25 @@ class DialoguePlanner:
         for i in range(len(DIALOGUE_LIST)):
             self.is_usable[i] = self.is_dialogue_usable(DIALOGUE_LIST[i].get_type(), self.usable_templates[i])
 
-        def init_set_dialogue_moves_usable(self):
-            # check which dialogue moves are usable
-            set_to_true = []
+    def init_set_dialogue_moves_usable(self):
+        # check which dialogue moves are usable
+        set_to_true = []
 
-            # set_to_true.append(DIALOGUE_TYPE_HINTING)
-            set_to_true.append(DIALOGUE_TYPE_SUGGESTING)
+        # set_to_true.append(DIALOGUE_TYPE_HINTING)
+        # set_to_true.append(DIALOGUE_TYPE_SUGGESTING)
 
-            # if self.num_action_events <= 3:
-            #     set_to_true.append(DIALOGUE_TYPE_FEEDBACK)
-            #     set_to_true.append(DIALOGUE_TYPE_PUMPING_GENERAL)
+        if self.num_action_events <= 3:
+            set_to_true.append(DIALOGUE_TYPE_FEEDBACK)
+            set_to_true.append(DIALOGUE_TYPE_PUMPING_GENERAL)
 
-            # elif self.get_num_usage(DIALOGUE_TYPE_FEEDBACK) + self.get_num_usage(DIALOGUE_TYPE_PUMPING_GENERAL) == 3:
-            #     set_to_true.append(DIALOGUE_TYPE_PUMPING_SPECIFIC)
-            #     set_to_true.append(DIALOGUE_TYPE_PUMPING_GENERAL)
+        elif self.get_num_usage(DIALOGUE_TYPE_FEEDBACK) + self.get_num_usage(DIALOGUE_TYPE_PUMPING_GENERAL) == 3:
+            set_to_true.append(DIALOGUE_TYPE_PUMPING_SPECIFIC)
+            set_to_true.append(DIALOGUE_TYPE_PUMPING_GENERAL)
 
-            # else:
-            #     set_to_true = ['feedback', 'general', 'specific', 'hinting', 'suggesting']
-                
-            self.set_dialogue_list_true(set_to_true)
+        else:
+            set_to_true = ['feedback', 'general', 'specific', 'hinting']
+
+        self.set_dialogue_list_true(set_to_true)
 
     def set_dialogue_list_true(self, set_to_true):
         for i in range(len(set_to_true)):
@@ -178,8 +175,10 @@ class DialoguePlanner:
         for X in template_list:
             print("Checking:", X)
             Logger.log_dialogue_model("Checking template " + str(X))
+            print(self.curr_event)
             if X.is_usable(self.curr_event, self.get_num_usage(X.get_type())):
                 usable_template_list.append(X)
+
         return usable_template_list
 
     def get_num_usage(self, dialogue_type):
@@ -235,35 +234,11 @@ class DialoguePlanner:
         return valid_moves
 
     def check_trigger_phrases(self, response, event_chain):
-        response = response.lower()
+        response = response.lower()   
 
-        #get latest dialogue move
-        last_move = self.get_last_dialogue_move()
-        if last_move is not None:
-            print("Last Move Dialogue Type: ", last_move.dialogue_type)
-
-        if last_move is not None:
-            # check if prev move is suggestion
-            if last_move.dialogue_type == DIALOGUE_TYPE_SUGGESTING:
-                if response in IS_AFFIRM:
-                    return DIALOGUE_TYPE_SUGGESTING_AFFIRM
-                elif response in IS_DENY:
-                    return DIALOGUE_TYPE_FOLLOW_UP
-            #check if prev move is follow up
-            elif last_move.dialogue_type == DIALOGUE_TYPE_FOLLOW_UP:
-                print("LAST MOVE IS FOLLOW UP")
-                if response in IS_DONT_LIKE:
-                    print("DON'T LIKE")
-                    return DIALOGUE_TYPE_FOLLOW_UP_DONT_LIKE
-                elif response in IS_WRONG:
-                    print("DEDUCT 0")
-                    return DIALOGUE_TYPE_FOLLOW_UP_WRONG
-            elif last_move.dialogue_type == DIALOGUE_TYPE_KNOWLEDGE_ACQUISITION_PUMPING:
-                return DIALOGUE_TYPE_SUGGESTING_AFFIRM
-
-            #TODO Add response for multiple choice type                
-
-        if response in PUMPING_TRIGGER:
+        if self.response in IS_END:
+            return DIALOGUE_TYPE_E_END
+        elif response in PUMPING_TRIGGER:
             if len(event_chain) > 0:
                 return DIALOGUE_TYPE_PUMPING_SPECIFIC
             return DIALOGUE_TYPE_PROMPT
@@ -272,10 +247,6 @@ class DialoguePlanner:
         elif response in HINTING_TRIGGER:
             if len(event_chain) > 0:
                 return DIALOGUE_TYPE_HINTING
-            return DIALOGUE_TYPE_PUMPING_GENERAL
-        elif response in SUGGESTING_TRIGGER:
-            if len(event_chain) > 0:
-                return DIALOGUE_TYPE_SUGGESTING
             return DIALOGUE_TYPE_PUMPING_GENERAL
         return None
 

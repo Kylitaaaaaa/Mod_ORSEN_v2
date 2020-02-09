@@ -32,8 +32,36 @@ class ContentDetermination:
         # if template has no fillable blanks, enter this particular if statement
         if len(chosen_template.template) == 1:
             response = chosen_template.template[0]
+
+        else:
+            print("=============")
+            print(self.curr_event)
+            print("=============")
+            print(chosen_template.dependent_nodes)
+            print("=============")
+            response = chosen_template.fill_blanks(self.curr_event)
+
+        # if response type is not a string (as in, pag template/list siya), join stuff idk
+        if type(response) is not type("dump"):
+            print(response)
+            str_response = ' '.join(response)
+            # TODO replace multiple occurences of spaces with only one space.
+        else:
+            str_response = response
+
+        self.reset_state()
+        return str_response, chosen_template
+    
+    def perform_content_determination(self, dialogue_history):
+        #choose template
+        chosen_template = self.choose_template()
+
+        #fill template to use
+        # if template has no fillable blanks, enter this particular if statement
+        if len(chosen_template.template) == 1:
+            response = chosen_template.template[0]
             
-        # [CELINA] Added the dialogue history for this part
+        # Added the dialogue history for this part
         elif self.move_to_execute == DIALOGUE_TYPE_KNOWLEDGE_ACQUISITION_PUMPING:
             response = chosen_template.fill_blanks(dialogue_history)
 

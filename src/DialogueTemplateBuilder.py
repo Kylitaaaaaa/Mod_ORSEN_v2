@@ -76,8 +76,9 @@ class DialogueTemplateBuilder:
       ##WELCOME MESSAGE
       elif dialogue_type == DIALOGUE_TYPE_EDEN_WELCOME:
          return EDENWelcomeDialogueTemplate(id, templates, relations, blanks, nodes, dependent_nodes)
-
-
+        
+      elif dialogue_type == DIALOGUE_TYPE_ORSEN_WELCOME:
+         return ORSENWelcomeDialogueTemplate(id, templates, relations, blanks, nodes, dependent_nodes)
 
       else:
          return UnknownDialogueTemplate(id, templates, relations, blanks, nodes, dependent_nodes)

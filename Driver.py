@@ -11,7 +11,6 @@ import time
 # Database access
 dbo_user = DBOUser('users', User)
 
-""" A part of me tells me na we need to have a different method for getting input para mabilis na lang ayusin soon pag sa iba gagamitin."""
 def get_input():
     user_input = input()
     return user_input
@@ -111,30 +110,29 @@ def start_storytelling():
         if not is_end_story:
             orsen_response = orsen.get_response(user_input)
             print("=========================================================")
-            print("EDEN:", orsen_response)
+            print(CURR_ORSEN_VERSION + ": " + orsen_response)
             print("=========================================================")
-            Logger.log_conversation("EDEN: " + str(orsen_response))
-            is_end_story = orsen.is_end_story(user_input)
-        else:
+            Logger.log_conversation(CURR_ORSEN_VERSION + ": " + str(orsen_response))
+            # is_end_story = orsen.is_end_story(user_input)
+        elif CURR_ORSEN_VERSION == EDEN:
             """EDEN"""
             # orsen_response = orsen.get_response("", move_to_execute = DIALOGUE_TYPE_E_END)
             orsen_response = orsen.get_response("", move_to_execute = DIALOGUE_TYPE_RECOLLECTION)
             # orsen_response = orsen_response + orsen.get_response("", move_to_execute = DIALOGUE_TYPE_RECOLLECTION)
             print("=========================================================")
-            print("EDEN:", orsen_response)
+            print(CURR_ORSEN_VERSION + ": " + orsen_response)
             print("=========================================================")
-            Logger.log_conversation("EDEN: " + str(orsen_response))
-
-
-
-
-            # is_end_story = True
-
+            Logger.log_conversation(CURR_ORSEN_VERSION + ": " + str(orsen_response))
+        elif CURR_ORSEN_VERSION == ORSEN1 or CURR_ORSEN_VERSION == ORSEN2:
             # """ORSEN"""
-            # print("Thank you for the story! Do you want to hear it again?")
-            # user_input = get_input()
-            # if user_input.lower() in IS_AFFIRM:
-            #     print(orsen.repeat_story())
+            orsen_response = "Thank you for the story! Do you want to hear it again?"
+            print("=========================================================")
+            print(CURR_ORSEN_VERSION + ": " + orsen_response)
+            print("=========================================================")
+            Logger.log_conversation(CURR_ORSEN_VERSION + ": " + str(orsen_response))
+            user_input = get_input()
+            if user_input.lower() in IS_AFFIRM:
+                print(orsen.repeat_story())
 
 orsen = ORSEN()
 
@@ -205,7 +203,7 @@ while is_engaged:
     orsen.world.reset_world()
     orsen.dialogue_planner.reset_new_world()
 
-    #orsen_welcome()
+    # orsen_welcome()
     temp_welcome = orsen.get_response(move_to_execute = orsen.dialogue_planner.get_welcome_message_type())
     print(temp_welcome)
     
@@ -217,7 +215,9 @@ while is_engaged:
     except Exception as e:
         Logger.log_conversation("ERROR: " + str(e))
 
-    print("Do you want to make another story?")
+    print("=========================================================")
+    print(CURR_ORSEN_VERSION + ": " + "Do you want to make another story?")
+    print("=========================================================")
     user_input = get_input()
     if user_input.lower() in IS_DENY:
         is_engaged = False

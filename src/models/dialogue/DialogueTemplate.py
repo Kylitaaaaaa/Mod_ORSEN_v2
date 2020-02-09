@@ -192,7 +192,7 @@ class DialogueTemplate(ABC):
         if len(element_list) != 0:
             print("Element List: ", element_list)
 
-            # [Celina] idk if dapat may randomizer dito
+            # idk if dapat may randomizer dito
             temp_list.append(np.random.choice(element_list))
 
             for X in element_list:
@@ -205,7 +205,7 @@ class DialogueTemplate(ABC):
         for x in range(len(temp_list)):
             Logger.log_dialogue_model_basic_example(str(temp_list[x]))
 
-        # [Celina] idk if dapat may randomizer dito
+        # idk if dapat may randomizer dito
         if len(temp_list) != 0:
             updated_list.append(np.random.choice(temp_list))
 
@@ -235,7 +235,7 @@ class DialogueTemplate(ABC):
                 print("X len is: ", len(X))
                 curr_refer = X[int(relation[0]) - 1]
 
-                # [Celina] idk if dapat may randomizer dito
+                # idk if dapat may randomizer dito
                 # curr_refer = np.random.choice(curr_refer_list)
 
                 if type(curr_refer) == Character or type(curr_refer) == Object:
@@ -313,7 +313,7 @@ class DialogueTemplate(ABC):
                     if type(self.relations_blanks[0][int(X[2])-1]) == Character or type(self.relations_blanks[0][int(X[2])-1]) == Object:
                         second_val = self.relations_blanks[0][int(X[2])-1].name
                     else:
-                        #[Celina] I changed the .first to .second
+                        #I changed the .first to .second
                         second_val = self.relations_blanks[0][int(X[2])-1].second
 
                     word_rel.append(Relation(first=first_val, relation=X[1], second=second_val))
