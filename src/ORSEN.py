@@ -285,6 +285,11 @@ class ORSEN:
         curr_event = None
         move_to_execute = preselected_move 
 
+        if move_to_execute is None:
+            move_to_execute = self.dialogue_planner.perform_dialogue_planner()
+        else:
+            self.dialogue_planner.perform_dialogue_planner(move_to_execute)
+
         if move_to_execute != "":
             self.dialogue_planner.perform_dialogue_planner(move_to_execute)
         else:
@@ -295,20 +300,22 @@ class ORSEN:
                 # (using previous sentences as context). This also including breaking the sentences into different event entities.  
                 ORSEN.perform_text_understanding(self, response)
 
-                #IDK uwu
                 curr_event = self.world.curr_event
-                print("THIS IS THE CURRENT EVENT")
                 print(curr_event)
-
                 Logger.log_dialogue_model_basic("THIS IS THE CURRENT EVENT:")
                 Logger.log_dialogue_model(curr_event)
-
                 self.dialogue_planner.set_state(curr_event, self.world.get_num_action_events())
-                #IDK uwu
 
                 move_to_execute = self.dialogue_planner.perform_dialogue_planner()
             else:
                 move_to_execute = ORSEN.update_relation_score(self, move_to_execute)
+                
+                curr_event = self.world.curr_event
+                print(curr_event)
+                Logger.log_dialogue_model_basic("THIS IS THE CURRENT EVENT:")
+                Logger.log_dialogue_model(curr_event)
+                self.dialogue_planner.set_state(curr_event, self.world.get_num_action_events())
+
                 self.dialogue_planner.perform_dialogue_planner(move_to_execute)
 
         available_templates = self.dialogue_planner.chosen_dialogue_template

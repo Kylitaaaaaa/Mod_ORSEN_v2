@@ -84,6 +84,8 @@ class DialoguePlanner:
         else:
             self.chosen_dialogue_move = dialogue_move
             self.chosen_dialogue_template = self.get_usable_templates(dialogue_move)
+            print("DP Line 87")
+            print(self.chosen_dialogue_template)
             self.dialogue_history.append(DialogueHistoryTemplate(dialogue_type=self.chosen_dialogue_move))
         
         Logger.log_dialogue_model_basic("PRINT ALL DIALOGUE TURNS: ")

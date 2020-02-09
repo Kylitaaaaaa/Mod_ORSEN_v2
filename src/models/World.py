@@ -19,7 +19,7 @@ class World:
     emotion_events = []
 
     # The temporary event that contains the last event from the last dialogue entered by the user.
-    curr_event = None
+    curr_event = []  # I changed this from curr_event = None
 
     #EDEN: Temporary event with emotions
     curr_emotion_event = None
@@ -39,7 +39,7 @@ class World:
         self.event_chains = event_chains
         self.sentence_references = sentence_references
         self.dialogue_move_history = dialogue_move_history
-        self.curr_event = None
+        self.curr_event = []
         self.curr_emotion_event = None
         self.last_fetched = []
         self.emotion_events = []
@@ -51,7 +51,7 @@ class World:
         self.event_chains = []
         self.sentence_references = []
         self.dialogue_move_history = []
-        self.curr_event = None
+        self.curr_event = []
         self.curr_emotion_event = None
         self.last_fetched = []
         self.emotion_events = []

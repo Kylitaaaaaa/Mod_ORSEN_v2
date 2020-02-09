@@ -11,6 +11,7 @@ from src import Logger, IS_AFFIRM, IS_DENY, IS_END, UserHandler, Pickle, CURR_OR
 from src.ORSEN import ORSEN
 from src.textunderstanding.InputDecoder import InputDecoder
 from src.googlehome import json_reply
+from src.constants import *
 from flask import Flask
 from flask import jsonify
 from flask import request
@@ -25,6 +26,11 @@ name = ""
 code = ""
 have_account = ""
 pickle_filepath = '../Mod_ORSEN_v2/logs/user world/'
+
+def initialize_orsen():
+    orsen.initialize_story_prerequisites()
+    orsen.world.reset_world()
+    orsen.dialogue_planner.reset_new_world()
 
 def account_status(user_input):
     global have_account
@@ -53,7 +59,8 @@ def login():
         UserHandler.get_instance().set_global_curr_user(temp_user)
         status = "storytelling"
         pickle_filepath = pickle_filepath + name
-        # return "Hi! Welcome back " + name + " . Let's make a story. You start!"
+        
+        initialize_orsen()
 
         temp_welcome = orsen.get_response(move_to_execute=orsen.dialogue_planner.get_welcome_message_type())
         return "Hi! Welcome back " + name + " . " + temp_welcome
@@ -64,8 +71,9 @@ def signup():
     UserHandler.get_instance().set_global_curr_user(dbo_user.add_user(User(-1, name, code)))
     status = "storytelling"
     pickle_filepath = pickle_filepath + name
-    # return "Alright" + name + ", let's make a story. You start!"
-    # return "Alright" + name + ", test"
+    
+    initialize_orsen()
+
     temp_welcome = orsen.get_response(move_to_execute=orsen.dialogue_planner.get_welcome_message_type())
     return "Alright " + name + " . " + temp_welcome
 
@@ -84,9 +92,6 @@ Logger.setup_loggers()
 
 print("---------Launching ORSEN---------")
 orsen = ORSEN()
-
-
-
 
 @app.route('/orsen', methods=["POST"])
 def driver():
@@ -111,16 +116,16 @@ def driver():
     # Greet the User
     elif focus["intent"] == "actions.intent.MAIN":
 
-        orsen_response = "Hi! I'm " + CURR_ORSEN_VERSION + "."
+        orsen_response = "Hi! I'm " + CURR_ORSEN_VERSION + ". "
 
         if status == "login_signup":
             orsen_response += "Do you have an account?"
             status = "account_status"
             
         elif status == "start_storytelling":
-            # orsen_response += "Let's make a story. You start!"
+            initialize_orsen()
+
             temp_welcome = orsen.get_response(move_to_execute=orsen.dialogue_planner.get_welcome_message_type())
-            # orsen_response += "How was your day?"
             orsen_response += temp_welcome
             status = "storytelling"
         
@@ -147,7 +152,6 @@ def driver():
         
         # STORYTELLING
         elif status == "storytelling":
-
             if UserHandler.get_instance().curr_user is None:
                 Logger.log_conversation("User : " + str(user_input))
             else:
@@ -158,41 +162,38 @@ def driver():
             if not is_end_story:
                 # TODO Connect to back end, get the response
                 orsen_response = orsen.get_response(user_input)
-                # orsen_response = "STORY TIME"
-                # Logger.log_conversation("ORSEN: " + str(orsen_response))
                 Logger.log_conversation(CURR_ORSEN_VERSION + ": " + str(orsen_response))
                 is_end_story = is_end_story_func(user_input)
                 print("IM AT END STORY FIRST")
 
             if is_end_story:
-                try:
-                    Pickle.pickle_world_wb(pickle_filepath, orsen.world.get_pickled_world())
-                    print("TRYING TO STORE PICKLE")
-                except Exception as e:
-                    print("Error: ", e)
+                if CURR_ORSEN_VERSION == EDEN:
+                    try:
+                        Pickle.pickle_world_wb(pickle_filepath, orsen.world.get_pickled_world())
+                        print("TRYING TO STORE PICKLE")
+                    except Exception as e:
+                        print("Error: ", e)
 
-                # orsen_response = orsen_response + " Do you want to make a new story?"
-                orsen_response = orsen_response + " Do you want to share another story?"
-                print("IM AT END STORY STATUS")
-                status = "create_another_story"
+                    # orsen_response = orsen_response + " Do you want to make a new story?"
+                    orsen_response = "Do you want to share another story?"
+                    print("IM AT END STORY STATUS")
+                    status = "create_another_story"
+                else:
+                    orsen_response = "Thank you for the story! Do you want to hear it again?"
+                    status = "repeat_story"
 
-
-        
-        # elif status == "repeat_story":
-        #     orsen_response = ""
-        #     if user_input.lower() in IS_AFFIRM:
-        #         # TODO Connect to back end, get repetition
-        #         orsen_response = orsen.repeat_story()
-        #         # orsen_response = "Repeating Story..."
-        #     orsen_response += " Do you want to create another story?"
-        #     status = "create_another_story"
+        elif status == "repeat_story":
+            if user_input.lower() in IS_AFFIRM:
+                # TODO Connect to back end, get repetition
+                orsen_response = orsen.repeat_story()
+                # orsen_response = "Repeating Story..."
+            orsen_response += " Do you want to create another story?"
+            status = "create_another_story"
         
         elif status == "create_another_story":
             print("IM AT CREATE NEW STORY")
             if user_input.lower() in IS_AFFIRM:
-                orsen.initialize_story_prerequisites()
-                orsen.world.reset_world()
-                orsen.dialogue_planner.reset_new_world()
+                initialize_orsen()
 
                 temp_welcome = orsen.get_response(move_to_execute=orsen.dialogue_planner.get_welcome_message_type())
                 # orsen_response = "Ok! Let's make another story! You go first"
