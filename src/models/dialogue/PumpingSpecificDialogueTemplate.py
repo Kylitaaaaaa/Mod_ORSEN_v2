@@ -1,4 +1,5 @@
 from . import DialogueTemplate
+from src.Logger import Logger
 from src.constants import DIALOGUE_TYPE_PUMPING_SPECIFIC, EVENT_ACTION, EVENT_CREATION, EVENT_DESCRIPTION
 
 

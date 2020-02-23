@@ -9,7 +9,7 @@ from EDEN.models import Emotion
 from EDEN.models.EmotionEventTemplateBuilder import EmotionEventTemplateBuilder, EVENT_DESCRIPTION
 from src.dbo.concept import DBOConcept, DBOConceptGlobalImpl
 from src.models.elements import Character
-# from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 from src import Logger, EVENT_ACTION
 
 nlp = spacy.load("en_core_web_sm")
